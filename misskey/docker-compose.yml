@@ -1,0 +1,83 @@
+version: "3.2"
+
+services:
+  web:
+    image: misskey/misskey:12.47.0
+    restart: always
+    ports:
+      - "3001:3000"
+    networks:
+      - internal_network
+    volumes:
+      - config:/misskey/.config
+      - files:/misskey/files
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_WEB
+
+  redis:
+    restart: always
+    image: redis:4.0-alpine
+    networks:
+      - internal_network
+    volumes:
+      - redis:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_REDIS
+
+  db:
+    restart: always
+    image: postgres:12.2-alpine
+    networks:
+      - internal_network
+    env_file:
+      - config/docker.env
+    volumes:
+      - db:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_DB
+
+#  es:
+#    restart: always
+#    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.2
+#    environment:
+#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#    networks:
+#      - internal_network
+#    volumes:
+#      - ./elasticsearch:/usr/share/elasticsearch/data
+
+networks:
+  internal_network:
+    driver: overlay
+    attachable: true
+
+volumes:
+  config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/misskey/config"
+  files:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/misskey/files"
+  redis:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/misskey/redis"
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/misskey/db"
