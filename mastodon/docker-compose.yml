@@ -1,0 +1,164 @@
+version: '3.2'
+services:
+
+  db:
+    restart: always
+    image: postgres:9.6-alpine
+    shm_size: 256mb
+    networks:
+      - internal_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_DB
+
+  redis:
+    restart: always
+    image: redis:6.0-alpine
+    networks:
+      - internal_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+    volumes:
+      - redis:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_REDIS
+
+#  es:
+#    restart: always
+#    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10
+#    environment:
+#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#      - "cluster.name=es-mastodon"
+#      - "discovery.type=single-node"
+#      - "bootstrap.memory_lock=true"
+#    networks:
+#      - internal_network
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+#    volumes:
+#      - ./elasticsearch:/usr/share/elasticsearch/data
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
+
+  web:
+    image: tootsuite/mastodon:v3.2.0
+    restart: always
+    env_file: ./config/production.env
+    command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
+    networks:
+      - external_network
+      - internal_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider --proxy=off localhost:3000/health || exit 1"]
+    depends_on:
+      - db
+      - redis
+#      - es
+    volumes:
+      - system:/mastodon/public/system
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_WEB
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mastodon_web.rule=Host(`mastodon.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.mastodon_web.entrypoints=websecure"
+        - "traefik.http.routers.mastodon_web.tls.certresolver=le"
+        - "traefik.http.services.mastodon_web.loadbalancer.server.port=3000"
+
+  streaming:
+    image: tootsuite/mastodon:v3.2.0
+    restart: always
+    env_file: ./config/production.env
+    command: node ./streaming
+    networks:
+      - external_network
+      - internal_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider --proxy=off localhost:4000/api/v1/streaming/health || exit 1"]
+    ports:
+      - "0.0.0.0:4000:4000"
+    depends_on:
+      - db
+      - redis
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_STREAMING
+
+  sidekiq:
+    image: tootsuite/mastodon:v3.2.0
+    restart: always
+    env_file: ./config/production.env
+    command: bundle exec sidekiq
+    depends_on:
+      - db
+      - redis
+    networks:
+      - external_network
+      - internal_network
+    volumes:
+      - system:/mastodon/public/system
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_SIDEKIQ
+## Uncomment to enable federation with tor instances along with adding the following ENV variables
+## http_proxy=http://privoxy:8118
+## ALLOW_ACCESS_TO_HIDDEN_SERVICE=true
+#  tor:
+#    image: sirboops/tor
+#    networks:
+#      - external_network
+#      - internal_network
+#
+#  privoxy:
+#    image: sirboops/privoxy
+#    volumes:
+#      - ./priv-config:/opt/config
+#    networks:
+#      - external_network
+#      - internal_network
+
+networks:
+  external_network:
+    external: true
+  internal_network:
+    internal: true
+
+volumes:
+  config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/mastodon/config"
+  system:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/mastodon/public/system"
+  redis:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/mastodon/redis"
+  postgres:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/mastodon/postgres"
