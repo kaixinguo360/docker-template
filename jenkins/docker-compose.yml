@@ -1,0 +1,35 @@
+version: "3.2"
+
+services:
+  web:
+    image: jenkins/jenkins:lts-alpine
+    ports:
+      - 50000:50000
+    volumes:
+      - data:/var/jenkins_home
+    networks:
+      - external_network
+    volumes:
+      - data:/var/jenkins_home
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_WEB
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.jenkins_web.rule=Host(`jenkins.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.jenkins_web.entrypoints=websecure"
+        - "traefik.http.routers.jenkins_web.tls.certresolver=le"
+        - "traefik.http.services.jenkins_web.loadbalancer.server.port=8080"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/jenkins/data"
