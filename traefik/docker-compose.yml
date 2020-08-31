@@ -1,9 +1,10 @@
-version: '3'
+version: "3.2"
 
 services:
   proxy:
     image: traefik:v2.3
     command:
+      - "--log.level=DEBUG"
       # 启用swarm模式支持
       - "--providers.docker.swarmMode=true"
       # 默认不公开容器
@@ -13,9 +14,26 @@ services:
       # 创建名为`web`的入口点，并为其暴露于80端口。该入口点会指示其它容器
       # 在哪个端口公开，详情见下文应用部署示例
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # Let's Encrypt httpchallenge方式获取https证书
+      # 更多见https://docs.traefik.io/https/overview/
+      - "--certificatesresolvers.le.acme.dnschallenge=true"
+      - "--certificatesresolvers.le.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.le.acme.email=<secret:USER_NAME>@example.com"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    env_file:
+      - config/docker.env
     ports:
-      - 80:80
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
     volumes:
+      - ssl:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - external_network
@@ -23,8 +41,26 @@ services:
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        # 全局重定向匹配路由规则，这里匹配了所有路由
+        - "traefik.http.routers.http2https.rule=HostRegexp(`{any:.+}`)"
+        # 入口点选择上面配置的web入口点
+        - "traefik.http.routers.http2https.entrypoints=web"
+        # 路由中间件
+        - "traefik.http.routers.http2https.middlewares=https-redirect"
+        - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+        # 最最关键的一步，创建一个noop虚服务的loadbalancer，port随便选，不然上述重定向配置不会生效
+        - "traefik.http.services.noop.loadbalancer.server.port=9999"
 
 networks:
   external_network:
     external: true
 
+volumes:
+  ssl:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/traefik/ssl"
