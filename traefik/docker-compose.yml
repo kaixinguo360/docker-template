@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  proxy:
+    image: traefik:v2.3
+    command:
+      # 启用swarm模式支持
+      - "--providers.docker.swarmMode=true"
+      # 默认不公开容器
+      - "--providers.docker.exposedbydefault=false"
+      # 为external_network网络启用代理
+      - "--providers.docker.network=external_network"
+      # 创建名为`web`的入口点，并为其暴露于80端口。该入口点会指示其它容器
+      # 在哪个端口公开，详情见下文应用部署示例
+      - "--entrypoints.web.address=:80"
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - external_network
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  external_network:
+    external: true
+
