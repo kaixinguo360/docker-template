@@ -1,0 +1,10 @@
+spring:
+    application:
+        name: MyList
+    datasource:
+        url: jdbc:mysql://db:3306/mylist?serverTimezone=UTC&characterEncoding=utf-8&useSSL=false
+        username: mylist
+        password: 1234567
+    resources:
+        static-locations: file:/opt/mylist/static/MyList
+

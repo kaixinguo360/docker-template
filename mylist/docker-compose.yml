@@ -1,0 +1,71 @@
+version: "3.2"
+
+services:
+
+  db:
+    restart: always
+    image: mysql/mysql-server:8.0
+    shm_size: 256mb
+    env_file:
+      - config/docker.env
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/mysql
+      - sql:/docker-entrypoint-initdb.d/
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_DB
+
+  web:
+    restart: always
+    image: mylist
+    networks:
+      - external_network
+      - internal_network
+    env_file:
+      - config/docker.env
+    volumes:
+      - jar:/opt/mylist/jar
+      - static:/opt/mylist/static
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_WEB
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mylist_web.rule=Host(`list.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.mylist_web.entrypoints=websecure"
+        - "traefik.http.routers.mylist_web.tls.certresolver=le"
+        - "traefik.http.services.mylist_web.loadbalancer.server.port=8080"
+
+networks:
+  external_network:
+    external: true
+  internal_network:
+    internal: true
+
+volumes:
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/mylist/db"
+  sql:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/mylist/sql"
+  jar:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/mylist/jar"
+  static:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/mylist/static"
