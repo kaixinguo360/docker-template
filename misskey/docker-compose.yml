@@ -1,13 +1,17 @@
-version: "3.2"
+version: "3"
 
 services:
   web:
+#    build: .
     image: misskey/misskey:12.47.0
     restart: always
-    ports:
-      - "3001:3000"
+    links:
+      - db
+      - redis
+#      - es
     networks:
       - internal_network
+      - external_network
     volumes:
       - config:/misskey/.config
       - files:/misskey/files
@@ -16,6 +20,12 @@ services:
       placement:
         constraints: 
           - $DEPLOY_NODE_WEB
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.misskey_web.rule=Host(`misskey.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.misskey_web.entrypoints=websecure"
+        - "traefik.http.routers.misskey_web.tls.certresolver=le"
+        - "traefik.http.services.misskey_web.loadbalancer.server.port=3000"
 
   redis:
     restart: always
@@ -57,8 +67,9 @@ services:
 
 networks:
   internal_network:
-    driver: overlay
-    attachable: true
+    internal: true
+  external_network:
+    external: true
 
 volumes:
   config:
