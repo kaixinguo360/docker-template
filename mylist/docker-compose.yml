@@ -35,7 +35,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.mylist_web.rule=Host(`list.<secret:HOST_NAME>`)"
-        - "traefik.http.routers.mylist_web.entrypoints=websecure"
+        - "traefik.http.routers.mylist_web.entrypoints=webhttps"
         - "traefik.http.routers.mylist_web.tls.certresolver=le"
         - "traefik.http.services.mylist_web.loadbalancer.server.port=8080"
 

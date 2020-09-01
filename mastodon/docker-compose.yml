@@ -70,7 +70,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.mastodon_web.rule=Host(`mastodon.<secret:HOST_NAME>`)"
-        - "traefik.http.routers.mastodon_web.entrypoints=websecure"
+        - "traefik.http.routers.mastodon_web.entrypoints=webhttps"
         - "traefik.http.routers.mastodon_web.tls.certresolver=le"
         - "traefik.http.services.mastodon_web.loadbalancer.server.port=3000"
 

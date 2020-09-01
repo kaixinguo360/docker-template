@@ -5,12 +5,8 @@ services:
     image: registry:2
     networks:
       - external_network
-    environment:
-      - REGISTRY_HTTP_TLS_CERTIFICATE=/ssl/docker.<secret:HOST_NAME>.crt
-      - REGISTRY_HTTP_TLS_KEY=/ssl/docker.<secret:HOST_NAME>.crt.key
     volumes:
       - data:/var/lib/registry
-      - ssl:/ssl
     deploy:
       replicas: 1
       placement:
@@ -19,7 +15,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.registry_web.rule=Host(`docker.<secret:HOST_NAME>`)"
-        - "traefik.http.routers.registry_web.entrypoints=websecure"
+        - "traefik.http.routers.registry_web.entrypoints=webhttps"
         - "traefik.http.routers.registry_web.tls.certresolver=le"
         - "traefik.http.services.registry_web.loadbalancer.server.port=5000"
 

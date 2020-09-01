@@ -19,7 +19,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.jenkins_web.rule=Host(`jenkins.<secret:HOST_NAME>`)"
-        - "traefik.http.routers.jenkins_web.entrypoints=websecure"
+        - "traefik.http.routers.jenkins_web.entrypoints=webhttps"
         - "traefik.http.routers.jenkins_web.tls.certresolver=le"
         - "traefik.http.services.jenkins_web.loadbalancer.server.port=8080"
 

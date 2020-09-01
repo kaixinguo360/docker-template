@@ -31,7 +31,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.portainer_web.rule=Host(`swarm.<secret:HOST_NAME>`)"
-        - "traefik.http.routers.portainer_web.entrypoints=websecure"
+        - "traefik.http.routers.portainer_web.entrypoints=webhttps"
         - "traefik.http.routers.portainer_web.tls.certresolver=le"
         - "traefik.http.services.portainer_web.loadbalancer.server.port=9000"
 
