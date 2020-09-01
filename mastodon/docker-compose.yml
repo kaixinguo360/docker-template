@@ -1,10 +1,8 @@
-version: '3.2'
+version: "3.2"
 services:
 
   db:
-    restart: always
     image: postgres:9.6-alpine
-    shm_size: 256mb
     networks:
       - internal_network
     healthcheck:
@@ -18,7 +16,6 @@ services:
           - $DEPLOY_NODE_DB
 
   redis:
-    restart: always
     image: redis:6.0-alpine
     networks:
       - internal_network
@@ -33,7 +30,6 @@ services:
           - $DEPLOY_NODE_REDIS
 
 #  es:
-#    restart: always
 #    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10
 #    environment:
 #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -53,7 +49,6 @@ services:
 
   web:
     image: tootsuite/mastodon:v3.2.0
-    restart: always
     env_file: ./config/production.env
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
     networks:
@@ -81,7 +76,6 @@ services:
 
   streaming:
     image: tootsuite/mastodon:v3.2.0
-    restart: always
     env_file: ./config/production.env
     command: node ./streaming
     networks:
@@ -102,7 +96,6 @@ services:
 
   sidekiq:
     image: tootsuite/mastodon:v3.2.0
-    restart: always
     env_file: ./config/production.env
     command: bundle exec sidekiq
     depends_on:

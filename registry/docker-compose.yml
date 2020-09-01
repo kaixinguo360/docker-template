@@ -3,7 +3,6 @@ version: "3.2"
 services:
   registry:
     image: registry:2
-    restart: always
     networks:
       - external_network
     environment:

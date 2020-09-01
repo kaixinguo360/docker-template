@@ -1,14 +1,9 @@
-version: "3"
+version: "3.2"
 
 services:
   web:
 #    build: .
     image: misskey/misskey:12.47.0
-    restart: always
-    links:
-      - db
-      - redis
-#      - es
     networks:
       - internal_network
       - external_network
@@ -28,7 +23,6 @@ services:
         - "traefik.http.services.misskey_web.loadbalancer.server.port=3000"
 
   redis:
-    restart: always
     image: redis:4.0-alpine
     networks:
       - internal_network
@@ -41,7 +35,6 @@ services:
           - $DEPLOY_NODE_REDIS
 
   db:
-    restart: always
     image: postgres:12.2-alpine
     networks:
       - internal_network
@@ -56,7 +49,6 @@ services:
           - $DEPLOY_NODE_DB
 
 #  es:
-#    restart: always
 #    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.2
 #    environment:
 #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
