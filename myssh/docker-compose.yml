@@ -1,0 +1,97 @@
+version: "3.2"
+
+services:
+  
+  honeypot:
+    image: myssh
+    env_file: ./config/docker.env
+    networks:
+      - internal_network
+      - external_network
+    ports:
+      - target: 22
+        published: 22
+        protocol: tcp
+        mode: host
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+
+  db:
+    image: mysql/mysql-server:5.7.31
+    env_file: ./config/docker.env
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/mysql
+      - sql:/docker-entrypoint-initdb.d/
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_DB
+
+  php:
+    image: myphp
+    networks:
+      - internal_network
+    depends_on:
+      - db
+    volumes:
+      - www:/var/www
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_WEB
+
+  nginx:
+    image: nginx
+    networks:
+      - internal_network
+      - external_network
+    depends_on:
+      - php
+    volumes:
+      - www:/var/www
+      - nginx:/etc/nginx/conf.d
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_WEB
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.myssh_web.rule=Host(`attack.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.myssh_web.entrypoints=webhttps"
+        - "traefik.http.routers.myssh_web.tls.certresolver=le"
+        - "traefik.http.services.myssh_web.loadbalancer.server.port=80"
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+    external: true
+
+volumes:
+  www:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/myssh/www"
+  nginx:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/myssh/nginx"
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/myssh/db"
+  sql:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/myssh/sql"
