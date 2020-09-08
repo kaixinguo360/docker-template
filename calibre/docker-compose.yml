@@ -1,0 +1,42 @@
+version: "3.2"
+
+services:
+  web:
+    image: linuxserver/calibre-web:0.6.8-ls78
+    networks:
+      - external_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - DOCKER_MODS=linuxserver/calibre-web:calibre
+    volumes:
+      - data:/config
+      - books:/books
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - $DEPLOY_NODE_WEB
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.calibre_web.rule=Host(`book.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.calibre_web.entrypoints=webhttps"
+        - "traefik.http.routers.calibre_web.tls.certresolver=le"
+        - "traefik.http.services.calibre_web.loadbalancer.server.port=8083"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  books:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/calibre/books"
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
+      device: ":/srv/nfs/calibre/data"
