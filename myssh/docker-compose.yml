@@ -30,7 +30,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - $DEPLOY_NODE_DB
+          - ${DEPLOY_NODE_DB:-"node.labels.ignore != true"}
 
   php:
     image: myphp
@@ -44,7 +44,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - $DEPLOY_NODE_WEB
+          - ${DEPLOY_NODE_WEB:-"node.labels.ignore != true"}
 
   nginx:
     image: nginx
@@ -60,7 +60,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - $DEPLOY_NODE_WEB
+          - ${DEPLOY_NODE_WEB:-"node.labels.ignore != true"}
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.myssh_web.rule=Host(`attack.<secret:HOST_NAME>`)"

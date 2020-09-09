@@ -15,7 +15,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - $DEPLOY_NODE_DB
+          - ${DEPLOY_NODE_DB:-"node.labels.ignore != true"}
 
   web:
     image: mylist
@@ -31,7 +31,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - $DEPLOY_NODE_WEB
+          - ${DEPLOY_NODE_WEB:-"node.labels.ignore != true"}
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.mylist_web.rule=Host(`list.<secret:HOST_NAME>`)"
