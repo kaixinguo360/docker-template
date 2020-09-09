@@ -34,7 +34,7 @@ ENV MYSQL_PASSWORD=1234567
 ENV MYSQL_DATABASE=myssh
 
 RUN echo "*/15 * * * * /usr/local/openssh/script/commit.sh" >> /var/spool/cron/crontabs/root
-RUN apk add --no-cache mysql-client jq
+RUN apk add --no-cache mysql-client jq curl
 
 CMD crond -b \
     && /usr/local/openssh/sbin/sshd -D
