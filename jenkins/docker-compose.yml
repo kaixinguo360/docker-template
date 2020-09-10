@@ -15,7 +15,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_WEB:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.jenkins_web.rule=Host(`jenkins.<secret:HOST_NAME>`)"
@@ -31,5 +31,5 @@ volumes:
   data:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/jenkins/data"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/jenkins/data"

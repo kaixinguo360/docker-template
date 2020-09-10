@@ -17,7 +17,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_WEB:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.calibre_web.rule=Host(`book.<secret:HOST_NAME>`)"
@@ -33,10 +33,10 @@ volumes:
   books:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/calibre/books"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/calibre/books"
   data:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/calibre/data"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/calibre/data"

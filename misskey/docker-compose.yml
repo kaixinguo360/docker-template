@@ -14,7 +14,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_WEB:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.misskey_web.rule=Host(`misskey.<secret:HOST_NAME>`)"
@@ -32,7 +32,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_REDIS:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
 
   db:
     image: postgres:12.2-alpine
@@ -46,7 +46,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_DB:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
 
 #  es:
 #    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.2
@@ -67,20 +67,20 @@ volumes:
   config:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/misskey/config"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/misskey/config"
   files:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/misskey/files"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/misskey/files"
   redis:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/misskey/redis"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/misskey/redis"
   db:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/misskey/db"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/misskey/db"

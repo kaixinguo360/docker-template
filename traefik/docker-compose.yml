@@ -61,5 +61,5 @@ volumes:
   ssl:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/traefik/ssl"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/traefik/ssl"

@@ -30,7 +30,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_DB:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
 
   php:
     image: myphp
@@ -44,7 +44,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_WEB:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
 
   nginx:
     image: nginx
@@ -60,7 +60,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_WEB:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.myssh_web.rule=Host(`attack.<secret:HOST_NAME>`)"
@@ -78,20 +78,20 @@ volumes:
   www:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/myssh/www"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/myssh/www"
   nginx:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/myssh/nginx"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/myssh/nginx"
   db:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/myssh/db"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/myssh/db"
   sql:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/myssh/sql"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/myssh/sql"

@@ -13,7 +13,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_DB:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
 
   redis:
     image: redis:6.0-alpine
@@ -27,7 +27,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_REDIS:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
 
 #  es:
 #    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10
@@ -66,7 +66,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_WEB:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.mastodon_web.rule=Host(`mastodon.<secret:HOST_NAME>`)"
@@ -92,7 +92,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_STREAMING:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_STREAMING:-node.labels.ignore != true}
 
   sidekiq:
     image: tootsuite/mastodon:v3.2.0
@@ -110,7 +110,7 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_SIDEKIQ:-"node.labels.ignore != true"}
+          - ${DEPLOY_NODE_SIDEKIQ:-node.labels.ignore != true}
 ## Uncomment to enable federation with tor instances along with adding the following ENV variables
 ## http_proxy=http://privoxy:8118
 ## ALLOW_ACCESS_TO_HIDDEN_SERVICE=true
@@ -138,20 +138,20 @@ volumes:
   config:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/mastodon/config"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/mastodon/config"
   system:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/mastodon/public/system"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/mastodon/public/system"
   redis:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/mastodon/redis"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/mastodon/redis"
   postgres:
     driver_opts:
       type: "nfs"
-      o: "addr=nfs.<secret:HOST_NAME>,nolock,soft,rw"
-      device: ":/srv/nfs/mastodon/postgres"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/mastodon/postgres"
