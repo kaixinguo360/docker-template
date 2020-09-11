@@ -1,0 +1,32 @@
+version: "3.2"
+
+services:
+
+  web:
+    image: rmountjoy/dashmachine:latest
+    volumes:
+      - data:/dashmachine/dashmachine/user_data
+    networks:
+      - external_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.dashmachine_web.rule=Host(`dash.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.dashmachine_web.entrypoints=webhttps"
+        - "traefik.http.routers.dashmachine_web.tls.certresolver=le"
+        - "traefik.http.services.dashmachine_web.loadbalancer.server.port=5000"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/dashmachine/data"
