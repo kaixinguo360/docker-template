@@ -1,0 +1,31 @@
+version: "3.2"
+
+services:
+  web:
+    image: radhifadlillah/shiori
+    networks:
+      - external_network
+    volumes:
+        - data:/srv/shiori
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.shiori_web.rule=Host(`shiori.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.shiori_web.entrypoints=webhttps"
+        - "traefik.http.routers.shiori_web.tls.certresolver=le"
+        - "traefik.http.services.shiori_web.loadbalancer.server.port=8080"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/shiori/data"
