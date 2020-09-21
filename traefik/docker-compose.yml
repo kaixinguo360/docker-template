@@ -4,22 +4,7 @@ services:
   proxy:
     image: traefik:v2.3
     command:
-      - "--log.level=DEBUG"
-      # 启用swarm模式支持
-      - "--providers.docker.swarmMode=true"
-      # 默认不公开容器
-      - "--providers.docker.exposedbydefault=false"
-      # 设置启用代理的网络
-      - "--providers.docker.network=external_network"
-      # 创建入口点
-      - "--entrypoints.webhttp.address=:80"
-      - "--entrypoints.webhttps.address=:443"
-      # Let's Encrypt httpchallenge方式获取https证书
-      # 更多见https://docs.traefik.io/https/overview/
-      - "--certificatesresolvers.le.acme.dnschallenge=true"
-      - "--certificatesresolvers.le.acme.dnschallenge.provider=cloudflare"
-      - "--certificatesresolvers.le.acme.email=<secret:USER_NAME>@example.com"
-      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      - "--configFile=/config/traefik.yml"
     env_file:
       - config/docker.env
     ports:
@@ -32,7 +17,8 @@ services:
         protocol: tcp
         mode: host
     volumes:
-      - ssl:/letsencrypt
+      - data:/data
+      - config:/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - external_network
@@ -58,8 +44,13 @@ networks:
     external: true
 
 volumes:
-  ssl:
+  data:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/traefik/ssl"
+      device: ":$DEPLOY_NFS_ROOT/traefik/data"
+  config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/traefik/config"

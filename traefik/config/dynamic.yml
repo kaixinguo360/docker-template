@@ -1,0 +1,8 @@
+tls:
+  options:
+    mtls:
+      clientAuth:
+        caFiles:
+          - /data/cacert.pem
+        clientAuthType: RequireAndVerifyClientCert
+

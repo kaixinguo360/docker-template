@@ -20,6 +20,7 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.archivebox_web.rule=Host(`archivebox.<secret:HOST_NAME>`)"
         - "traefik.http.routers.archivebox_web.entrypoints=webhttps"
+        - "traefik.http.routers.archivebox_web.tls.options=mtls@file"
         - "traefik.http.routers.archivebox_web.tls.certresolver=le"
         - "traefik.http.services.archivebox_web.loadbalancer.server.port=8000"
 

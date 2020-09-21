@@ -1,0 +1,32 @@
+log:
+  level: DEBUG
+
+providers:
+  docker:
+    # 启用swarm模式支持
+    swarmMode: true
+    # 默认不公开容器
+    exposedbydefault: false
+    # 设置启用代理的网络
+    network: external_network
+  file:
+    filename: /config/dynamic.yml
+
+# 创建入口点
+entrypoints:
+  webhttp:
+    address: ":80"
+  webhttps:
+    address: ":443"
+
+# Let's Encrypt httpchallenge方式获取https证书
+# 更多见https://docs.traefik.io/https/overview/
+certificatesresolvers:
+  le:
+    acme:
+      dnschallenge: true
+      dnschallenge:
+        provider: cloudflare
+      email: <secret:USER_NAME>@example.com
+      storage: /data/acme.json
+
