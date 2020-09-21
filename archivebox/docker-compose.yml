@@ -1,0 +1,35 @@
+version: "3.2"
+
+services:
+  web:
+    image: nikisweeting/archivebox
+    command: server 0.0.0.0:8000
+    env_file: ./config/docker.env
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - external_network
+    volumes:
+        - data:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.archivebox_web.rule=Host(`archivebox.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.archivebox_web.entrypoints=webhttps"
+        - "traefik.http.routers.archivebox_web.tls.certresolver=le"
+        - "traefik.http.services.archivebox_web.loadbalancer.server.port=8000"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/archivebox/data"
