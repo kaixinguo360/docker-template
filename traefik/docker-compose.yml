@@ -25,7 +25,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.role == manager
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true"
         # 全局重定向匹配路由规则，这里匹配了所有路由
