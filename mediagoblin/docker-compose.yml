@@ -1,0 +1,31 @@
+version: "3.2"
+
+services:
+  web:
+    image: mtlynch/mediagoblin
+    networks:
+      - external_network
+    volumes:
+      - data:/var/lib/mediagoblin
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mediagoblin_web.rule=Host(`mediagoblin.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.mediagoblin_web.entrypoints=webhttps"
+        - "traefik.http.routers.mediagoblin_web.tls.certresolver=le"
+        - "traefik.http.services.mediagoblin_web.loadbalancer.server.port=6543"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/mediagoblin/data"
