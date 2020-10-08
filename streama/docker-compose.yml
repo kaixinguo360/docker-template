@@ -1,0 +1,74 @@
+version: "3.2"
+
+services:
+  web:
+    image: gkiko/streama:latest
+    entrypoint: ["java", "-Dgrails.env=mysql", "-jar", "streama.jar"]
+    networks:
+      - internal_network
+      - external_network
+    depends_on:
+      - db
+    environment:
+      ACTIVE_PROFILE: mysql
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_DB: streama
+      MYSQL_USER: streama
+      MYSQL_PASSWORD: streama_password
+    volumes:
+      - videos:/videos
+      - type: bind
+        source: /etc/timezone
+        target: /etc/timezone
+        read_only: true
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.streama_web.rule=Host(`streama.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.streama_web.entrypoints=webhttps"
+        - "traefik.http.routers.streama_web.tls.certresolver=le"
+        - "traefik.http.services.streama_web.loadbalancer.server.port=8080"
+
+  db:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: streama_root_password
+      MYSQL_USER: streama
+      MYSQL_DATABASE: streama
+      MYSQL_PASSWORD: streama_password
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/mysql
+      - type: bind
+        source: /etc/timezone
+        target: /etc/timezone
+        read_only: true
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+    external: true
+
+volumes:
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/streama/db"
+  videos:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_VIDEO_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_VIDEO_ROOT"
