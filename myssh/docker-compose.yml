@@ -32,30 +32,15 @@ services:
         constraints: 
           - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
 
-  php:
+  web:
     image: myphp
-    networks:
-      - internal_network
-    depends_on:
-      - db
-    volumes:
-      - www:/var/www
-    deploy:
-      replicas: 1
-      placement:
-        constraints: 
-          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
-
-  nginx:
-    image: nginx
     networks:
       - internal_network
       - external_network
     depends_on:
-      - php
+      - db
     volumes:
       - www:/var/www
-      - nginx:/etc/nginx/conf.d
     deploy:
       replicas: 1
       placement:
@@ -80,11 +65,6 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
       device: ":$DEPLOY_NFS_ROOT/myssh/www"
-  nginx:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/myssh/nginx"
   db:
     driver_opts:
       type: "nfs"
