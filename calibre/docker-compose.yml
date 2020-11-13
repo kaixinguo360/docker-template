@@ -30,13 +30,13 @@ networks:
     external: true
 
 volumes:
-  books:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/calibre/books"
   data:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
       device: ":$DEPLOY_NFS_ROOT/calibre/data"
+  books:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_EBOOK_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_EBOOK_ROOT"

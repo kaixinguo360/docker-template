@@ -9,7 +9,7 @@ services:
     networks:
       - external_network
     volumes:
-        - data:/var/www/html/config
+      - data:/var/www/html/config
     deploy:
       replicas: 1
       placement:
