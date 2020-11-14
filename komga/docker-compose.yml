@@ -8,6 +8,7 @@ services:
     volumes:
       - data:/config
       - books:/books
+      - sdu:/mnt/sdu
       - type: bind
         source: /etc/timezone
         target: /etc/timezone
@@ -39,3 +40,9 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_BOOK_HOST,nolock,soft,rw"
       device: ":$DEPLOY_BOOK_ROOT"
+  sdu:
+    driver: "sapk/plugin-rclone:latest"
+    driver_opts:
+      args: "--attr-timeout 60s --vfs-cache-mode full"
+      config: "$DEPLOY_RCLONE_SDU_CONFIG"
+      remote: "$DEPLOY_RCLONE_SDU_REMOTE"
