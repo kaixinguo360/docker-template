@@ -1,0 +1,50 @@
+version: "3.2"
+
+services:
+  web:
+    image: jellyfin/jellyfin
+    networks:
+      - external_network
+    volumes:
+      - config:/config
+      - cache:/cache
+      - media:/media
+      - sdu:/mnt/sdu
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.jellyfin_web.rule=Host(`jellyfin.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.jellyfin_web.entrypoints=webhttps"
+        - "traefik.http.routers.jellyfin_web.tls.certresolver=le"
+        - "traefik.http.services.jellyfin_web.loadbalancer.server.port=8096"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/jellyfin/config"
+  cache:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/jellyfin/cache"
+  media:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_MEDIA_ROOT"
+  sdu:
+    driver: "sapk/plugin-rclone:latest"
+    driver_opts:
+      args: "--attr-timeout 60s --vfs-cache-mode full"
+      config: "$DEPLOY_RCLONE_SDU_CONFIG"
+      remote: "$DEPLOY_RCLONE_SDU_REMOTE"
