@@ -1,0 +1,76 @@
+version: "3.2"
+
+services:
+  web:
+    image: viktorstrate/photoview:1
+    environment:
+      - MYSQL_URL=photoview:photoview_password@tcp(db)/photoview
+      - API_LISTEN_IP=web
+      - API_LISTEN_PORT=80
+      - PHOTO_CACHE=/app/cache
+      - PUBLIC_ENDPOINT=https://photoview.<secret:HOST_NAME>/
+      # Optional: To enable map related features, you need to create a mapbox token.
+      # A token can be generated for free here https://account.mapbox.com/access-tokens/
+      # It's a good idea to limit the scope of the token to your own domain, to prevent others from using it.
+      # - MAPBOX_TOKEN=<YOUR TOKEN HERE>
+    depends_on:
+      - db
+    networks:
+      - external_network
+      - internal_network
+    volumes:
+      - apicache:/app/cache
+      - photos:/media/photos
+      - sdu:/mnt/sdu
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.photoview_web.rule=Host(`photoview.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.photoview_web.entrypoints=webhttps"
+        - "traefik.http.routers.photoview_web.tls.certresolver=le"
+        - "traefik.http.services.photoview_web.loadbalancer.server.port=80"
+
+  db:
+    image: mariadb:10.5
+    networks:
+      - internal_network
+    environment:
+      - MYSQL_DATABASE=photoview
+      - MYSQL_USER=photoview
+      - MYSQL_PASSWORD=photoview_password
+      - MYSQL_RANDOM_ROOT_PASSWORD=photoview_root_password
+    volumes:
+      - db:/var/lib/mysql
+
+networks:
+  external_network:
+    external: true
+  internal_network:
+    internal: true
+
+volumes:
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/photoview/db"
+  apicache:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/photoview/apicache"
+  photos:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_PHOTO_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_PHOTO_ROOT"
+  sdu:
+    driver: "sapk/plugin-rclone:latest"
+    driver_opts:
+      args: "--attr-timeout 60s --vfs-cache-mode full"
+      config: "$DEPLOY_RCLONE_SDU_CONFIG"
+      remote: "$DEPLOY_RCLONE_SDU_REMOTE"
