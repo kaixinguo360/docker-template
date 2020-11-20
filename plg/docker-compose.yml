@@ -1,0 +1,68 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+      loki-pipeline-stages: |
+          - regex:
+              expression: '(level|lvl|severity)=(?P<level>\w+)'
+          - labels:
+              level:
+
+services:
+  grafana:
+    image: grafana/grafana
+    logging: *loki-logging
+    networks:
+      - external_network
+    volumes:
+      - grafana:/var/lib/grafana
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_GRAFANA:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.grafana_web.rule=Host(`grafana.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.grafana_web.entrypoints=webhttps"
+        - "traefik.http.routers.grafana_web.tls.certresolver=le"
+        - "traefik.http.services.grafana_web.loadbalancer.server.port=3000"
+
+  loki:
+    image: grafana/loki
+    logging: *loki-logging
+    networks:
+      - external_network
+    volumes:
+      - loki:/mnt/config
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_LOKI:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.loki_web.rule=Host(`loki.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.loki_web.entrypoints=webhttps"
+        - "traefik.http.routers.loki_web.tls.certresolver=le"
+        - "traefik.http.services.loki_web.loadbalancer.server.port=3100"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  grafana:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/plg/grafana"
+  loki:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/plg/loki"
