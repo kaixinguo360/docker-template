@@ -1,0 +1,115 @@
+version: "3.2"
+
+services:
+  web:
+    image: photoprism/photoprism:latest
+    networks:
+      - external_network
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    #healthcheck:
+    #  test: ["CMD", "photoprism", "status"]
+    #  interval: 60s
+    #  timeout: 15s
+    #  retries: 5
+    environment:
+      PHOTOPRISM_ADMIN_PASSWORD: "1234567"
+      PHOTOPRISM_DEBUG: "false"
+      PHOTOPRISM_EXPERIMENTAL: "false"
+      PHOTOPRISM_SITE_URL: "https://photoprism.<secret:HOST_NAME>"
+      PHOTOPRISM_SITE_TITLE: "PhotoPrism"
+      PHOTOPRISM_SITE_CAPTION: "Browse My Life"
+      PHOTOPRISM_SITE_DESCRIPTION: ""
+      PHOTOPRISM_SITE_AUTHOR: "<secret:USER_NAME>"
+      PHOTOPRISM_HTTP_HOST: "0.0.0.0"
+      PHOTOPRISM_HTTP_PORT: 80
+ 
+      # No authentication required (disables password protection)
+      PHOTOPRISM_PUBLIC: "false"
+
+      # Don't modify originals directory (reduced functionality)
+      PHOTOPRISM_READONLY: "true"
+
+      # Allow uploads that MAY be offensive
+      PHOTOPRISM_UPLOAD_NSFW: "true"
+
+      # Flag photos as private that MAY be offensive
+      PHOTOPRISM_DETECT_NSFW: "true"
+
+      # Users can not view or change settings
+      PHOTOPRISM_SETTINGS_HIDDEN: "false"
+
+      # Use sqlite or mysql
+      PHOTOPRISM_DATABASE_DRIVER: "sqlite"
+      #PHOTOPRISM_DATABASE_DRIVER: "mysql"
+      #PHOTOPRISM_DATABASE_DSN: "photoprism:insecure@tcp(mariadb:3306)/photoprism?charset=utf8mb4,utf8&parseTime=true"
+
+      # Automatically create JSON sidecar files using Exiftool
+      PHOTOPRISM_SIDECAR_JSON: "true"
+
+      # Automatically backup metadata to YAML sidecar files
+      PHOTOPRISM_SIDECAR_YAML: "true"
+
+      # Resample filter, best to worst: blackman, lanczos, cubic, linear
+      PHOTOPRISM_THUMB_FILTER: "lanczos"
+
+      # Enable on-demand thumbnail rendering (high memory and cpu usage)
+      PHOTOPRISM_THUMB_UNCACHED: "false"
+
+      # Pre-rendered thumbnail size limit (default 2048, min 720, max 7680)
+      PHOTOPRISM_THUMB_SIZE: 2048
+
+      # Retina 4K, DCI 4K (requires more storage); 7680 for 8K Ultra HD
+      #PHOTOPRISM_THUMB_SIZE: 4096
+
+      # On-demand rendering size limit (default 7680, min 720, max 7680)
+      PHOTOPRISM_THUMB_SIZE_UNCACHED: 7680
+
+      # Size limit for converted image files in pixels (720-30000)
+      PHOTOPRISM_JPEG_SIZE: 7680
+
+      # Set to 95 for high-quality thumbnails (25-100)
+      PHOTOPRISM_JPEG_QUALITY: 92
+
+      # Use darktable presets (disables concurrent raw to jpeg conversion)
+      PHOTOPRISM_DARKTABLE_PRESETS: "false"
+
+    volumes:
+      - config:/photoprism/storage
+      - photos:/photoprism/originals
+      - sdu:/mnt/sdu
+
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.photoprism_web.rule=Host(`photoprism.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.photoprism_web.entrypoints=webhttps"
+        - "traefik.http.routers.photoprism_web.tls.certresolver=le"
+        - "traefik.http.services.photoprism_web.loadbalancer.server.port=80"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/photoprism/config"
+  photos:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_PHOTO_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_PHOTO_ROOT"
+  sdu:
+    driver: "sapk/plugin-rclone:latest"
+    driver_opts:
+      args: "--attr-timeout 60s --vfs-cache-mode full"
+      config: "$DEPLOY_RCLONE_SDU_CONFIG"
+      remote: "$DEPLOY_RCLONE_SDU_REMOTE"
