@@ -1,8 +1,16 @@
-version: "3.2"
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
 
 services:
   web:
     image: jenkins/jenkins:lts-alpine
+    logging: *loki-logging
     ports:
       - 50000:50000
     volumes:

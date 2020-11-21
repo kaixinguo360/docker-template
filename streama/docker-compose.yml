@@ -1,8 +1,16 @@
-version: "3.2"
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
 
 services:
   web:
     image: gkiko/streama:latest
+    logging: *loki-logging
     entrypoint: ["java", "-Dgrails.env=mysql", "-jar", "streama.jar"]
     networks:
       - internal_network
@@ -36,6 +44,7 @@ services:
 
   db:
     image: mysql:5.6
+    logging: *loki-logging
     environment:
       MYSQL_ROOT_PASSWORD: streama_root_password
       MYSQL_USER: streama

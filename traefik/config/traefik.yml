@@ -1,5 +1,5 @@
-log:
-  level: DEBUG
+#log:
+#  level: DEBUG
 
 providers:
   docker:

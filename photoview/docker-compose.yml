@@ -1,8 +1,16 @@
-version: "3.2"
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
 
 services:
   web:
     image: viktorstrate/photoview:1
+    logging: *loki-logging
     environment:
       - MYSQL_URL=photoview:photoview_password@tcp(db)/photoview
       - API_LISTEN_IP=web
@@ -36,6 +44,7 @@ services:
 
   db:
     image: mariadb:10.5
+    logging: *loki-logging
     networks:
       - internal_network
     environment:

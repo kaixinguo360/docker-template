@@ -1,9 +1,16 @@
-version: "3.2"
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
 
 services:
-
   db:
     image: mysql/mysql-server:8.0
+    logging: *loki-logging
     env_file:
       - config/docker.env
     networks:
@@ -19,6 +26,7 @@ services:
 
   web:
     image: mylist
+    logging: *loki-logging
     networks:
       - external_network
       - internal_network

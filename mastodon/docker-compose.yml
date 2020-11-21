@@ -1,8 +1,16 @@
-version: "3.2"
-services:
+version: "3.8"
 
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
   db:
     image: postgres:9.6-alpine
+    logging: *loki-logging
     networks:
       - internal_network
     healthcheck:
@@ -17,6 +25,7 @@ services:
 
   redis:
     image: redis:6.0-alpine
+    logging: *loki-logging
     networks:
       - internal_network
     healthcheck:
@@ -31,6 +40,7 @@ services:
 
 #  es:
 #    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10
+    logging: *loki-logging
 #    environment:
 #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
 #      - "cluster.name=es-mastodon"
@@ -49,6 +59,7 @@ services:
 
   web:
     image: tootsuite/mastodon:v3.2.0
+    logging: *loki-logging
     env_file: ./config/production.env
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
     networks:
@@ -76,6 +87,7 @@ services:
 
   streaming:
     image: tootsuite/mastodon:v3.2.0
+    logging: *loki-logging
     env_file: ./config/production.env
     command: node ./streaming
     networks:
@@ -96,6 +108,7 @@ services:
 
   sidekiq:
     image: tootsuite/mastodon:v3.2.0
+    logging: *loki-logging
     env_file: ./config/production.env
     command: bundle exec sidekiq
     depends_on:
@@ -116,12 +129,14 @@ services:
 ## ALLOW_ACCESS_TO_HIDDEN_SERVICE=true
 #  tor:
 #    image: sirboops/tor
+    logging: *loki-logging
 #    networks:
 #      - external_network
 #      - internal_network
 #
 #  privoxy:
 #    image: sirboops/privoxy
+    logging: *loki-logging
 #    volumes:
 #      - ./priv-config:/opt/config
 #    networks:
