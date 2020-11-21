@@ -6,11 +6,6 @@ x-logging: &loki-logging
       loki-url: "${DEPLOY_LOKI_URL}"
       loki-retries: 5
       loki-batch-size: 400
-      loki-pipeline-stages: |
-          - regex:
-              expression: '(level|lvl|severity)=(?P<level>\w+)'
-          - labels:
-              level:
 
 services:
   grafana:
@@ -37,8 +32,6 @@ services:
     logging: *loki-logging
     networks:
       - external_network
-    volumes:
-      - loki:/mnt/config
     deploy:
       replicas: 1
       placement:
@@ -51,9 +44,39 @@ services:
         - "traefik.http.routers.loki_web.tls.certresolver=le"
         - "traefik.http.services.loki_web.loadbalancer.server.port=3100"
 
+  # Reference: https://github.com/mlabouardy/swarm-tig
+  influxdb:
+    image: influxdb
+    logging: *loki-logging
+    networks:
+      - external_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_INFLUXDB:-node.labels.ignore != true}
+
+  telegraf:
+    image: telegraf
+    logging: *loki-logging
+    hostname: "{{.Node.Hostname}}"
+    networks:
+      - external_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    configs:
+      - source: telegraf-config
+        target: /etc/telegraf/telegraf.conf
+    deploy:
+      mode: global
+
 networks:
   external_network:
     external: true
+
+configs:
+  telegraf-config:
+    file: ./config/telegraf.conf
 
 volumes:
   grafana:
@@ -61,8 +84,3 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
       device: ":$DEPLOY_NFS_ROOT/plg/grafana"
-  loki:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/plg/loki"
