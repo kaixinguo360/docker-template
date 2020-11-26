@@ -54,6 +54,11 @@ services:
       - MYSQL_RANDOM_ROOT_PASSWORD=photoview_root_password
     volumes:
       - db:/var/lib/mysql
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
 
 networks:
   external_network:
