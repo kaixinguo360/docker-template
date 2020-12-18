@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   web:
     image: nikisweeting/archivebox
-    logging: *loki-logging
+#    logging: *loki-logging
     command: server 0.0.0.0:8000
     env_file: ./config/docker.env
     environment:

@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   proxy:
     image: traefik:v2.3
-    logging: *loki-logging
+#    logging: *loki-logging
     command:
       - "--configFile=/config/traefik.yml"
     env_file:

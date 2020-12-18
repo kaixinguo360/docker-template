@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   web:
     image: gkiko/streama:latest
-    logging: *loki-logging
+#    logging: *loki-logging
     entrypoint: ["java", "-Dgrails.env=mysql", "-jar", "streama.jar"]
     networks:
       - internal_network
@@ -44,7 +44,7 @@ services:
 
   db:
     image: mysql:5.6
-    logging: *loki-logging
+#    logging: *loki-logging
     environment:
       MYSQL_ROOT_PASSWORD: streama_root_password
       MYSQL_USER: streama

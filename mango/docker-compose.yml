@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   web:
     image: hkalexling/mango:v0.12.2
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - external_network
     volumes:

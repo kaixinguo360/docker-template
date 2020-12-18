@@ -11,7 +11,7 @@ services:
   web:
 #    build: .
     image: misskey/misskey:12.47.0
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - internal_network
       - external_network
@@ -32,7 +32,7 @@ services:
 
   redis:
     image: redis:4.0-alpine
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - internal_network
     volumes:
@@ -45,7 +45,7 @@ services:
 
   db:
     image: postgres:12.2-alpine
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - internal_network
     env_file:
@@ -60,7 +60,7 @@ services:
 
 #  es:
 #    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.2
-    logging: *loki-logging
+#    logging: *loki-logging
 #    environment:
 #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
 #    networks:

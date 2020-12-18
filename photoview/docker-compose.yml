@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   web:
     image: viktorstrate/photoview:1
-    logging: *loki-logging
+#    logging: *loki-logging
     environment:
       - MYSQL_URL=photoview:photoview_password@tcp(db)/photoview
       - API_LISTEN_IP=web
@@ -44,7 +44,7 @@ services:
 
   db:
     image: mariadb:10.5
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - internal_network
     environment:

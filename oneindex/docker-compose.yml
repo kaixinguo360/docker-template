@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   web:
     image: setzero/oneindex
-    logging: *loki-logging
+#    logging: *loki-logging
     environment:
       REFRESH_TOKEN: '0 * * * *'
       REFRESH_CACHE: '*/10 * * * *'

@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   honeypot:
     image: myssh
-    logging: *loki-logging
+#    logging: *loki-logging
     env_file: ./config/docker.env
     networks:
       - internal_network
@@ -27,7 +27,7 @@ services:
 
   db:
     image: mysql/mysql-server:5.7.31
-    logging: *loki-logging
+#    logging: *loki-logging
     env_file: ./config/docker.env
     networks:
       - internal_network
@@ -42,7 +42,7 @@ services:
 
   web:
     image: myphp
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - internal_network
       - external_network

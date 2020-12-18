@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   grafana:
     image: grafana/grafana
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - external_network
     volumes:
@@ -29,7 +29,7 @@ services:
 
   loki:
     image: grafana/loki
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - external_network
     deploy:
@@ -47,7 +47,7 @@ services:
   # Reference: https://github.com/mlabouardy/swarm-tig
   influxdb:
     image: influxdb
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - external_network
     deploy:
@@ -58,7 +58,7 @@ services:
 
   telegraf:
     image: telegraf
-    logging: *loki-logging
+#    logging: *loki-logging
     hostname: "{{.Node.Hostname}}"
     networks:
       - external_network

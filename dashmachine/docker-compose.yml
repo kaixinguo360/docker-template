@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   web:
     image: rmountjoy/dashmachine:latest
-    logging: *loki-logging
+#    logging: *loki-logging
     volumes:
       - data:/dashmachine/dashmachine/user_data
     networks:

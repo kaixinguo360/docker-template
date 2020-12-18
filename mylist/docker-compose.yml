@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   db:
     image: mysql/mysql-server:8.0
-    logging: *loki-logging
+#    logging: *loki-logging
     env_file:
       - config/docker.env
     networks:
@@ -26,7 +26,7 @@ services:
 
   web:
     image: mylist
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - external_network
       - internal_network

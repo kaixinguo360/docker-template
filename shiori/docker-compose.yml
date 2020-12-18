@@ -10,7 +10,7 @@ x-logging: &loki-logging
 services:
   web:
     image: radhifadlillah/shiori
-    logging: *loki-logging
+#    logging: *loki-logging
     networks:
       - external_network
     volumes:
