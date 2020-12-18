@@ -28,7 +28,7 @@ services:
       - internal_network
     volumes:
       - apicache:/app/cache
-      - photos:/media/photos
+      - images:/media/images
       - sdu:/mnt/sdu
     deploy:
       replicas: 1
@@ -77,11 +77,11 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
       device: ":$DEPLOY_NFS_ROOT/photoview/apicache"
-  photos:
+  images:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_PHOTO_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_PHOTO_ROOT"
+      o: "addr=$DEPLOY_IMAGE_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_IMAGE_ROOT"
   sdu:
     driver: "sapk/plugin-rclone:latest"
     driver_opts:

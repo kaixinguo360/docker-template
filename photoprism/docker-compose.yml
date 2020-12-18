@@ -42,7 +42,7 @@ services:
       # Allow uploads that MAY be offensive
       PHOTOPRISM_UPLOAD_NSFW: "true"
 
-      # Flag photos as private that MAY be offensive
+      # Flag images as private that MAY be offensive
       PHOTOPRISM_DETECT_NSFW: "true"
 
       # Users can not view or change settings
@@ -85,7 +85,7 @@ services:
 
     volumes:
       - config:/photoprism/storage
-      - photos:/photoprism/originals
+      - images:/photoprism/originals
       - sdu:/mnt/sdu
 
     deploy:
@@ -110,11 +110,11 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
       device: ":$DEPLOY_NFS_ROOT/photoprism/config"
-  photos:
+  images:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_PHOTO_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_PHOTO_ROOT"
+      o: "addr=$DEPLOY_IMAGE_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_IMAGE_ROOT"
   sdu:
     driver: "sapk/plugin-rclone:latest"
     driver_opts:
