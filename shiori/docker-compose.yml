@@ -22,7 +22,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.shiori_web.rule=Host(`shiori.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.shiori_web.rule=Host(`shiori.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.shiori_web.entrypoints=webhttps"
         - "traefik.http.routers.shiori_web.tls.certresolver=le"
         - "traefik.http.services.shiori_web.loadbalancer.server.port=8080"

@@ -22,7 +22,7 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.registry_web.rule=Host(`docker.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.registry_web.rule=Host(`docker.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.registry_web.entrypoints=webhttps"
         - "traefik.http.routers.registry_web.tls.certresolver=le"
         - "traefik.http.services.registry_web.loadbalancer.server.port=5000"

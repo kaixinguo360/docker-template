@@ -80,7 +80,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.mastodon_web.rule=Host(`mastodon.<secret:HOST_NAME>`)"
+        - "traefik.http.routers.mastodon_web.rule=Host(`mastodon.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.mastodon_web.entrypoints=webhttps"
         - "traefik.http.routers.mastodon_web.tls.certresolver=le"
         - "traefik.http.services.mastodon_web.loadbalancer.server.port=3000"
