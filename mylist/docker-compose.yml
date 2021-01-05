@@ -58,19 +58,19 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/mylist/db"
+      device: ":$DEPLOY_NFS_ROOT/mylist/var/db"
   sql:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/mylist/sql"
+      device: ":$DEPLOY_NFS_ROOT/mylist/var/sql"
   jar:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/mylist/jar"
+      device: ":$DEPLOY_NFS_ROOT/mylist/var/jar"
   static:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/mylist/static"
+      device: ":$DEPLOY_NFS_ROOT/mylist/var/static"

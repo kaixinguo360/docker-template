@@ -75,7 +75,7 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/streama/db"
+      device: ":$DEPLOY_NFS_ROOT/streama/var/db"
   videos:
     driver_opts:
       type: "nfs"

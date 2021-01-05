@@ -36,4 +36,4 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/shiori/data"
+      device: ":$DEPLOY_NFS_ROOT/shiori/var/data"

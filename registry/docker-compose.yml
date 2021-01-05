@@ -36,9 +36,9 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/registry/data"
+      device: ":$DEPLOY_NFS_ROOT/registry/var/data"
   ssl:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/registry/ssl"
+      device: ":$DEPLOY_NFS_ROOT/registry/var/ssl"
