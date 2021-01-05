@@ -14,7 +14,7 @@ services:
     networks:
       - external_network
     volumes:
-      - config:/config
+      - data:/config
       - cache:/cache
       - media:/media
       - sdu:/mnt/sdu
@@ -35,11 +35,11 @@ networks:
     external: true
 
 volumes:
-  config:
+  data:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/jellyfin/var/config"
+      device: ":$DEPLOY_NFS_ROOT/jellyfin/var/data"
   cache:
     driver_opts:
       type: "nfs"

@@ -84,7 +84,7 @@ services:
       PHOTOPRISM_DARKTABLE_PRESETS: "false"
 
     volumes:
-      - config:/photoprism/storage
+      - data:/photoprism/storage
       - images:/photoprism/originals
       - sdu:/mnt/sdu
 
@@ -105,11 +105,11 @@ networks:
     external: true
 
 volumes:
-  config:
+  data:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/photoprism/var/config"
+      device: ":$DEPLOY_NFS_ROOT/photoprism/var/data"
   images:
     driver_opts:
       type: "nfs"
