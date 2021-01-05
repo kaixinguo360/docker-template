@@ -2,7 +2,8 @@
 
 cd $(dirname $0)/..
 
-DEPLOY_NODE_WEB="node.hostname==w.<secret:HOST_NAME>" \
-DEPLOY_NODE_REDIS="node.hostname==w.<secret:HOST_NAME>" \
-DEPLOY_NODE_DB="node.hostname==p.<secret:HOST_NAME>" \
+set -o allexport
+[ -f ./node.env ] && . ./node.env
+set +o allexport
+
 docker stack deploy -c docker-compose.yml misskey
