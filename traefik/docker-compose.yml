@@ -26,8 +26,12 @@ services:
         mode: host
     volumes:
       - data:/data
-      - config:/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    configs:
+      - source: traefik-config
+        target: /config/traefik.yml
+      - source: dynamic-config
+        target: /config/dynamic.yml
     networks:
       - external_network
     deploy:
@@ -50,6 +54,12 @@ services:
 networks:
   external_network:
     external: true
+
+configs:
+  traefik-config:
+    file: ./config/traefik.yml
+  dynamic-config:
+    file: ./config/dynamic.yml
 
 volumes:
   data:

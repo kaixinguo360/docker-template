@@ -14,8 +14,10 @@ services:
     networks:
       - external_network
     volumes:
-      - config:/root/.config/mango
       - data:/root/mango
+    configs:
+      - source: mango-config
+        target: /root/.config/mango/config.yml
     deploy:
       replicas: 1
       placement:
@@ -31,6 +33,10 @@ services:
 networks:
   external_network:
     external: true
+
+configs:
+  mango-config:
+    file: ./config/config.yml
 
 volumes:
   config:

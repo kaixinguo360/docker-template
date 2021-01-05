@@ -16,8 +16,10 @@ services:
       - internal_network
       - external_network
     volumes:
-      - config:/misskey/.config
       - files:/misskey/files
+    configs:
+      - source: misskey-config
+        target: /misskey/.config/default.yml
     deploy:
       replicas: 1
       placement:
@@ -73,6 +75,10 @@ networks:
     internal: true
   external_network:
     external: true
+
+configs:
+  misskey-config:
+    file: ./config/default.yml
 
 volumes:
   config:
