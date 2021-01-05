@@ -3,11 +3,7 @@
 cd $(dirname $0)/..
 
 set -o allexport
-[ -f ./node.env ] && . ./node.env
-set +o allexport
-
-set -o allexport
-[ -f ./node.env ] && . ./node.env
+[ -f ./deploy.env ] && . ./deploy.env
 set +o allexport
 
 docker stack deploy -c docker-compose.yml veso
