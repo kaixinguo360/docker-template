@@ -24,9 +24,8 @@ entrypoints:
 certificatesresolvers:
   le:
     acme:
-      dnschallenge: true
-      dnschallenge:
-        provider: cloudflare
+      httpchallenge:
+        entrypoint: webhttp
       email: <secret:USER_NAME>@example.com
       storage: /data/acme.json
 

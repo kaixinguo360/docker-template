@@ -13,8 +13,6 @@ services:
 #    logging: *loki-logging
     command:
       - "--configFile=/config/traefik.yml"
-    env_file:
-      - config/docker.env
     ports:
       - target: 80
         published: 80
