@@ -1,0 +1,43 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: searx/searx
+#    logging: *loki-logging
+    environment:
+      BASE_URL: https://searx.${DEPLOY_HOSTNAME}/
+    networks:
+      - external_network
+    configs:
+      - source: searx-config
+        target: /etc/searx/settings.yml
+      - source: uwsgi-config
+        target: /etc/searx/uwsgi.ini
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.searx_web.rule=Host(`searx.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.searx_web.entrypoints=webhttps"
+        - "traefik.http.routers.searx_web.tls.certresolver=le"
+        - "traefik.http.services.searx_web.loadbalancer.server.port=8080"
+
+configs:
+  searx-config:
+    file: ./config/settings.yml
+  uwsgi-config:
+    file: ./config/uwsgi.ini
+
+networks:
+  external_network:
+    external: true
