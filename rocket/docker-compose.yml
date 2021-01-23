@@ -1,0 +1,80 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: rocketchat/rocket.chat:latest
+#    logging: *loki-logging
+    command: >
+      bash -c
+        "for i in `seq 1 30`; do
+          node main.js &&
+          s=$$? && break || s=$$?;
+          echo \"Tried $$i times. Waiting 5 secs...\";
+          sleep 5;
+        done; (exit $$s)"
+    environment:
+      PORT: "3000"
+      ROOT_URL: https://rocket.${DEPLOY_HOSTNAME}
+      MONGO_URL: mongodb://db:27017/rocketchat
+      MONGO_OPLOG_URL: mongodb://db:27017/local
+#      MAIL_URL: smtp://smtp.email
+#      HTTP_PROXY: http://proxy.domain.com
+#      HTTPS_PROXY: http://proxy.domain.com
+    depends_on:
+      - db
+    networks:
+      - internal_network
+      - external_network
+    volumes:
+      - data:/app/uploads
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.rocket_web.rule=Host(`rocket.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.rocket_web.entrypoints=webhttps"
+        - "traefik.http.routers.rocket_web.tls.certresolver=le"
+        - "traefik.http.services.rocket_web.loadbalancer.server.port=3000"
+
+  db:
+    image: mongo:4.0
+    volumes:
+     - db:/data/db
+    command: mongod --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1
+    networks:
+      - internal_network
+      - external_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  internal_network:
+    internal: true
+    attachable: true
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/rocket/var/data"
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/rocket/var/db"
