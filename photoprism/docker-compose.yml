@@ -13,9 +13,6 @@ services:
 #    logging: *loki-logging
     networks:
       - external_network
-    security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
     #healthcheck:
     #  test: ["CMD", "photoprism", "status"]
     #  interval: 60s
@@ -29,7 +26,7 @@ services:
       PHOTOPRISM_SITE_TITLE: "PhotoPrism"
       PHOTOPRISM_SITE_CAPTION: "Browse My Life"
       PHOTOPRISM_SITE_DESCRIPTION: ""
-      PHOTOPRISM_SITE_AUTHOR: "<secret:USER_NAME>"
+      PHOTOPRISM_SITE_AUTHOR: ""
       PHOTOPRISM_HTTP_HOST: "0.0.0.0"
       PHOTOPRISM_HTTP_PORT: 80
  
@@ -43,7 +40,7 @@ services:
       PHOTOPRISM_UPLOAD_NSFW: "true"
 
       # Flag images as private that MAY be offensive
-      PHOTOPRISM_DETECT_NSFW: "true"
+      PHOTOPRISM_DETECT_NSFW: "false"
 
       # Users can not view or change settings
       PHOTOPRISM_SETTINGS_HIDDEN: "false"
@@ -85,7 +82,8 @@ services:
 
     volumes:
       - data:/photoprism/storage
-      - images:/photoprism/originals
+      - library:/photoprism/originals
+      - media:/media
       - sdu:/mnt/sdu
 
     deploy:
@@ -110,11 +108,16 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
       device: ":$DEPLOY_NFS_ROOT/photoprism/var/data"
-  images:
+  library:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_IMAGE_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_IMAGE_ROOT"
+      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_NFS_ROOT/photoprism/var/library"
+  media:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_MEDIA_ROOT"
   sdu:
     driver: "sapk/plugin-rclone:latest"
     driver_opts:
