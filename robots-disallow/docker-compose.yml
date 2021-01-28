@@ -1,0 +1,30 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: wikiwi/robots-disallow
+#    logging: *loki-logging
+    networks:
+      - external_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.robots-disallow_web.rule=Path(`/robots.txt`)"
+        - "traefik.http.routers.robots-disallow_web.entrypoints=webhttps"
+        - "traefik.http.routers.robots-disallow_web.tls.certresolver=le"
+        - "traefik.http.services.robots-disallow_web.loadbalancer.server.port=8080"
+
+networks:
+  external_network:
+    external: true
