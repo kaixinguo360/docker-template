@@ -73,14 +73,14 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/myssh/var/www"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/myssh/var}/www"
   db:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/myssh/var/db"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/myssh/var}/db"
   sql:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/myssh/var/sql"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/myssh/var}/sql"

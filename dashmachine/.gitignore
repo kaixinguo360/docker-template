@@ -1,2 +1,6 @@
-deploy.env
-deploy-*.env
+*
+!/.gitignore
+!/docker-compose.yml
+!/bin/
+!/config/
+!/var/

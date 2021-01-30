@@ -71,12 +71,12 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/photoview/var/db"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/photoview/var}/db"
   apicache:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/photoview/var/apicache"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/photoview/var}/apicache"
   images:
     driver_opts:
       type: "nfs"

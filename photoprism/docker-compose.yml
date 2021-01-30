@@ -9,7 +9,8 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: photoprism/photoprism:latest
+#    image: photoprism/photoprism:preview
+    image: photoprism
 #    logging: *loki-logging
     networks:
       - external_network
@@ -107,12 +108,12 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/photoprism/var/data"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/photoprism/var}/data"
   library:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/photoprism/var/library"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/photoprism/var}/library"
   media:
     driver_opts:
       type: "nfs"

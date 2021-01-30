@@ -38,4 +38,4 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/scylla/var/data"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/scylla/var}/data"

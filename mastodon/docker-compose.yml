@@ -154,14 +154,14 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/mastodon/var/public/system"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/mastodon/var}/public/system"
   redis:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/mastodon/var/redis"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/mastodon/var}/redis"
   postgres:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/mastodon/var/postgres"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/mastodon/var}/postgres"

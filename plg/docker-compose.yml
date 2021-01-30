@@ -83,4 +83,4 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT/plg/var/grafana"
+      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/plg/var}/grafana"
