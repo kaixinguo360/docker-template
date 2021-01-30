@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-cd $(dirname $0)/..
+. $(dirname $0)/lib.sh
 
-docker stack rm mylist
+docker stack rm $DEPLOY_STACK_NAME
+

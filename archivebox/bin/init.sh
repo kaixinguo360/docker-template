@@ -1,5 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-cd $(dirname $0)/..
+. $(dirname $0)/lib.sh
 
-docker-compose run web init
+printf "Initing... " && {
+    docker-compose run web init
+} && echo 'done.'
+

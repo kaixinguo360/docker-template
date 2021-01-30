@@ -1,12 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-cd $(dirname $0)/..
+. $(dirname $0)/lib.sh
 
-set -o allexport
-[ -f ./deploy.env ] && . ./deploy.env
-set +o allexport
-
-echo -n "Initing... " && {
+printf "Initing... " && {
     docker run --network rocket_internal_network --rm mongo:4.0 bash << 'HERE'
     for i in `seq 1 30`; do
       mongo db/rocketchat --eval \"

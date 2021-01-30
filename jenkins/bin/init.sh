@@ -1,12 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-cd $(dirname $0)/..
+. $(dirname $0)/lib.sh
 
-set -o allexport
-[ -f ./deploy.env ] && . ./deploy.env
-set +o allexport
-
-echo -n "Initing... " && {
+printf "Initing... " && {
     sudo chown -R 1000:1000 ./var/data
 } && echo 'done.'
 

@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-cd $(dirname $0)
+. $(dirname $0)/lib.sh
 
-./stop.sh
+./bin/stop.sh
 sleep 1
-./start.sh
+./bin/start.sh
+

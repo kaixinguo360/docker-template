@@ -1,12 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-cd $(dirname $0)/..
+. $(dirname $0)/lib.sh
 
-set -o allexport
-[ -f ./deploy.env ] && . ./deploy.env
-set +o allexport
-
-echo -n "Initing... " && {
+printf "Initing... " && {
     sudo ln -s -n /media/images ./var/library/local
 } && echo 'done.'
 

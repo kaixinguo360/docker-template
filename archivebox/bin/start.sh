@@ -1,9 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-cd $(dirname $0)/..
+. $(dirname $0)/lib.sh
 
-set -o allexport
-[ -f ./deploy.env ] && . ./deploy.env
-set +o allexport
+./bin/config.sh | docker stack deploy -c - $DEPLOY_STACK_NAME
 
-docker stack deploy -c docker-compose.yml archivebox
