@@ -10,7 +10,9 @@ x-logging: &loki-logging
 services:
   web:
     image: wikiwi/robots-disallow
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
     networks:
       - external_network
     deploy:
@@ -19,7 +21,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.robots-disallow_web.rule=Path(`/robots.txt`)"
         - "traefik.http.routers.robots-disallow_web.entrypoints=webhttps"
         - "traefik.http.routers.robots-disallow_web.tls.certresolver=le"

@@ -10,16 +10,16 @@ x-logging: &loki-logging
 services:
   proxy:
     image: traefik:v2.3
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     command:
       - "--configFile=/config/traefik.yml"
     ports:
       - target: 80
-        published: 80
+        published: ${DEPLOY_PORT_HTTP:-80}
         protocol: tcp
         mode: host
       - target: 443
-        published: 443
+        published: ${DEPLOY_PORT_HTTP:-443}
         protocol: tcp
         mode: host
     volumes:

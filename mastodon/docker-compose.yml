@@ -8,58 +8,11 @@ x-logging: &loki-logging
       loki-batch-size: 400
 
 services:
-  db:
-    image: postgres:9.6-alpine
-#    logging: *loki-logging
-    networks:
-      - internal_network
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    deploy:
-      replicas: 1
-      placement:
-        constraints: 
-          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
-
-  redis:
-    image: redis:6.0-alpine
-#    logging: *loki-logging
-    networks:
-      - internal_network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-    volumes:
-      - redis:/data
-    deploy:
-      replicas: 1
-      placement:
-        constraints: 
-          - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
-
-#  es:
-#    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10
-#    logging: *loki-logging
-#    environment:
-#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-#      - "cluster.name=es-mastodon"
-#      - "discovery.type=single-node"
-#      - "bootstrap.memory_lock=true"
-#    networks:
-#      - internal_network
-#    healthcheck:
-#      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
-#    volumes:
-#      - ./elasticsearch:/usr/share/elasticsearch/data
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
-
   web:
     image: tootsuite/mastodon:v3.2.0
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
     env_file: ./config/production.env
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
     networks:
@@ -79,15 +32,64 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.mastodon_web.rule=Host(`mastodon.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.mastodon_web.entrypoints=webhttps"
         - "traefik.http.routers.mastodon_web.tls.certresolver=le"
         - "traefik.http.services.mastodon_web.loadbalancer.server.port=3000"
 
+  db:
+    image: postgres:9.6-alpine
+#:log |    logging: *loki-logging
+    networks:
+      - internal_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+  redis:
+    image: redis:6.0-alpine
+#:log |    logging: *loki-logging
+    networks:
+      - internal_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+    volumes:
+      - redis:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
+
+#  es:
+#    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10
+##:log |    logging: *loki-logging
+#    environment:
+#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#      - "cluster.name=es-mastodon"
+#      - "discovery.type=single-node"
+#      - "bootstrap.memory_lock=true"
+#    networks:
+#      - internal_network
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+#    volumes:
+#      - ./elasticsearch:/usr/share/elasticsearch/data
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
+
   streaming:
     image: tootsuite/mastodon:v3.2.0
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     env_file: ./config/production.env
     command: node ./streaming
     networks:
@@ -108,7 +110,7 @@ services:
 
   sidekiq:
     image: tootsuite/mastodon:v3.2.0
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     env_file: ./config/production.env
     command: bundle exec sidekiq
     depends_on:
@@ -129,14 +131,14 @@ services:
 ## ALLOW_ACCESS_TO_HIDDEN_SERVICE=true
 #  tor:
 #    image: sirboops/tor
-#    logging: *loki-logging
+##:log |    logging: *loki-logging
 #    networks:
 #      - external_network
 #      - internal_network
 #
 #  privoxy:
 #    image: sirboops/privoxy
-#    logging: *loki-logging
+##:log |    logging: *loki-logging
 #    volumes:
 #      - ./priv-config:/opt/config
 #    networks:

@@ -9,9 +9,10 @@ x-logging: &loki-logging
 
 services:
   web:
-#    image: photoprism/photoprism:preview
-    image: photoprism
-#    logging: *loki-logging
+    image: photoprism/photoprism:preview
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
     networks:
       - external_network
     #healthcheck:
@@ -93,7 +94,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.photoprism_web.rule=Host(`photoprism.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.photoprism_web.entrypoints=webhttps"
         - "traefik.http.routers.photoprism_web.tls.certresolver=le"

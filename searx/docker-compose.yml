@@ -10,7 +10,9 @@ x-logging: &loki-logging
 services:
   web:
     image: searx/searx
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
     environment:
       BASE_URL: https://searx.${DEPLOY_HOSTNAME}/
     networks:
@@ -26,7 +28,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.searx_web.rule=Host(`searx.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.searx_web.entrypoints=webhttps"
         - "traefik.http.routers.searx_web.tls.certresolver=le"
@@ -41,3 +43,4 @@ configs:
 networks:
   external_network:
     external: true
+

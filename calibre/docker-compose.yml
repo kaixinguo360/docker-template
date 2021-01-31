@@ -10,7 +10,9 @@ x-logging: &loki-logging
 services:
   web:
     image: linuxserver/calibre-web:0.6.8-ls78
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8083}:8083
     networks:
       - external_network
     environment:
@@ -27,7 +29,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.calibre_web.rule=Host(`book.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.calibre_web.entrypoints=webhttps"
         - "traefik.http.routers.calibre_web.tls.certresolver=le"

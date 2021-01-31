@@ -10,7 +10,9 @@ x-logging: &loki-logging
 services:
   web:
     image: viktorstrate/photoview:1
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
     environment:
       - MYSQL_URL=photoview:photoview_password@tcp(db)/photoview
       - API_LISTEN_IP=web
@@ -36,7 +38,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.photoview_web.rule=Host(`photoview.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.photoview_web.entrypoints=webhttps"
         - "traefik.http.routers.photoview_web.tls.certresolver=le"
@@ -44,7 +46,7 @@ services:
 
   db:
     image: mariadb:10.5
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     networks:
       - internal_network
     environment:

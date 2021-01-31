@@ -10,9 +10,10 @@ x-logging: &loki-logging
 services:
   web:
     image: jenkins/jenkins:lts-alpine
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     ports:
       - 50000:50000
+#:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
     volumes:
       - data:/var/jenkins_home
     networks:
@@ -25,7 +26,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.jenkins_web.rule=Host(`jenkins.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.jenkins_web.entrypoints=webhttps"
         - "traefik.http.routers.jenkins_web.tls.certresolver=le"

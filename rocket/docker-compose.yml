@@ -10,7 +10,9 @@ x-logging: &loki-logging
 services:
   web:
     image: rocketchat/rocket.chat:latest
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
     command: >
       bash -c
         "for i in `seq 1 30`; do
@@ -40,7 +42,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.rocket_web.rule=Host(`rocket.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.rocket_web.entrypoints=webhttps"
         - "traefik.http.routers.rocket_web.tls.certresolver=le"

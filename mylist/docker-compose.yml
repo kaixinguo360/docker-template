@@ -8,25 +8,11 @@ x-logging: &loki-logging
       loki-batch-size: 400
 
 services:
-  db:
-    image: mysql/mysql-server:8.0
-#    logging: *loki-logging
-    env_file:
-      - config/docker.env
-    networks:
-      - internal_network
-    volumes:
-      - db:/var/lib/mysql
-      - sql:/docker-entrypoint-initdb.d/
-    deploy:
-      replicas: 1
-      placement:
-        constraints: 
-          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
-
   web:
     image: mylist
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
     networks:
       - external_network
       - internal_network
@@ -41,11 +27,27 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.mylist_web.rule=Host(`list.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.mylist_web.entrypoints=webhttps"
         - "traefik.http.routers.mylist_web.tls.certresolver=le"
         - "traefik.http.services.mylist_web.loadbalancer.server.port=8080"
+
+  db:
+    image: mysql/mysql-server:8.0
+#:log |    logging: *loki-logging
+    env_file:
+      - config/docker.env
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/mysql
+      - sql:/docker-entrypoint-initdb.d/
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
 
 networks:
   external_network:

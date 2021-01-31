@@ -10,7 +10,9 @@ x-logging: &loki-logging
 services:
   registry:
     image: registry:2
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_REGISTORY:-5000}:5000
     networks:
       - external_network
     volumes:
@@ -21,7 +23,7 @@ services:
         constraints: 
           - node.role == manager
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.registry_web.rule=Host(`docker.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.registry_web.entrypoints=webhttps"
         - "traefik.http.routers.registry_web.tls.certresolver=le"

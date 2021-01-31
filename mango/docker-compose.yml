@@ -10,7 +10,9 @@ x-logging: &loki-logging
 services:
   web:
     image: hkalexling/mango:v0.12.2
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-9000}:9000
     networks:
       - external_network
     volumes:
@@ -24,7 +26,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.mango_web.rule=Host(`mango.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.mango_web.entrypoints=webhttps"
         - "traefik.http.routers.mango_web.tls.certresolver=le"

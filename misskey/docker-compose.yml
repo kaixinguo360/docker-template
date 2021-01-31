@@ -9,9 +9,10 @@ x-logging: &loki-logging
 
 services:
   web:
-#    build: .
     image: misskey/misskey:12.47.0
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
     networks:
       - internal_network
       - external_network
@@ -26,7 +27,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.misskey_web.rule=Host(`misskey.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.misskey_web.entrypoints=webhttps"
         - "traefik.http.routers.misskey_web.tls.certresolver=le"
@@ -34,7 +35,7 @@ services:
 
   redis:
     image: redis:4.0-alpine
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     networks:
       - internal_network
     volumes:
@@ -47,7 +48,7 @@ services:
 
   db:
     image: postgres:12.2-alpine
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     networks:
       - internal_network
     env_file:
@@ -62,7 +63,7 @@ services:
 
 #  es:
 #    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.2
-#    logging: *loki-logging
+##:log |    logging: *loki-logging
 #    environment:
 #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
 #    networks:

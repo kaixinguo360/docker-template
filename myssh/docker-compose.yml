@@ -8,9 +8,33 @@ x-logging: &loki-logging
       loki-batch-size: 400
 
 services:
+  web:
+    image: myphp
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
+    networks:
+      - internal_network
+      - external_network
+    depends_on:
+      - db
+    volumes:
+      - www:/var/www
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.myssh_web.rule=Host(`attack.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.myssh_web.entrypoints=webhttps"
+        - "traefik.http.routers.myssh_web.tls.certresolver=le"
+        - "traefik.http.services.myssh_web.loadbalancer.server.port=80"
+
   honeypot:
     image: myssh
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     env_file: ./config/docker.env
     networks:
       - internal_network
@@ -27,7 +51,7 @@ services:
 
   db:
     image: mysql/mysql-server:5.7.31
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     env_file: ./config/docker.env
     networks:
       - internal_network
@@ -39,28 +63,6 @@ services:
       placement:
         constraints: 
           - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
-
-  web:
-    image: myphp
-#    logging: *loki-logging
-    networks:
-      - internal_network
-      - external_network
-    depends_on:
-      - db
-    volumes:
-      - www:/var/www
-    deploy:
-      replicas: 1
-      placement:
-        constraints: 
-          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.myssh_web.rule=Host(`attack.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.myssh_web.entrypoints=webhttps"
-        - "traefik.http.routers.myssh_web.tls.certresolver=le"
-        - "traefik.http.services.myssh_web.loadbalancer.server.port=80"
 
 networks:
   internal_network:

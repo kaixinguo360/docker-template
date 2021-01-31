@@ -10,7 +10,9 @@ x-logging: &loki-logging
 services:
   grafana:
     image: grafana/grafana
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_GRAFANA:-3000}:3000
     networks:
       - external_network
     volumes:
@@ -21,7 +23,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_GRAFANA:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.grafana_web.rule=Host(`grafana.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.grafana_web.entrypoints=webhttps"
         - "traefik.http.routers.grafana_web.tls.certresolver=le"
@@ -29,7 +31,9 @@ services:
 
   loki:
     image: grafana/loki
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_LOKI:-3100}:3100
     networks:
       - external_network
     deploy:
@@ -38,7 +42,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_LOKI:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.loki_web.rule=Host(`loki.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.loki_web.entrypoints=webhttps"
         - "traefik.http.routers.loki_web.tls.certresolver=le"
@@ -47,7 +51,7 @@ services:
   # Reference: https://github.com/mlabouardy/swarm-tig
   influxdb:
     image: influxdb
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     networks:
       - external_network
     deploy:
@@ -58,7 +62,7 @@ services:
 
   telegraf:
     image: telegraf
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
     hostname: "{{.Node.Hostname}}"
     networks:
       - external_network

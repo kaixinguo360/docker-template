@@ -10,7 +10,9 @@ x-logging: &loki-logging
 services:
   web:
     image: setzero/oneindex
-#    logging: *loki-logging
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
     environment:
       REFRESH_TOKEN: '0 * * * *'
       REFRESH_CACHE: '*/10 * * * *'
@@ -24,7 +26,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true"
+        - "traefik.enable=true" #!port
         - "traefik.http.routers.oneindex_web.rule=Host(`one.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.oneindex_web.entrypoints=webhttps"
         - "traefik.http.routers.oneindex_web.tls.certresolver=le"
