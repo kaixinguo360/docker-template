@@ -12,8 +12,9 @@ cd $(dirname $0)/..
 export DEPLOY_STACK_NAME="$(basename $(realpath $(pwd)))"
 
 # Load Profile
+[ -n "$1" ] && PROFILE="$1" && shift
 set -o allexport
-[ -z "$1" -a -f ./deploy.env ] && . ./deploy.env
-[ -n "$1" ] && . "./deploy-$1.env"
+[ -z "$PROFILE" -a -f ./deploy.env ] && . ./deploy.env
+[ -n "$PROFILE" -a -f "./deploy-$PROFILE.env" ] && . "./deploy-$PROFILE.env"
 set +o allexport
 
