@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: wildcat/scylla:1.1.7
+    image: ${DEPLOY_IMAGE_WEB:-wildcat/scylla:1.1.7}
 #:log |    logging: *loki-logging
     networks:
       - external_network

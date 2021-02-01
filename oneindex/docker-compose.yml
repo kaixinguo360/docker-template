@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: setzero/oneindex
+    image: ${DEPLOY_IMAGE_WEB:-setzero/oneindex}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80

@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: viktorstrate/photoview:1
+    image: ${DEPLOY_IMAGE_WEB:-viktorstrate/photoview:1}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80
@@ -45,7 +45,7 @@ services:
         - "traefik.http.services.photoview_web.loadbalancer.server.port=80"
 
   db:
-    image: mariadb:10.5
+    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
 #:log |    logging: *loki-logging
     networks:
       - internal_network

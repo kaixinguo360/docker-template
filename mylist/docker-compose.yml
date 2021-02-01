@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: mylist
+    image: ${DEPLOY_IMAGE_WEB:-mylist}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
@@ -34,7 +34,7 @@ services:
         - "traefik.http.services.mylist_web.loadbalancer.server.port=8080"
 
   db:
-    image: mysql/mysql-server:8.0
+    image: ${DEPLOY_IMAGE_DB:-mysql/mysql-server:8.0}
 #:log |    logging: *loki-logging
     env_file:
       - config/docker.env

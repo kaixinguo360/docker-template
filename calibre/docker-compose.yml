@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: linuxserver/calibre-web:0.6.8-ls78
+    image: ${DEPLOY_IMAGE_WEB:-linuxserver/calibre-web:0.6.8-ls78}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8083}:8083

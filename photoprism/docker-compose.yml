@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: photoprism/photoprism:preview
+    image: ${DEPLOY_IMAGE_WEB:-photoprism/photoprism:preview}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80

@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   proxy:
-    image: traefik:v2.3
+    image: ${DEPLOY_IMAGE_PROXY:-traefik:v2.3}
 #:log |    logging: *loki-logging
     command:
       - "--configFile=/config/traefik.yml"

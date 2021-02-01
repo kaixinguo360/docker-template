@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: tootsuite/mastodon:v3.2.0
+    image: ${DEPLOY_IMAGE_WEB:-tootsuite/mastodon:v3.2.0}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
@@ -39,7 +39,7 @@ services:
         - "traefik.http.services.mastodon_web.loadbalancer.server.port=3000"
 
   db:
-    image: postgres:9.6-alpine
+    image: ${DEPLOY_IMAGE_DB:-postgres:9.6-alpine}
 #:log |    logging: *loki-logging
     networks:
       - internal_network
@@ -54,7 +54,7 @@ services:
           - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
 
   redis:
-    image: redis:6.0-alpine
+    image: ${DEPLOY_IMAGE_REDIS:-redis:6.0-alpine}
 #:log |    logging: *loki-logging
     networks:
       - internal_network
@@ -69,7 +69,7 @@ services:
           - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
 
 #  es:
-#    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10
+#    image: ${DEPLOY_IMAGE_ES:-docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10}
 ##:log |    logging: *loki-logging
 #    environment:
 #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -88,7 +88,7 @@ services:
 #        hard: -1
 
   streaming:
-    image: tootsuite/mastodon:v3.2.0
+    image: ${DEPLOY_IMAGE_STREAMING:-tootsuite/mastodon:v3.2.0}
 #:log |    logging: *loki-logging
     env_file: ./config/production.env
     command: node ./streaming
@@ -109,7 +109,7 @@ services:
           - ${DEPLOY_NODE_STREAMING:-node.labels.ignore != true}
 
   sidekiq:
-    image: tootsuite/mastodon:v3.2.0
+    image: ${DEPLOY_IMAGE_SIDEKIQ:-tootsuite/mastodon:v3.2.0}
 #:log |    logging: *loki-logging
     env_file: ./config/production.env
     command: bundle exec sidekiq
@@ -130,14 +130,14 @@ services:
 ## http_proxy=http://privoxy:8118
 ## ALLOW_ACCESS_TO_HIDDEN_SERVICE=true
 #  tor:
-#    image: sirboops/tor
+#    image: ${DEPLOY_IMAGE_TOR:-sirboops/tor}
 ##:log |    logging: *loki-logging
 #    networks:
 #      - external_network
 #      - internal_network
 #
 #  privoxy:
-#    image: sirboops/privoxy
+#    image: ${DEPLOY_IMAGE_PRIVOXY:-sirboops/privoxy}
 ##:log |    logging: *loki-logging
 #    volumes:
 #      - ./priv-config:/opt/config

@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: gkiko/streama:latest
+    image: ${DEPLOY_IMAGE_WEB:-gkiko/streama:latest}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
@@ -45,7 +45,7 @@ services:
         - "traefik.http.services.streama_web.loadbalancer.server.port=8080"
 
   db:
-    image: mysql:5.6
+    image: ${DEPLOY_IMAGE_DB:-mysql:5.6}
 #:log |    logging: *loki-logging
     environment:
       MYSQL_ROOT_PASSWORD: streama_root_password

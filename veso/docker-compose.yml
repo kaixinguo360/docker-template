@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: vesotv/veso
+    image: ${DEPLOY_IMAGE_WEB:-vesotv/veso}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8096}:8096

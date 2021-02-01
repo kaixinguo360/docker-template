@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   registry:
-    image: registry:2
+    image: ${DEPLOY_IMAGE_REGISTRY:-registry:2}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_REGISTORY:-5000}:5000

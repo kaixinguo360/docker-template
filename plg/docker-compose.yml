@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   grafana:
-    image: grafana/grafana
+    image: ${DEPLOY_IMAGE_GRAFANA:-grafana/grafana}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_GRAFANA:-3000}:3000
@@ -30,7 +30,7 @@ services:
         - "traefik.http.services.grafana_web.loadbalancer.server.port=3000"
 
   loki:
-    image: grafana/loki
+    image: ${DEPLOY_IMAGE_LOKI:-grafana/loki}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_LOKI:-3100}:3100
@@ -50,7 +50,7 @@ services:
 
   # Reference: https://github.com/mlabouardy/swarm-tig
   influxdb:
-    image: influxdb
+    image: ${DEPLOY_IMAGE_INFLUXDB:-influxdb}
 #:log |    logging: *loki-logging
     networks:
       - external_network
@@ -61,7 +61,7 @@ services:
           - ${DEPLOY_NODE_INFLUXDB:-node.labels.ignore != true}
 
   telegraf:
-    image: telegraf
+    image: ${DEPLOY_IMAGE_TELEGRF:-telegraf}
 #:log |    logging: *loki-logging
     hostname: "{{.Node.Hostname}}"
     networks:

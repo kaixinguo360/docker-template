@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: rocketchat/rocket.chat:latest
+    image: ${DEPLOY_IMAGE_WEB:-rocketchat/rocket.chat:latest}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
@@ -49,7 +49,7 @@ services:
         - "traefik.http.services.rocket_web.loadbalancer.server.port=3000"
 
   db:
-    image: mongo:4.0
+    image: ${DEPLOY_IMAGE_DB:-mongo:4.0}
     volumes:
      - db:/data/db
     command: mongod --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1

@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: misskey/misskey:12.47.0
+    image: ${DEPLOY_IMAGE_WEB:-misskey/misskey:12.47.0}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
@@ -34,7 +34,7 @@ services:
         - "traefik.http.services.misskey_web.loadbalancer.server.port=3000"
 
   redis:
-    image: redis:4.0-alpine
+    image: ${DEPLOY_IMAGE_REDIS:-redis:4.0-alpine}
 #:log |    logging: *loki-logging
     networks:
       - internal_network
@@ -47,7 +47,7 @@ services:
           - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
 
   db:
-    image: postgres:12.2-alpine
+    image: ${DEPLOY_IMAGE_DB:-postgres:12.2-alpine}
 #:log |    logging: *loki-logging
     networks:
       - internal_network
@@ -62,7 +62,7 @@ services:
           - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
 
 #  es:
-#    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.2
+#    image: ${DEPLOY_IMAGE_ES:-docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.2}
 ##:log |    logging: *loki-logging
 #    environment:
 #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"

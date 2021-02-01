@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: searx/searx
+    image: ${DEPLOY_IMAGE_WEB:-searx/searx}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
@@ -43,4 +43,5 @@ configs:
 networks:
   external_network:
     external: true
+
 

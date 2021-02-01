@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: wikiwi/robots-disallow
+    image: ${DEPLOY_IMAGE_WEB:-wikiwi/robots-disallow}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8080}:8080

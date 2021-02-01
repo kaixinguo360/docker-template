@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: hkalexling/mango:v0.12.2
+    image: ${DEPLOY_IMAGE_WEB:-hkalexling/mango:v0.12.2}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-9000}:9000

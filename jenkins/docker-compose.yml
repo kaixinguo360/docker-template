@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: jenkins/jenkins:lts-alpine
+    image: ${DEPLOY_IMAGE_WEB:-jenkins/jenkins:lts-alpine}
 #:log |    logging: *loki-logging
     ports:
       - 50000:50000

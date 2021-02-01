@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: myphp
+    image: ${DEPLOY_IMAGE_WEB:-myphp}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80
@@ -33,7 +33,7 @@ services:
         - "traefik.http.services.myssh_web.loadbalancer.server.port=80"
 
   honeypot:
-    image: myssh
+    image: ${DEPLOY_IMAGE_HONEYPOT:-myssh}
 #:log |    logging: *loki-logging
     env_file: ./config/docker.env
     networks:
@@ -50,7 +50,7 @@ services:
         constraints: [node.platform.os == linux]
 
   db:
-    image: mysql/mysql-server:5.7.31
+    image: ${DEPLOY_IMAGE_DB:-mysql/mysql-server:5.7.31}
 #:log |    logging: *loki-logging
     env_file: ./config/docker.env
     networks:
