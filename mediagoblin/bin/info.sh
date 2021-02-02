@@ -14,8 +14,9 @@ HERE
 
 grep '${DEPLOY_[^}]*}\|$DEPLOY_[A-Z_a-z0-9]*' \
     -r -o -h \
-    --exclude-dir=var \
     --exclude=info.sh \
+    ./bin/* ./config/* ./docker-compose*.yml \
+    2>/dev/null \
     | sort -u \
     | xargs -l1 -i sh -c 'echo $(echo \{}|grep -o "DEPLOY_[A-Z_a-z0-9]*")=\"{}\"' \
     | sort -u
