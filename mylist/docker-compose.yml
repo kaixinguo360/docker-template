@@ -28,7 +28,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.mylist_web.rule=Host(`list.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.mylist_web.rule=Host(`${DEPLOY_SUBDOMAIN:-list}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.mylist_web.entrypoints=webhttps"
         - "traefik.http.routers.mylist_web.tls.certresolver=le"
         - "traefik.http.services.mylist_web.loadbalancer.server.port=8080"

@@ -23,7 +23,7 @@ services:
         done; (exit $$s)"
     environment:
       PORT: "3000"
-      ROOT_URL: https://rocket.${DEPLOY_HOSTNAME}
+      ROOT_URL: https://${DEPLOY_SUBDOMAIN:-rocket}.${DEPLOY_HOSTNAME}
       MONGO_URL: mongodb://db:27017/rocketchat
       MONGO_OPLOG_URL: mongodb://db:27017/local
 #      MAIL_URL: smtp://smtp.email
@@ -43,7 +43,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.rocket_web.rule=Host(`rocket.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.rocket_web.rule=Host(`${DEPLOY_SUBDOMAIN:-rocket}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.rocket_web.entrypoints=webhttps"
         - "traefik.http.routers.rocket_web.tls.certresolver=le"
         - "traefik.http.services.rocket_web.loadbalancer.server.port=3000"

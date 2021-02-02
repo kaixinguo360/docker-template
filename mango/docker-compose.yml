@@ -27,7 +27,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.mango_web.rule=Host(`mango.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.mango_web.rule=Host(`${DEPLOY_SUBDOMAIN:-mango}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.mango_web.entrypoints=webhttps"
         - "traefik.http.routers.mango_web.tls.certresolver=le"
         - "traefik.http.services.mango_web.loadbalancer.server.port=9000"

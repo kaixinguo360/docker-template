@@ -14,7 +14,7 @@ services:
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
     environment:
-      BASE_URL: https://searx.${DEPLOY_HOSTNAME}/
+      BASE_URL: https://${DEPLOY_SUBDOMAIN:-searx}.${DEPLOY_HOSTNAME}/
     networks:
       - external_network
     configs:
@@ -29,7 +29,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.searx_web.rule=Host(`searx.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.searx_web.rule=Host(`${DEPLOY_SUBDOMAIN:-searx}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.searx_web.entrypoints=webhttps"
         - "traefik.http.routers.searx_web.tls.certresolver=le"
         - "traefik.http.services.searx_web.loadbalancer.server.port=8080"

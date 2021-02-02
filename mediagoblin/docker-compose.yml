@@ -24,7 +24,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.mediagoblin_web.rule=Host(`mediagoblin.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.mediagoblin_web.rule=Host(`${DEPLOY_SUBDOMAIN:-mediagoblin}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.mediagoblin_web.entrypoints=webhttps"
         - "traefik.http.routers.mediagoblin_web.tls.certresolver=le"
         - "traefik.http.services.mediagoblin_web.loadbalancer.server.port=6543"

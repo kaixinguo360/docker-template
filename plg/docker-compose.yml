@@ -24,7 +24,7 @@ services:
           - ${DEPLOY_NODE_GRAFANA:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.grafana_web.rule=Host(`grafana.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.grafana_web.rule=Host(`${DEPLOY_SUBDOMAIN:-grafana}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.grafana_web.entrypoints=webhttps"
         - "traefik.http.routers.grafana_web.tls.certresolver=le"
         - "traefik.http.services.grafana_web.loadbalancer.server.port=3000"
@@ -43,7 +43,7 @@ services:
           - ${DEPLOY_NODE_LOKI:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.loki_web.rule=Host(`loki.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.loki_web.rule=Host(`${DEPLOY_SUBDOMAIN:-loki}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.loki_web.entrypoints=webhttps"
         - "traefik.http.routers.loki_web.tls.certresolver=le"
         - "traefik.http.services.loki_web.loadbalancer.server.port=3100"

@@ -27,7 +27,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.myssh_web.rule=Host(`attack.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.myssh_web.rule=Host(`${DEPLOY_SUBDOMAIN:-attack}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.myssh_web.entrypoints=webhttps"
         - "traefik.http.routers.myssh_web.tls.certresolver=le"
         - "traefik.http.services.myssh_web.loadbalancer.server.port=80"
