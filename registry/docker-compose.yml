@@ -24,10 +24,10 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.registry_web.rule=Host(`${DEPLOY_SUBDOMAIN:-docker}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.registry_web.entrypoints=webhttps"
-        - "traefik.http.routers.registry_web.tls.certresolver=le"
-        - "traefik.http.services.registry_web.loadbalancer.server.port=5000"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.rule=Host(`${DEPLOY_SUBDOMAIN:-docker}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-registry}.loadbalancer.server.port=5000"
 
 networks:
   external_network:

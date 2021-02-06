@@ -43,10 +43,10 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.rocket_web.rule=Host(`${DEPLOY_SUBDOMAIN:-rocket}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.rocket_web.entrypoints=webhttps"
-        - "traefik.http.routers.rocket_web.tls.certresolver=le"
-        - "traefik.http.services.rocket_web.loadbalancer.server.port=3000"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-rocket}.rule=Host(`${DEPLOY_SUBDOMAIN:-rocket}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-rocket}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-rocket}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-rocket}.loadbalancer.server.port=3000"
 
   db:
     image: ${DEPLOY_IMAGE_DB:-mongo:4.0}

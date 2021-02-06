@@ -29,10 +29,10 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.searx_web.rule=Host(`${DEPLOY_SUBDOMAIN:-searx}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.searx_web.entrypoints=webhttps"
-        - "traefik.http.routers.searx_web.tls.certresolver=le"
-        - "traefik.http.services.searx_web.loadbalancer.server.port=8080"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-searx}.rule=Host(`${DEPLOY_SUBDOMAIN:-searx}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-searx}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-searx}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-searx}.loadbalancer.server.port=8080"
 
 configs:
   searx-config:

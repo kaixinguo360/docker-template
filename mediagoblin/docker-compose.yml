@@ -24,10 +24,10 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.mediagoblin_web.rule=Host(`${DEPLOY_SUBDOMAIN:-mediagoblin}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.mediagoblin_web.entrypoints=webhttps"
-        - "traefik.http.routers.mediagoblin_web.tls.certresolver=le"
-        - "traefik.http.services.mediagoblin_web.loadbalancer.server.port=6543"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mediagoblin}.rule=Host(`${DEPLOY_SUBDOMAIN:-mediagoblin}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mediagoblin}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mediagoblin}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-mediagoblin}.loadbalancer.server.port=6543"
 
 networks:
   external_network:

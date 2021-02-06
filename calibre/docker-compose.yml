@@ -30,10 +30,10 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.calibre_web.rule=Host(`${DEPLOY_SUBDOMAIN:-book}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.calibre_web.entrypoints=webhttps"
-        - "traefik.http.routers.calibre_web.tls.certresolver=le"
-        - "traefik.http.services.calibre_web.loadbalancer.server.port=8083"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-calibre}.rule=Host(`${DEPLOY_SUBDOMAIN:-book}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-calibre}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-calibre}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-calibre}.loadbalancer.server.port=8083"
 
 networks:
   external_network:

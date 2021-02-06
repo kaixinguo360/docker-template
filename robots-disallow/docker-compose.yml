@@ -22,10 +22,10 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.robots-disallow_web.rule=Path(`/robots.txt`)"
-        - "traefik.http.routers.robots-disallow_web.entrypoints=webhttps"
-        - "traefik.http.routers.robots-disallow_web.tls.certresolver=le"
-        - "traefik.http.services.robots-disallow_web.loadbalancer.server.port=8080"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-robots-disallow}.rule=Path(`/robots.txt`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-robots-disallow}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-robots-disallow}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-robots-disallow}.loadbalancer.server.port=8080"
 
 networks:
   external_network:

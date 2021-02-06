@@ -28,11 +28,11 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.archivebox_web.rule=Host(`${DEPLOY_SUBDOMAIN:-archivebox}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.archivebox_web.entrypoints=webhttps"
-        - "traefik.http.routers.archivebox_web.tls.options=mtls@file"
-        - "traefik.http.routers.archivebox_web.tls.certresolver=le"
-        - "traefik.http.services.archivebox_web.loadbalancer.server.port=8000"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.rule=Host(`${DEPLOY_SUBDOMAIN:-archivebox}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.options=mtls@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-archivebox}.loadbalancer.server.port=8000"
 
 networks:
   external_network:

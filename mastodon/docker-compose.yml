@@ -33,10 +33,10 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.mastodon_web.rule=Host(`${DEPLOY_SUBDOMAIN:-mastodon}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.mastodon_web.entrypoints=webhttps"
-        - "traefik.http.routers.mastodon_web.tls.certresolver=le"
-        - "traefik.http.services.mastodon_web.loadbalancer.server.port=3000"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mastodon}.rule=Host(`${DEPLOY_SUBDOMAIN:-mastodon}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mastodon}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mastodon}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-mastodon}.loadbalancer.server.port=3000"
 
   db:
     image: ${DEPLOY_IMAGE_DB:-postgres:9.6-alpine}

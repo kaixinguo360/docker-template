@@ -40,10 +40,10 @@ services:
         constraints: [node.role == manager]
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.portainer_web.rule=Host(`${DEPLOY_SUBDOMAIN:-swarm}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.portainer_web.entrypoints=webhttps"
-        - "traefik.http.routers.portainer_web.tls.certresolver=le"
-        - "traefik.http.services.portainer_web.loadbalancer.server.port=9000"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.rule=Host(`${DEPLOY_SUBDOMAIN:-swarm}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-portainer}.loadbalancer.server.port=9000"
 
 networks:
   external_network:

@@ -27,10 +27,10 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.oneindex_web.rule=Host(`${DEPLOY_SUBDOMAIN:-one}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.oneindex_web.entrypoints=webhttps"
-        - "traefik.http.routers.oneindex_web.tls.certresolver=le"
-        - "traefik.http.services.oneindex_web.loadbalancer.server.port=80"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-oneindex}.rule=Host(`${DEPLOY_SUBDOMAIN:-one}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-oneindex}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-oneindex}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-oneindex}.loadbalancer.server.port=80"
 
 networks:
   external_network:

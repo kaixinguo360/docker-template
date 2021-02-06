@@ -28,10 +28,10 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.misskey_web.rule=Host(`${DEPLOY_SUBDOMAIN:-misskey}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.misskey_web.entrypoints=webhttps"
-        - "traefik.http.routers.misskey_web.tls.certresolver=le"
-        - "traefik.http.services.misskey_web.loadbalancer.server.port=3000"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-misskey}.rule=Host(`${DEPLOY_SUBDOMAIN:-misskey}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-misskey}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-misskey}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-misskey}.loadbalancer.server.port=3000"
 
   redis:
     image: ${DEPLOY_IMAGE_REDIS:-redis:4.0-alpine}

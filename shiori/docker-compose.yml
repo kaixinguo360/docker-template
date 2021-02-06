@@ -24,10 +24,10 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!port
-        - "traefik.http.routers.shiori_web.rule=Host(`${DEPLOY_SUBDOMAIN:-shiori}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.shiori_web.entrypoints=webhttps"
-        - "traefik.http.routers.shiori_web.tls.certresolver=le"
-        - "traefik.http.services.shiori_web.loadbalancer.server.port=8080"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-shiori}.rule=Host(`${DEPLOY_SUBDOMAIN:-shiori}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-shiori}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-shiori}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-shiori}.loadbalancer.server.port=8080"
 
 networks:
   external_network:
