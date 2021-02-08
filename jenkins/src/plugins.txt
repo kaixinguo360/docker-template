@@ -1,0 +1,9 @@
+build-timeout:latest
+credentials-binding:latest
+email-ext:latest
+git:latest
+gradle:latest
+pipeline-stage-view:latest
+workflow-aggregator:latest
+localization-zh-cn:latest
+docker-workflow:latest
