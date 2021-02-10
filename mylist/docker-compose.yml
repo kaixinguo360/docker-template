@@ -42,7 +42,9 @@ services:
       - internal_network
     volumes:
       - db:/var/lib/mysql
-      - sql:/docker-entrypoint-initdb.d/
+    configs:
+      - source: initdb-config
+        target: /docker-entrypoint-initdb.d/mysql.sql
     deploy:
       replicas: 1
       placement:
@@ -55,24 +57,23 @@ networks:
   internal_network:
     internal: true
 
+configs:
+  initdb-config:
+    file: ./config/mysql.sql
+
 volumes:
   db:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/mylist/var}/db"
-  sql:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/mylist/var}/sql"
+      o: "addr=$$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$$DEPLOY_NFS_ROOT/${DEPLOY_STACK_NAME:-mylist}/db"
   jar:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/mylist/var}/jar"
+      o: "addr=$$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$$DEPLOY_NFS_ROOT/${DEPLOY_STACK_NAME:-mylist}/jar"
   static:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/mylist/var}/static"
+      o: "addr=$$DEPLOY_NFS_HOST,nolock,soft,rw"
+      device: ":$$DEPLOY_NFS_ROOT/${DEPLOY_STACK_NAME:-mylist}/static"

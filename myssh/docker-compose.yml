@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-myphp}
+    image: ${DEPLOY_IMAGE_WEB:-myssh-web}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80
@@ -33,7 +33,7 @@ services:
         - "traefik.http.services.${DEPLOY_STACK_NAME:-myssh}.loadbalancer.server.port=80"
 
   honeypot:
-    image: ${DEPLOY_IMAGE_HONEYPOT:-myssh}
+    image: ${DEPLOY_IMAGE_HONEYPOT:-myssh-honeypot}
 #:log |    logging: *loki-logging
     env_file: ./config/docker.env
     networks:
@@ -57,7 +57,9 @@ services:
       - internal_network
     volumes:
       - db:/var/lib/mysql
-      - sql:/docker-entrypoint-initdb.d/
+    configs:
+      - source: initdb-config
+        target: /docker-entrypoint-initdb.d/mysql.sql
     deploy:
       replicas: 1
       placement:
@@ -70,6 +72,10 @@ networks:
   external_network:
     external: true
 
+configs:
+  initdb-config:
+    file: ./config/mysql.sql
+
 volumes:
   www:
     driver_opts:
@@ -81,8 +87,3 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
       device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/myssh/var}/db"
-  sql:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/myssh/var}/sql"
