@@ -63,10 +63,10 @@ volumes:
   data:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/traefik/var}/data"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-traefik}/data"
   config:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/traefik/var}/config"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-traefik}/config"

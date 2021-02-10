@@ -72,18 +72,18 @@ volumes:
   db:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/photoview/var}/db"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-photoview}/db"
   apicache:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT${DEPLOY_DATA_ROOT:-/photoview/var}/apicache"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-photoview}/apicache"
   images:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_NFS_ROOT"
+      o: "addr=$DEPLOY_IMAGE_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_IMAGE_ROOTT"
   sdu:
     driver: "sapk/plugin-rclone:latest"
     driver_opts:

@@ -65,15 +65,15 @@ volumes:
   db:
     driver_opts:
       type: "nfs"
-      o: "addr=$$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$$DEPLOY_NFS_ROOT/${DEPLOY_STACK_NAME:-mylist}/db"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mylist}/db"
   jar:
     driver_opts:
       type: "nfs"
-      o: "addr=$$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$$DEPLOY_NFS_ROOT/${DEPLOY_STACK_NAME:-mylist}/jar"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mylist}/jar"
   static:
     driver_opts:
       type: "nfs"
-      o: "addr=$$DEPLOY_NFS_HOST,nolock,soft,rw"
-      device: ":$$DEPLOY_NFS_ROOT/${DEPLOY_STACK_NAME:-mylist}/static"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mylist}/static"

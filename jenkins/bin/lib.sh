@@ -8,9 +8,6 @@ fi
 # Change Working Directory
 cd $(dirname $0)/..
 
-# Get Default Stack Name
-export DEPLOY_STACK_NAME="$(basename $(realpath $(pwd)))"
-
 # Get Profile Name
 if [ -n "$1" ]; then
     if [ "$1" = "-" ]; then
@@ -23,6 +20,13 @@ if [ -n "$1" ]; then
         PROFILE="$1"
     fi
     shift
+fi
+
+# Set Default Stack Name
+if [ -n "$PROFILE" ]; then
+    export DEPLOY_STACK_NAME="$(basename $(realpath $(pwd)))-$PROFILE"
+else
+    export DEPLOY_STACK_NAME="$(basename $(realpath $(pwd)))"
 fi
 
 # Load Profile
