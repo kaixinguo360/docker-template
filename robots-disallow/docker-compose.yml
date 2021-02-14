@@ -23,6 +23,7 @@ services:
       labels:
         - "traefik.enable=true" #!port
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-robots-disallow}.rule=Path(`/robots.txt`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-robots-disallow}.priority=100"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-robots-disallow}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-robots-disallow}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-robots-disallow}.loadbalancer.server.port=8080"
