@@ -82,8 +82,8 @@ volumes:
   images:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_IMAGE_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_IMAGE_ROOTT"
+      o: "addr=$DEPLOY_MEDIA_IMAGE_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_MEDIA_IMAGE_ROOTT"
   sdu:
     driver: "sapk/plugin-rclone:latest"
     driver_opts:

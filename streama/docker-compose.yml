@@ -81,5 +81,5 @@ volumes:
   videos:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_VIDEO_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_VIDEO_ROOT"
+      o: "addr=$DEPLOY_MEDIA_VIDEO_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_MEDIA_VIDEO_ROOT"

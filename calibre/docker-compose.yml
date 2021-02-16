@@ -48,5 +48,5 @@ volumes:
   books:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_EBOOK_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_EBOOK_ROOT"
+      o: "addr=$DEPLOY_MEDIA_BOOK_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_MEDIA_BOOK_ROOT"
