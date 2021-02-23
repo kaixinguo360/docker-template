@@ -16,9 +16,9 @@ COPY php-dev.ini php-prod.ini "$PHP_INI_DIR/"
 RUN apk add --no-cache \
         nginx \
         socat \
-    && mkdir /run/nginx
+    && mkdir /run/nginx \
+    && mkdir /etc/nginx/conf.ext
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-CMD mkdir /etc/nginx/conf.ext
 EXPOSE 80
 WORKDIR /var/www
 
@@ -44,6 +44,7 @@ ENV DB_HOST='' \
     DB_LOCAL_PORT='' \
     DEBUG=''
 COPY run.sh /opt/run.sh
-RUN chmod +x /opt/run.sh
+RUN chmod +x /opt/run.sh \
+    && rm -rf /var/www/*
 CMD /opt/run.sh
 
