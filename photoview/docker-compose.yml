@@ -31,7 +31,7 @@ services:
     volumes:
       - apicache:/app/cache
       - images:/media/images
-      - sdu:/mnt/sdu
+      - rclone:$DEPLOY_RCLONE_LOCAL
     deploy:
       replicas: 1
       placement:
@@ -84,9 +84,9 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_MEDIA_IMAGE_HOST,nolock,soft,rw"
       device: ":$DEPLOY_MEDIA_IMAGE_ROOTT"
-  sdu:
+  rclone:
     driver: "sapk/plugin-rclone:latest"
     driver_opts:
       args: "--attr-timeout 60s --vfs-cache-mode full"
-      config: "$DEPLOY_RCLONE_SDU_CONFIG"
-      remote: "$DEPLOY_RCLONE_SDU_REMOTE"
+      config: "$DEPLOY_RCLONE_CONFIG"
+      remote: "$DEPLOY_RCLONE_REMOTE"

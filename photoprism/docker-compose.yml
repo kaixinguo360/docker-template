@@ -86,7 +86,7 @@ services:
       - data:/photoprism/storage
       - library:/photoprism/originals
       - media:/media
-      - sdu:/mnt/sdu
+      - rclone:$DEPLOY_RCLONE_LOCAL
 
     deploy:
       replicas: 1
@@ -120,9 +120,9 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_MEDIA_ROOT"
-  sdu:
+  rclone:
     driver: "sapk/plugin-rclone:latest"
     driver_opts:
       args: "--attr-timeout 60s --vfs-cache-mode full"
-      config: "$DEPLOY_RCLONE_SDU_CONFIG"
-      remote: "$DEPLOY_RCLONE_SDU_REMOTE"
+      config: "$DEPLOY_RCLONE_CONFIG"
+      remote: "$DEPLOY_RCLONE_REMOTE"
