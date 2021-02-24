@@ -1,0 +1,137 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-drone/drone:1}
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
+    environment:
+      # Reference: https://docs.drone.io/server/reference/
+      - DRONE_BITBUCKET_CLIENT_ID
+      - DRONE_BITBUCKET_CLIENT_SECRET
+      - DRONE_BITBUCKET_DEBUG
+      - DRONE_CLEANUP_DEADLINE_PENDING
+      - DRONE_CLEANUP_DEADLINE_RUNNING
+      - DRONE_CLEANUP_DISABLED
+      - DRONE_CLEANUP_INTERVAL
+      - DRONE_CONVERT_PLUGIN_ENDPOINT
+      - DRONE_CONVERT_PLUGIN_EXTENSION
+      - DRONE_CONVERT_PLUGIN_SECRET
+      - DRONE_CONVERT_PLUGIN_SKIP_VERIFY
+      - DRONE_COOKIE_SECRET
+      - DRONE_COOKIE_TIMEOUT
+      - DRONE_CRON_DISABLED
+      - DRONE_CRON_INTERVAL
+      - DRONE_DATABASE_DATASOURCE=/data/database.sqlite
+      - DRONE_DATABASE_DRIVER=sqlite3
+      - DRONE_DATABASE_SECRET
+      - DRONE_GIT_ALWAYS_AUTH
+      - DRONE_GIT_PASSWORD
+      - DRONE_GIT_USERNAME
+      - DRONE_GITEA_CLIENT_ID
+      - DRONE_GITEA_CLIENT_SECRET
+      - DRONE_GITEA_SERVER
+      - DRONE_GITEA_SKIP_VERIFY
+      - DRONE_GITHUB_CLIENT_ID
+      - DRONE_GITHUB_CLIENT_SECRET
+      - DRONE_GITHUB_SCOPE
+      - DRONE_GITHUB_SERVER
+      - DRONE_GITHUB_SKIP_VERIFY
+      - DRONE_GITLAB_CLIENT_ID
+      - DRONE_GITLAB_CLIENT_SECRET
+      - DRONE_GITLAB_SERVER
+      - DRONE_GITLAB_SKIP_VERIFY
+      - DRONE_GOGS_SERVER
+      - DRONE_GOGS_SKIP_VERIFY
+      - DRONE_JSONNET_ENABLED
+      - DRONE_LICENSE
+      - DRONE_LOGS_COLOR
+      - DRONE_LOGS_DEBUG
+      - DRONE_LOGS_PRETTY
+      - DRONE_LOGS_TRACE
+      - DRONE_PROMETHEUS_ANONYMOUS_ACCESS
+      - DRONE_REGISTRATION_CLOSED
+      - DRONE_REPOSITORY_FILTER
+      - DRONE_AGENTS_ENABLED=true
+      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET:-secret}
+      - DRONE_S3_BUCKET
+      - DRONE_S3_ENDPOINT
+      - DRONE_S3_PATH_STYLE
+      - DRONE_S3_PREFIX
+      - DRONE_SERVER_HOST=${DEPLOY_SUBDOMAIN:-drone}.${DEPLOY_HOSTNAME}
+      - DRONE_SERVER_PROTO=https
+      - DRONE_SERVER_PROXY_HOST
+      - DRONE_SERVER_PROXY_PROTO
+      - DRONE_STARLARK_ENABLED
+      - DRONE_STASH_CONSUMER_KEY
+      - DRONE_STASH_PRIVATE_KEY
+      - DRONE_STASH_SERVER
+      - DRONE_STASH_SKIP_VERIFY
+      - DRONE_STATUS_DISABLED
+      - DRONE_STATUS_NAME
+      - DRONE_TLS_AUTOCERT
+      - DRONE_TLS_CERT
+      - DRONE_TLS_KEY
+      - DRONE_USER_CREATE
+      - DRONE_USER_FILTER
+      - DRONE_VALIDATE_PLUGIN_ENDPOINT
+      - DRONE_VALIDATE_PLUGIN_SECRET
+      - DRONE_VALIDATE_PLUGIN_SKIP_VERIFY
+      - DRONE_WEBHOOK_ENDPOINT
+      - DRONE_WEBHOOK_EVENTS
+      - DRONE_WEBHOOK_SECRET
+      - DRONE_WEBHOOK_SKIP_VERIFY
+    networks:
+      - external_network
+    volumes:
+      - data:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-drone}.rule=Host(`${DEPLOY_SUBDOMAIN:-drone}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-drone}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-drone}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-drone}.loadbalancer.server.port=80"
+
+  agent:
+    image: drone/drone-runner-docker:1
+    depends_on:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    environment:
+      - DRONE_RPC_PROTO=https
+      - DRONE_RPC_HOST=${DEPLOY_SUBDOMAIN:-drone}.${DEPLOY_HOSTNAME}
+      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET:-secret}
+      - DRONE_RUNNER_NAME="{{.Node.Hostname}}-{{.Task.Slot}}"
+      - DRONE_RUNNER_CAPACITY=2
+    networks:
+      - external_network
+    deploy:
+      replicas: ${DEPLOY_REPLICAS_AGENT:-1}
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_AGENT:-node.labels.ignore != true}
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-drone}/data"
