@@ -89,8 +89,10 @@ services:
       - DRONE_WEBHOOK_EVENTS
       - DRONE_WEBHOOK_SECRET
       - DRONE_WEBHOOK_SKIP_VERIFY
+#:yaml_repository|      - DRONE_YAML_ENDPOINT=http://drone_yaml_repository:3000/
     networks:
       - external_network
+      - internal_network
     volumes:
       - data:/data
     deploy:
@@ -112,22 +114,33 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
     environment:
-      - DRONE_RPC_PROTO=https
-      - DRONE_RPC_HOST=${DEPLOY_SUBDOMAIN:-drone}.${DEPLOY_HOSTNAME}
+      - DRONE_RPC_PROTO=http
+      - DRONE_RPC_HOST=web
       - DRONE_RPC_SECRET=${DRONE_RPC_SECRET:-secret}
       - DRONE_RUNNER_NAME="{{.Node.Hostname}}-{{.Task.Slot}}"
       - DRONE_RUNNER_CAPACITY=2
     networks:
-      - external_network
+      - internal_network
     deploy:
       replicas: ${DEPLOY_REPLICAS_AGENT:-1}
       placement:
         constraints: 
           - ${DEPLOY_NODE_AGENT:-node.labels.ignore != true}
 
+# Reference: https://github.com/spainer/drone-configuration-repository
+#:yaml_repository|  drone_yaml_repository:
+#:yaml_repository|    image: 'svenpainer/drone-configuration-repository'
+#:yaml_repository|    networks:
+#:yaml_repository|      - external_network
+#:yaml_repository|      - internal_network
+#:yaml_repository|    environment:
+#:yaml_repository|      - DRONE_YAML_REPOSITORY_URL=$DEPLOY_YAML_REPOSITORY
+
 networks:
   external_network:
     external: true
+  internal_network:
+    internal: true
 
 volumes:
   data:
