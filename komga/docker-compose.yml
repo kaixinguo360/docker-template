@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-gotson/komga}
+    image: ${DEPLOY_IMAGE_WEB:-gotson/komga:latest}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8080}:8080

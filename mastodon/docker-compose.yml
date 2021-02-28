@@ -130,14 +130,14 @@ services:
 ## http_proxy=http://privoxy:8118
 ## ALLOW_ACCESS_TO_HIDDEN_SERVICE=true
 #  tor:
-#    image: ${DEPLOY_IMAGE_TOR:-sirboops/tor}
+#    image: ${DEPLOY_IMAGE_TOR:-sirboops/tor:latest}
 ##:log |    logging: *loki-logging
 #    networks:
 #      - external_network
 #      - internal_network
 #
 #  privoxy:
-#    image: ${DEPLOY_IMAGE_PRIVOXY:-sirboops/privoxy}
+#    image: ${DEPLOY_IMAGE_PRIVOXY:-sirboops/privoxy:latest}
 ##:log |    logging: *loki-logging
 #    volumes:
 #      - ./priv-config:/opt/config

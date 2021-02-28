@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-myssh-web}
+    image: ${DEPLOY_IMAGE_WEB:-myssh-web:latest}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80
@@ -33,7 +33,7 @@ services:
         - "traefik.http.services.${DEPLOY_STACK_NAME:-myssh}.loadbalancer.server.port=80"
 
   honeypot:
-    image: ${DEPLOY_IMAGE_HONEYPOT:-myssh-honeypot}
+    image: ${DEPLOY_IMAGE_HONEYPOT:-myssh-honeypot:latest}
 #:log |    logging: *loki-logging
     env_file: ./config/docker.env
     networks:

@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-mtlynch/mediagoblin}
+    image: ${DEPLOY_IMAGE_WEB:-mtlynch/mediagoblin:latest}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-6543}:6543

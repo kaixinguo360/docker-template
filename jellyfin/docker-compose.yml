@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-jellyfin/jellyfin}
+    image: ${DEPLOY_IMAGE_WEB:-jellyfin/jellyfin:latest}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8096}:8096
