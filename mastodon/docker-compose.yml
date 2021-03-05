@@ -14,6 +14,20 @@ services:
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
     env_file: ./config/production.env
+    environment:
+      - LOCAL_DOMAIN
+      - SINGLE_USER_MODE
+      - SECRET_KEY_BASE
+      - OTP_SECRET
+      - VAPID_PRIVATE_KEY
+      - VAPID_PUBLIC_KEY
+      - SMTP_SERVER
+      - SMTP_PORT
+      - SMTP_LOGIN
+      - SMTP_PASSWORD
+      - SMTP_AUTH_METHOD
+      - SMTP_OPENSSL_VERIFY_MODE
+      - SMTP_FROM_ADDRESS
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
     networks:
       - external_network
@@ -91,6 +105,13 @@ services:
     image: ${DEPLOY_IMAGE_STREAMING:-tootsuite/mastodon:v3.2.0}
 #:log |    logging: *loki-logging
     env_file: ./config/production.env
+    environment:
+      - LOCAL_DOMAIN
+      - SINGLE_USER_MODE
+      - SECRET_KEY_BASE
+      - OTP_SECRET
+      - VAPID_PRIVATE_KEY
+      - VAPID_PUBLIC_KEY
     command: node ./streaming
     networks:
       - external_network
@@ -112,6 +133,13 @@ services:
     image: ${DEPLOY_IMAGE_SIDEKIQ:-tootsuite/mastodon:v3.2.0}
 #:log |    logging: *loki-logging
     env_file: ./config/production.env
+    environment:
+      - LOCAL_DOMAIN
+      - SINGLE_USER_MODE
+      - SECRET_KEY_BASE
+      - OTP_SECRET
+      - VAPID_PRIVATE_KEY
+      - VAPID_PUBLIC_KEY
     command: bundle exec sidekiq
     depends_on:
       - db
