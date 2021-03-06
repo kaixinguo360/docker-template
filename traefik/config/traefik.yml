@@ -26,6 +26,6 @@ certificatesresolvers:
     acme:
       httpchallenge:
         entrypoint: webhttp
-      email: <secret:USER_NAME>@example.com
+      email: user@example.com
       storage: /data/acme.json
 

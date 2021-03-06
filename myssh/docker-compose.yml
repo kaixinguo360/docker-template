@@ -36,6 +36,8 @@ services:
     image: ${DEPLOY_IMAGE_HONEYPOT:-myssh-honeypot:latest}
 #:log |    logging: *loki-logging
     env_file: ./config/docker.env
+    environment:
+      - IPSTACK_ACCESS_KEY
     networks:
       - internal_network
       - external_network

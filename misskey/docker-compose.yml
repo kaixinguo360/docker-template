@@ -13,6 +13,8 @@ services:
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
+    environment:
+      BASE_URL: ${DEPLOY_SUBDOMAIN:-misskey}.${DEPLOY_HOSTNAME}
     networks:
       - internal_network
       - external_network
@@ -80,6 +82,7 @@ networks:
 configs:
   misskey-config:
     file: ./config/default.yml
+    template_driver: golang
 
 volumes:
   config:

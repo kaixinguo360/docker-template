@@ -1,7 +1,0 @@
-version: "3.2"
-
-services:
-  myssh:
-    image: myssh
-    ports:
-      - "22:22"
