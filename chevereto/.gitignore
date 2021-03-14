@@ -1,0 +1,7 @@
+/*
+!/.gitignore
+!/docker-compose.yml
+!/bin/
+!/src/
+!/config/
+!/var/
