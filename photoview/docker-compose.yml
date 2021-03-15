@@ -87,6 +87,6 @@ volumes:
   rclone:
     driver: "sapk/plugin-rclone:latest"
     driver_opts:
-      args: "--attr-timeout 60s --vfs-cache-mode full"
+      args: "--allow-root --allow-other --attr-timeout 60s --vfs-cache-mode full"
       config: "$DEPLOY_RCLONE_CONFIG"
       remote: "$DEPLOY_RCLONE_REMOTE"
