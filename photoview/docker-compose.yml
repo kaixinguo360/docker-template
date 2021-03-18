@@ -31,7 +31,7 @@ services:
     volumes:
       - apicache:/app/cache
       - images:/media/images
-      - rclone:$DEPLOY_RCLONE_LOCAL
+#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
     deploy:
       replicas: 1
       placement:
@@ -79,14 +79,19 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-photoview}/apicache"
-  images:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_MEDIA_IMAGE_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_MEDIA_IMAGE_ROOTT"
-  rclone:
-    driver: "sapk/plugin-rclone:latest"
-    driver_opts:
-      args: "--allow-root --allow-other --attr-timeout 60s --vfs-cache-mode full"
-      config: "$DEPLOY_RCLONE_CONFIG"
-      remote: "$DEPLOY_RCLONE_REMOTE"
+  images: #!media_image
+    driver_opts: #!media_image
+      type: "nfs" #!media_image
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!media_image
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-photoview}/images" #!media_image
+#:media_image|  images:
+#:media_image|    driver_opts:
+#:media_image|      type: "nfs"
+#:media_image|      o: "addr=$DEPLOY_MEDIA_IMAGE_HOST,nolock,soft,rw"
+#:media_image|      device: ":$DEPLOY_MEDIA_IMAGE_ROOTT"
+#:rclone|  rclone:
+#:rclone|    driver: "sapk/plugin-rclone:latest"
+#:rclone|    driver_opts:
+#:rclone|      args: "--allow-root --allow-other --attr-timeout 60s --vfs-cache-mode full"
+#:rclone|      config: "$DEPLOY_RCLONE_CONFIG"
+#:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"

@@ -18,8 +18,8 @@ services:
     volumes:
       - data:/config
       - cache:/cache
-      - media:/media
-      - rclone:$DEPLOY_RCLONE_LOCAL
+#:media |      - media:/media
+#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
     deploy:
       replicas: 1
       placement:
@@ -47,14 +47,14 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyfin}/cache"
-  media:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_MEDIA_ROOT"
-  rclone:
-    driver: "sapk/plugin-rclone:latest"
-    driver_opts:
-      args: "--allow-root --allow-other --attr-timeout 60s --vfs-cache-mode full"
-      config: "$DEPLOY_RCLONE_CONFIG"
-      remote: "$DEPLOY_RCLONE_REMOTE"
+#:media |  media:
+#:media |    driver_opts:
+#:media |      type: "nfs"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      device: ":$DEPLOY_MEDIA_ROOT"
+#:rclone|  rclone:
+#:rclone|    driver: "sapk/plugin-rclone:latest"
+#:rclone|    driver_opts:
+#:rclone|      args: "--allow-root --allow-other --attr-timeout 60s --vfs-cache-mode full"
+#:rclone|      config: "$DEPLOY_RCLONE_CONFIG"
+#:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"

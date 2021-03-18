@@ -78,8 +78,13 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-streama}/db"
-  videos:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_MEDIA_VIDEO_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_MEDIA_VIDEO_ROOT"
+  videos: #!media_video
+    driver_opts: #!media_video
+      type: "nfs" #!media_video
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!media_video
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-streama}/videos" #!media_video
+#:media_video|  videos:
+#:media_video|    driver_opts:
+#:media_video|      type: "nfs"
+#:media_video|      o: "addr=$DEPLOY_MEDIA_VIDEO_HOST,nolock,soft,rw"
+#:media_video|      device: ":$DEPLOY_MEDIA_VIDEO_ROOT"
