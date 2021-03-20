@@ -55,7 +55,6 @@ services:
     command: mongod --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1
     networks:
       - internal_network
-      - external_network
     deploy:
       replicas: 1
       placement:
