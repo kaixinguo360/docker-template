@@ -1,0 +1,34 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-denghongcai/forsaken-mail:latest}
+#:log |    logging: *loki-logging
+    ports:
+      - ${DEPLOY_PORT_SMTP:-25}:25
+#:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
+    networks:
+      - external_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-forsakenmail}.rule=Host(`${DEPLOY_SUBDOMAIN:-forsakenmail}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-forsakenmail}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-forsakenmail}.tls.options=mtls@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-forsakenmail}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-forsakenmail}.loadbalancer.server.port=3000"
+
+networks:
+  external_network:
+    external: true
