@@ -1,0 +1,33 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-redocly/cors-anywhere:latest}
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
+    networks:
+      - external_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-corsanywhere}.rule=Host(`${DEPLOY_SUBDOMAIN:-cors}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-corsanywhere}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-corsanywhere}.tls.options=mtls@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-corsanywhere}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-corsanywhere}.loadbalancer.server.port=8080"
+
+networks:
+  external_network:
+    external: true
