@@ -32,7 +32,7 @@ services:
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.rule=Host(`${DEPLOY_SUBDOMAIN:-lnmp}.${DEPLOY_HOSTNAME}`)" #!custom_router_rule
 #:custom_router_rule|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.rule=$DEPLOY_CUSTOM_ROUTER_RULE"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.entrypoints=webhttps" #!client_ssl
-#:client_ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.options=mtls@file"
+#:client_ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-lnmp}.loadbalancer.server.port=80"
 

@@ -1,6 +1,6 @@
 tls:
   options:
-    mtls:
+    sslVerifyClient:
       clientAuth:
         caFiles:
           - /data/cacert.pem

@@ -25,7 +25,7 @@ services:
         - "traefik.enable=true" #!port
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.rule=Host(`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.entrypoints=webhttps"
-#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.options=mtls@file"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-aria2}_aria2.loadbalancer.server.port=80"
 
@@ -71,7 +71,7 @@ services:
         - "traefik.enable=true" #!port
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.rule=Host(`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}`)&&PathPrefix(`/jsonrpc`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.entrypoints=webhttps"
-#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.tls.options=mtls@file"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-aria2}_web.loadbalancer.server.port=6800"
  

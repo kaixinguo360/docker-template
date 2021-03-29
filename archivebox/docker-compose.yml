@@ -30,7 +30,7 @@ services:
         - "traefik.enable=true" #!port
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.rule=Host(`${DEPLOY_SUBDOMAIN:-archivebox}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.entrypoints=webhttps"
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.options=mtls@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-archivebox}.loadbalancer.server.port=8000"
 

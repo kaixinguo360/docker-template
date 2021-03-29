@@ -24,7 +24,7 @@ services:
         - "traefik.enable=true" #!port
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-corsanywhere}.rule=Host(`${DEPLOY_SUBDOMAIN:-cors}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-corsanywhere}.entrypoints=webhttps"
-#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-corsanywhere}.tls.options=mtls@file"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-corsanywhere}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-corsanywhere}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-corsanywhere}.loadbalancer.server.port=8080"
 

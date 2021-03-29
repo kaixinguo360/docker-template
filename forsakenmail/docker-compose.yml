@@ -25,7 +25,7 @@ services:
         - "traefik.enable=true" #!port
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-forsakenmail}.rule=Host(`${DEPLOY_SUBDOMAIN:-forsakenmail}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-forsakenmail}.entrypoints=webhttps"
-#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-forsakenmail}.tls.options=mtls@file"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-forsakenmail}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-forsakenmail}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-forsakenmail}.loadbalancer.server.port=3000"
 

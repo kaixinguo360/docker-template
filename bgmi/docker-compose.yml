@@ -35,14 +35,14 @@ services:
 
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_web.rule=Host(`${DEPLOY_SUBDOMAIN:-bgmi}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_web.entrypoints=webhttps"
-#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_web.tls.options=mtls@file"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_web.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_web.tls.certresolver=le"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_web.service=${DEPLOY_STACK_NAME:-bgmi}_web"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-bgmi}_web.loadbalancer.server.port=80"
 
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_webui.rule=Host(`webui-${DEPLOY_SUBDOMAIN:-bgmi}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_webui.entrypoints=webhttps"
-#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_webui.tls.options=mtls@file"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_webui.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_webui.tls.certresolver=le"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_webui.service=${DEPLOY_STACK_NAME:-bgmi}_webui"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-bgmi}_webui.loadbalancer.server.port=9091"
