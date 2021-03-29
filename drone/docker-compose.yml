@@ -108,7 +108,7 @@ services:
         - "traefik.http.services.${DEPLOY_STACK_NAME:-drone}.loadbalancer.server.port=80"
 
   agent:
-    image: ${DEPLOY_IMAGE_AGENT:drone/drone-runner-docker:1}
+    image: ${DEPLOY_IMAGE_AGENT:-drone/drone-runner-docker:1}
     depends_on:
       - web
     volumes:
@@ -129,7 +129,7 @@ services:
 
 # Reference: https://github.com/spainer/drone-configuration-repository
 #:yaml_repository|  drone_yaml_repository:
-#:yaml_repository|    image: ${DEPLOY_IMAGE_YAML_REPO:svenpainer/drone-configuration-repository:latest}
+#:yaml_repository|    image: ${DEPLOY_IMAGE_YAML_REPO:-svenpainer/drone-configuration-repository:latest}
 #:yaml_repository|    networks:
 #:yaml_repository|      - external_network
 #:yaml_repository|      - internal_network

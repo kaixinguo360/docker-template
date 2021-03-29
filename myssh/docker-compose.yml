@@ -18,8 +18,6 @@ services:
       - external_network
     depends_on:
       - db
-    volumes:
-      - www:/var/www
     deploy:
       replicas: 1
       placement:
@@ -35,8 +33,11 @@ services:
   honeypot:
     image: ${DEPLOY_IMAGE_HONEYPOT:-myssh-honeypot:latest}
 #:log |    logging: *loki-logging
-    env_file: ./config/docker.env
     environment:
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=myssh
+      - MYSQL_USER=myssh
+      - MYSQL_PASSWORD=1234567
       - IPSTACK_ACCESS_KEY
     networks:
       - internal_network
@@ -52,16 +53,21 @@ services:
         constraints: [node.platform.os == linux]
 
   db:
-    image: ${DEPLOY_IMAGE_DB:-mysql/mysql-server:5.7.31}
+    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
 #:log |    logging: *loki-logging
-    env_file: ./config/docker.env
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_ROOT_PASSWORD=1234567
+      - MYSQL_DATABASE=myssh
+      - MYSQL_USER=myssh
+      - MYSQL_PASSWORD=1234567
     networks:
       - internal_network
     volumes:
       - db:/var/lib/mysql
     configs:
       - source: initdb-config
-        target: /docker-entrypoint-initdb.d/mysql.sql
+        target: /docker-entrypoint-initdb.d/initdb.sql
     deploy:
       replicas: 1
       placement:
@@ -76,15 +82,9 @@ networks:
 
 configs:
   initdb-config:
-    file: ./config/mysql.sql
+    file: ./config/myssh.sql
 
 volumes:
-volumes:
-  www:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-myssh}/www"
   db:
     driver_opts:
       type: "nfs"
