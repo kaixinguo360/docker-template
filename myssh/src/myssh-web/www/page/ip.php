@@ -122,6 +122,12 @@ $data=json_encode($data);
         ]
     };
     myChart.setOption(option);
+    myChart.on('click', function (params) {
+        if (params.componentSubType === 'scatter') {
+            var ip = params.data.rhost;
+            navigator.clipboard.writeText(ip);
+        }
+    });
 
     // $.get('res/world.json', function (worldJson) {
     //     echarts.registerMap('world', worldJson); // 注册地图

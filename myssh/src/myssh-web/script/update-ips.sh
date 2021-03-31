@@ -1,5 +1,11 @@
 #!/bin/sh
 
+printf 'Update ip infos\n'
+
+[ -z "$IPSTACK_ACCESS_KEY" ] \
+    && echo "[ERROR] IPSTACK_ACCESS_KEY not set" >&2 \
+    && exit 1
+
 cd $(dirname $0)
 
 SQL="CREATE TABLE IF NOT EXISTS ips ( \
@@ -20,4 +26,6 @@ SQL="CREATE TABLE IF NOT EXISTS ips ( \
     )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;"
 
 echo "$SQL" | mysql-cli.sh
-echo 'SELECT rhost FROM passwords WHERE rhost NOT IN (SELECT ip FROM ips) AND rhost!="" GROUP BY rhost' | mysql-cli.sh | awk '{system("./iplookup.sh "$0" ips | mysql-cli.sh")}'
+echo 'SELECT DISTINCT rhost FROM passwords WHERE rhost NOT IN (SELECT DISTINCT ip FROM ips) AND rhost!="" GROUP BY rhost' \
+    | mysql-cli.sh \
+    | awk '{system("./iplookup.sh "$0" ips | mysql-cli.sh")}'

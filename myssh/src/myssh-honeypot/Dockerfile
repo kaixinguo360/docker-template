@@ -1,6 +1,6 @@
 FROM alpine as builder
 
-RUN apk add --no-cache gcc make autoconf zlib-dev openssl-dev musl-dev git
+RUN apk add --no-cache gcc make autoconf automake zlib-dev openssl-dev musl-dev git
 
 RUN git clone https://github.com/openssh/openssh-portable.git /root/openssh
 
