@@ -81,6 +81,7 @@ services:
 networks:
   internal_network:
     internal: true
+    attachable: true
   external_network:
     external: true
 

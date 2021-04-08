@@ -28,4 +28,5 @@ SQL="CREATE TABLE IF NOT EXISTS ips ( \
 echo "$SQL" | mysql-cli.sh
 echo 'SELECT DISTINCT rhost FROM passwords WHERE rhost NOT IN (SELECT DISTINCT ip FROM ips) AND rhost!="" GROUP BY rhost' \
     | mysql-cli.sh \
-    | awk '{system("./iplookup.sh "$0" ips | mysql-cli.sh")}'
+    | xargs -n1 -i iplookup.sh {} ips \
+    | mysql-cli.sh
