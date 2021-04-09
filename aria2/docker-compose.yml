@@ -33,10 +33,10 @@ services:
     # Reference: https://p3terx.com/archives/docker-aria2-pro.html
     image: ${DEPLOY_IMAGE_ARIA2:-p3terx/aria2-pro:latest}
 #:log |    logging: *loki-logging
-    logging:			#!log
-      driver: json-file	#!log
-      options:			#!log
-        max-size: 1m	#!log
+    logging:            #!log
+      driver: json-file #!log
+      options:          #!log
+        max-size: 1m    #!log
     ports:
       - ${DEPLOY_PORT_ARIA2_BT:-6888}:6888/tcp
       - ${DEPLOY_PORT_ARIA2_BT:-6888}:6888/udp
