@@ -2,6 +2,7 @@
 
 # Default Params
 TEMPLATE_NAME="$(basename $(realpath $(dirname $0)/..))"
+TEMPLATE_PATH="$(realpath $(dirname $0)/..)"
 if [ -n "$DEPLOY_BACKUP_ROOT" ]; then
     DEFAULT_BACKUP_PATH="$DEPLOY_BACKUP_ROOT/$TEMPLATE_NAME"
 else
@@ -34,8 +35,9 @@ cat << HERE
     BACKUP_MSG  = $BACKUP_MSG
     BACKUP_PATH = $BACKUP_PATH
     BACKUP_TIME = $BACKUP_TIME
-  done
 HERE
+[ -n "$SKIP" ] && printf '    SKIP        = %s\n' "$SKIP"
+printf '  done\n'
 
 if [ -z `docker image ls alpine:3 -q` ]; then
     printf '  Pulling tool image alpine:3... '
@@ -44,61 +46,74 @@ if [ -z `docker image ls alpine:3 -q` ]; then
         || exit 1
 fi
 
-printf '  Backuping data from %s:%s/%s...\n' \
+printf '  Backuping data from %s:%s/%s... ' \
     "$DEPLOY_DATA_HOST" \
     "$DEPLOY_DATA_ROOT" \
     "$DEPLOY_STACK_NAME"
-printf '    Preparing tmp volume... '
-docker volume rm -f tmp_volume >/dev/null || exit 1
-docker volume create tmp_volume \
-    --driver local \
-    -o "type=nfs" \
-    -o "o=addr=$DEPLOY_DATA_HOST,nolock,soft,rw" \
-    -o "device=:$DEPLOY_DATA_ROOT" \
-    >/dev/null \
-    && printf 'ok\n' \
-    || exit 1
-docker run --rm -i \
-    -v tmp_volume:/data \
-    -v "$BACKUP_PATH":/backup \
-    alpine:3 sh << HERE || exit 1
-if [ -d '/data/$DEPLOY_STACK_NAME' ]; then
-    cd "/data/$DEPLOY_STACK_NAME" \
-        && printf '    Packaging... ' \
-        && tar -zcpf /tmp/backup.tgz * \
-        && printf '%s\n' \$(du -h /tmp/backup.tgz|awk '{print \$1}') \
-        && printf '    Generating ID... ' \
-        && ID=\$(md5sum /tmp/backup.tgz|awk '{print \$1}'|head -c 7) \
-        && printf '%s\n' "\$ID" \
-        && printf '    Archiving... ' \
-        && BACKUP_NAME="${DEPLOY_STACK_NAME}_[$BACKUP_TIME]_[\$ID]_[$BACKUP_MSG].data.tgz" \
-        && mv /tmp/backup.tgz "/backup/\${BACKUP_NAME}" \
-        && printf '%s\n' "\$BACKUP_NAME"
+if [ -n "$SKIP" -a -n "$(echo "$SKIP"|grep -E 'data|D')" ]; then
+    printf 'skipped\n'
 else
-    printf '    Packaging... skipped\n'
-fi
+    printf '\n'
+    printf '    Preparing tmp volume... '
+    docker volume rm -f tmp_volume >/dev/null || exit 1
+    docker volume create tmp_volume \
+        --driver local \
+        -o "type=nfs" \
+        -o "o=addr=$DEPLOY_DATA_HOST,nolock,soft,rw" \
+        -o "device=:$DEPLOY_DATA_ROOT" \
+        >/dev/null \
+        && printf 'ok\n' \
+        || exit 1
+    docker run --rm -i \
+        -v tmp_volume:/data \
+        -v "$BACKUP_PATH":/backup \
+        alpine:3 sh << HERE || exit 1
+    if [ -d '/data/$DEPLOY_STACK_NAME' ]; then
+        cd "/data/$DEPLOY_STACK_NAME" \
+            && printf '    Packaging... ' \
+            && tar -zcpf /tmp/backup.tgz * \
+            && printf '%s\n' \$(du -h /tmp/backup.tgz|awk '{print \$1}') \
+            && printf '    Generating ID... ' \
+            && ID=\$(md5sum /tmp/backup.tgz|awk '{print \$1}'|head -c 7) \
+            && printf '%s\n' "\$ID" \
+            && printf '    Archiving... ' \
+            && BACKUP_NAME="${DEPLOY_STACK_NAME}_[$BACKUP_TIME]_[\$ID]_[$BACKUP_MSG].data.tgz" \
+            && mv /tmp/backup.tgz "/backup/\${BACKUP_NAME}" \
+            && printf '%s\n' "\$BACKUP_NAME"
+    else
+        printf '    Packaging... skipped\n'
+    fi
 HERE
-printf '    Removing tmp volume... '
-docker volume rm -f tmp_volume >/dev/null \
-    && printf 'ok\n' \
-    || exit 1
-printf '  done\n'
+    printf '    Removing tmp volume... '
+    docker volume rm -f tmp_volume >/dev/null \
+        && printf 'ok\n' \
+        || exit 1
+    printf '  done\n'
+fi
 
-TMP_PATH="/tmp"
-TMP_NAME=".tmp.${DEPLOY_STACK_NAME}_${BACKUP_TIME}_${BACKUP_MSG}.config.tgz"
-printf "  Backuping config... " \
-    && cd $(dirname $(realpath $(pwd))) \
-    && mkdir -p "$BACKUP_PATH" \
-    && printf "\b\b\b\b, template: $TEMPLATE_NAME... " \
-    && sudo tar -zcpf "$TMP_PATH/${TMP_NAME}" "$TEMPLATE_NAME" \
-    && sudo chown $UID:$GROUPS "$TMP_PATH/${TMP_NAME}" \
-    && printf "\b\b\b\b, size: %s... " $(du -h "$TMP_PATH/${TMP_NAME}"|awk '{print $1}') \
-    && ID=$(md5sum "$TMP_PATH/${TMP_NAME}"|awk '{print $1}'|head -c 7) \
-    && printf "\b\b\b\b, id: $ID... " \
-    && BACKUP_NAME="${DEPLOY_STACK_NAME}_[${BACKUP_TIME}]_[${ID}]_[${BACKUP_MSG}].config.tgz" \
-    && sudo mv "$TMP_PATH/${TMP_NAME}" "$BACKUP_PATH/${BACKUP_NAME}" \
-    && printf "\b\b\b\b, msg: $BACKUP_MSG... " \
-    && printf '\b\b\b\b, done.\n'
+printf "  Backuping config from %s... " $(realpath $TEMPLATE_PATH)
+if [ -n "$SKIP" -a -n "$(echo "$SKIP"|grep -E 'config|C')" ]; then
+    printf 'skipped\n'
+else
+    printf '\n'
+    docker run --rm -i \
+        -v "$(dirname $TEMPLATE_PATH)":/data \
+        -v "$BACKUP_PATH":/backup \
+        alpine:3 sh << HERE || exit 1
+        cd /data \
+            && printf '    Packaging... ' \
+            && tar -zcpf /tmp/backup.tgz "$TEMPLATE_NAME" \
+            && printf '%s\n' \$(du -h /tmp/backup.tgz|awk '{print \$1}') \
+            && printf '    Generating ID... ' \
+            && ID=\$(md5sum /tmp/backup.tgz|awk '{print \$1}'|head -c 7) \
+            && printf '%s\n' "\$ID" \
+            && printf '    Archiving... ' \
+            && BACKUP_NAME="${DEPLOY_STACK_NAME}_[${BACKUP_TIME}]_[\${ID}]_[${BACKUP_MSG}].config.tgz" \
+            && mv /tmp/backup.tgz "/backup/\${BACKUP_NAME}" \
+            && printf '%s\n' "\$BACKUP_NAME"
+HERE
+    printf '  done\n'
+fi
 
 printf 'done\n'
 
