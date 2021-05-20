@@ -16,8 +16,12 @@ services:
     networks:
       - external_network
       - internal_network
-    env_file:
-      - config/docker.env
+    environment:
+      - SPRING_APPLICATION_NAME=MyList
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mylist
+      - SPRING_DATASOURCE_USERNAME=mylist
+      - SPRING_DATASOURCE_PASSWORD=1234567
+      - SERVER_PORT=8080
     volumes:
       - jar:/opt/mylist/jar
       - static:/opt/mylist/static
@@ -34,17 +38,19 @@ services:
         - "traefik.http.services.${DEPLOY_STACK_NAME:-mylist}.loadbalancer.server.port=8080"
 
   db:
-    image: ${DEPLOY_IMAGE_DB:-mysql/mysql-server:8.0}
+    image: ${DEPLOY_IMAGE_DB:-postgres:12.2-alpine}
 #:log |    logging: *loki-logging
-    env_file:
-      - config/docker.env
+    environment:
+      - POSTGRES_DB=mylist
+      - POSTGRES_USER=mylist
+      - POSTGRES_PASSWORD=1234567
     networks:
       - internal_network
     volumes:
-      - db:/var/lib/mysql
+      - db:/var/lib/postgresql/data
     configs:
       - source: initdb-config
-        target: /docker-entrypoint-initdb.d/mysql.sql
+        target: /docker-entrypoint-initdb.d/mylist.sql
     deploy:
       replicas: 1
       placement:
@@ -59,7 +65,7 @@ networks:
 
 configs:
   initdb-config:
-    file: ./config/mysql.sql
+    file: ./config/mylist.sql
 
 volumes:
   db:
