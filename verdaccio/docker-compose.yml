@@ -1,0 +1,54 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-verdaccio/verdaccio:4}
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-4873}:4873
+    networks:
+      - external_network
+    volumes:
+      - storage:/verdaccio/storage
+      - config:/verdaccio/conf
+#:plugins|      - plugins:/verdaccio/plugins
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-verdaccio}.rule=Host(`${DEPLOY_SUBDOMAIN:-verdaccio}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-verdaccio}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-verdaccio}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-verdaccio}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-verdaccio}.loadbalancer.server.port=4873"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  storage:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-verdaccio}/storage"
+  config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-verdaccio}/config"
+#:plugins|  plugins:
+#:plugins|    driver_opts:
+#:plugins|      type: "nfs"
+#:plugins|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:plugins|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-verdaccio}/plugins"
