@@ -1,0 +1,40 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  proxy:
+    image: ${DEPLOY_IMAGE_PROXY:-vimagick/tinyproxy:latest}
+#:log |    logging: *loki-logging
+    ports: #!global-deploy
+      - ${DEPLOY_PORT_PROXY:-8888}:8888 #!global-deploy
+#:global-deploy|    ports:
+#:global-deploy|      - target: 8888
+#:global-deploy|        published: ${DEPLOY_PORT_PROXY:-8888}
+#:global-deploy|        protocol: tcp
+#:global-deploy|        mode: host
+    networks:
+      - external_network
+    configs:
+      - source: tinyproxy-config
+        target: /etc/tinyproxy/tinyproxy.conf
+    deploy:
+#:global-deploy|      mode: global
+      replicas: 1 #!global-deploy
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_PROXY:-node.labels.ignore != true}
+
+networks:
+  external_network:
+    external: true
+
+configs:
+  tinyproxy-config:
+    file: ./config/tinyproxy.conf
+    template_driver: golang
