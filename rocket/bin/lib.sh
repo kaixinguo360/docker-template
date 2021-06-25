@@ -22,16 +22,17 @@ if [ -n "$1" ]; then
     shift
 fi
 
-# Set Default Stack Name
+# Set Default Stack Name & Profile File
 if [ -n "$PROFILE" ]; then
     export DEPLOY_STACK_NAME="$(basename $(realpath $(pwd)))-$PROFILE"
+    export DEPLOY_PROFILE_FILE="./deploy-$PROFILE.env"
 else
     export DEPLOY_STACK_NAME="$(basename $(realpath $(pwd)))"
+    export DEPLOY_PROFILE_FILE="./deploy.env"
 fi
 
 # Load Profile
 set -o allexport
-[ -z "$PROFILE" -a -f ./deploy.env ] && . ./deploy.env
-[ -n "$PROFILE" -a -f "./deploy-$PROFILE.env" ] && . "./deploy-$PROFILE.env"
+[ -f "$DEPLOY_PROFILE_FILE" ] && . "$DEPLOY_PROFILE_FILE"
 set +o allexport
 
