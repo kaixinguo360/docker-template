@@ -1,0 +1,58 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-fatedier/frps:v0.37.0}
+#:log |    logging: *loki-logging
+    ports:
+      - ${DEPLOY_PORT_WEB_BIND:-7000}:7000
+#:port|      - ${DEPLOY_PORT_WEB_DASHBOARD:-7500}:7500
+    command: "-c /etc/frp/frps.ini"
+    environment:
+      DASHBOARD_USER: ${DASHBOARD_USER:-admin}
+      DASHBOARD_PWD: ${DASHBOARD_PWD:-admin}
+      AUTH_TOKEN: ${AUTH_TOKEN:-1234567}
+      BASE_URL: ${DEPLOY_SUBDOMAIN:-frp}.${DEPLOY_HOSTNAME}
+    networks:
+      - external_network
+    configs:
+      - source: frp-config
+        target: /etc/frp/frps.ini
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.rule=Host(`${DEPLOY_SUBDOMAIN:-frp}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.tls.certresolver=le"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.service=${DEPLOY_STACK_NAME:-frp}_dashboard"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-frp}_dashboard.loadbalancer.server.port=7500"
+
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_vhost.rule=HostRegexp(`{subdomain:.+}.${DEPLOY_SUBDOMAIN:-frp}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_vhost.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_vhost.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_vhost.tls.certresolver=le"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_vhost.service=${DEPLOY_STACK_NAME:-frp}_vhost"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-frp}_vhost.loadbalancer.server.port=80"
+
+networks:
+  external_network:
+    external: true
+
+configs:
+  frp-config:
+    file: ${DEPLOY_CONFIG_CEREBRO:-config/frps.ini}
+    template_driver: golang
+
