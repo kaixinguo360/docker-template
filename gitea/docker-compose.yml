@@ -1,0 +1,76 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-gitea/gitea:latest}
+#:log |    logging: *loki-logging
+    ports:
+      - ${DEPLOY_PORT_SSH:-22}:22
+#:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
+#:db|    environment:
+#:db|      - GITEA__database__DB_TYPE=mysql
+#:db|      - GITEA__database__HOST=db:3306
+#:db|      - GITEA__database__NAME=gitea
+#:db|      - GITEA__database__USER=gitea
+#:db|      - GITEA__database__PASSWD=gitea_password
+    networks:
+      - external_network
+#:db|      - internal_network
+    volumes:
+      - data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-gitea}.rule=Host(`${DEPLOY_SUBDOMAIN:-gitea}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-gitea}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-gitea}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-gitea}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-gitea}.loadbalancer.server.port=3000"
+
+#:db|  db:
+#:db|    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
+#:db|    networks:
+#:db|      - internal_network
+#:db|    environment:
+#:db|      - MYSQL_DATABASE=gitea
+#:db|      - MYSQL_USER=gitea
+#:db|      - MYSQL_PASSWORD=gitea_password
+#:db|      - MYSQL_RANDOM_ROOT_PASSWORD=gitea_root_password
+#:db|    volumes:
+#:db|      - db:/var/lib/mysql
+#:db|    deploy:
+#:db|      replicas: 1
+#:db|      placement:
+#:db|        constraints: 
+#:db|          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  external_network:
+    external: true
+#:db|  internal_network:
+#:db|    internal: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-gitea}/data"
+#:db|  db:
+#:db|    driver_opts:
+#:db|      type: "nfs"
+#:db|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:db|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-gitea}/db"
