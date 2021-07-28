@@ -14,12 +14,15 @@ services:
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB_HTTP:-80}:80
     environment:
-      - DB_HOST=$DEPLOY_DB_HOST
-      - DB_PORT=$DEPLOY_DB_PORT
+#:db|      - DB_HOST=db
+#:db|      - DB_PORT=3306
+      - DB_HOST=$DEPLOY_DB_HOST #!db
+      - DB_PORT=$DEPLOY_DB_PORT #!db
       - DB_LOCAL_PORT=$DEPLOY_DB_LOCAL_PORT
       - DEBUG=$DEPLOY_DEBUG
     networks:
       - external_network
+#:db|      - internal_network
     volumes:
       - www:/var/www
 #:media |      - media:/media
@@ -38,9 +41,28 @@ services:
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-lnmp}.loadbalancer.server.port=80"
 
+#:db|  db:
+#:db|    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
+#:db|    networks:
+#:db|      - internal_network
+#:db|    environment:
+#:db|      - MYSQL_DATABASE=${MYSQL_DATABASE:-lnmp}
+#:db|      - MYSQL_USER=${MYSQL_USER:-lnmp}
+#:db|      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-lnmp_password}
+#:db|      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-lnmp_root_password}
+#:db|    volumes:
+#:db|      - db:/var/lib/mysql
+#:db|    deploy:
+#:db|      replicas: 1
+#:db|      placement:
+#:db|        constraints:
+#:db|          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
 networks:
   external_network:
     external: true
+#:db|  internal_network:
+#:db|    internal: true
 
 volumes:
   www:
@@ -48,6 +70,11 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-lnmp}/www"
+#:db|  db:
+#:db|    driver_opts:
+#:db|      type: "nfs"
+#:db|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:db|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-gitea}/db"
 #:media |  media:
 #:media |    driver_opts:
 #:media |      type: "nfs"
