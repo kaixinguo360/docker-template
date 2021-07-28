@@ -53,7 +53,7 @@ services:
       - MYSQL_DATABASE=photoview
       - MYSQL_USER=photoview
       - MYSQL_PASSWORD=photoview_password
-      - MYSQL_RANDOM_ROOT_PASSWORD=photoview_root_password
+      - MYSQL_ROOT_PASSWORD=photoview_root_password
     volumes:
       - db:/var/lib/mysql
     deploy:

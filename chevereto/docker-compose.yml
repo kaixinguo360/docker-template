@@ -43,7 +43,7 @@ services:
 #:db|      - MYSQL_DATABASE=chevereto
 #:db|      - MYSQL_USER=chevereto
 #:db|      - MYSQL_PASSWORD=chevereto_password
-#:db|      - MYSQL_RANDOM_ROOT_PASSWORD=chevereto_root_password
+#:db|      - MYSQL_ROOT_PASSWORD=chevereto_root_password
 #:db|    volumes:
 #:db|      - db:/var/lib/mysql
 #:db|    deploy:

@@ -48,7 +48,7 @@ services:
 #:db|      - MYSQL_DATABASE=gitea
 #:db|      - MYSQL_USER=gitea
 #:db|      - MYSQL_PASSWORD=gitea_password
-#:db|      - MYSQL_RANDOM_ROOT_PASSWORD=gitea_root_password
+#:db|      - MYSQL_ROOT_PASSWORD=gitea_root_password
 #:db|    volumes:
 #:db|      - db:/var/lib/mysql
 #:db|    deploy:
