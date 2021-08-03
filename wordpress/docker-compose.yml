@@ -1,0 +1,83 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-wordpress:latest}
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
+    environment:
+#:db|      - WORDPRESS_DB_HOST=db
+#:db|      - WORDPRESS_DB_USER=wordpress
+#:db|      - WORDPRESS_DB_PASSWORD=wordpress_password
+#:db|      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_TABLE_PREFIX
+      - WORDPRESS_AUTH_KEY
+      - WORDPRESS_SECURE_AUTH_KEY
+      - WORDPRESS_LOGGED_IN_KEY
+      - WORDPRESS_NONCE_KEY
+      - WORDPRESS_AUTH_SALT
+      - WORDPRESS_SECURE_AUTH_SALT
+      - WORDPRESS_LOGGED_IN_SALT
+      - WORDPRESS_NONCE_SALT
+      - WORDPRESS_DEBUG
+      - WORDPRESS_CONFIG_EXTRA
+    networks:
+      - external_network
+#:db|      - internal_network
+    volumes:
+      - data:/var/www/html
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-wordpress}.rule=Host(`${DEPLOY_SUBDOMAIN:-wordpress}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-wordpress}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-wordpress}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-wordpress}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-wordpress}.loadbalancer.server.port=80"
+
+#:db|  db:
+#:db|    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
+#:db|    networks:
+#:db|      - internal_network
+#:db|    environment:
+#:db|      - MYSQL_DATABASE=wordpress
+#:db|      - MYSQL_USER=wordpress
+#:db|      - MYSQL_PASSWORD=wordpress_password
+#:db|      - MYSQL_ROOT_PASSWORD=wordpress_root_password
+#:db|    volumes:
+#:db|      - db:/var/lib/mysql
+#:db|    deploy:
+#:db|      replicas: 1
+#:db|      placement:
+#:db|        constraints:
+#:db|          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  external_network:
+    external: true
+#:db|  internal_network:
+#:db|    internal: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-wordpress}/data"
+#:db|  db:
+#:db|    driver_opts:
+#:db|      type: "nfs"
+#:db|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:db|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-wordpress}/db"
