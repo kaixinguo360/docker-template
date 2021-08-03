@@ -25,8 +25,10 @@ services:
     image: ${DEPLOY_IMAGE_PORTAINER:-portainer/portainer:latest}
 #:log |    logging: *loki-logging
     command: -H tcp://tasks.agent:9001 --tlsskipverify
-    ports:
-      - "8000:8000"
+#:port|    ports: #!edge_compute
+#:edge_compute|    ports: #!port
+#:edge_compute|#:port|    ports:
+#:edge_compute|      - "8000:8000"
 #:port|      - ${DEPLOY_PORT_PORTAINER:-9000}:9000
     volumes:
       - data:/data
