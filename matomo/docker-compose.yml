@@ -1,0 +1,74 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-matomo:latest}
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
+#:db|    environment:
+#:db|      - MATOMO_DATABASE_HOST=db
+#:db|      - MATOMO_DATABASE_ADAPTER=mysql
+#:db|      - MATOMO_DATABASE_USERNAME=matomo
+#:db|      - MATOMO_DATABASE_PASSWORD=matomo_password
+#:db|      - MATOMO_DATABASE_DBNAME=matomo
+#:db|      - MATOMO_DATABASE_TABLES_PREFIX
+    networks:
+      - external_network
+#:db|      - internal_network
+    volumes:
+      - data:/var/www/html
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-matomo}.rule=Host(`${DEPLOY_SUBDOMAIN:-matomo}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-matomo}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-matomo}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-matomo}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-matomo}.loadbalancer.server.port=80"
+
+#:db|  db:
+#:db|    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
+#:db|    networks:
+#:db|      - internal_network
+#:db|    environment:
+#:db|      - MYSQL_DATABASE=matomo
+#:db|      - MYSQL_USER=matomo
+#:db|      - MYSQL_PASSWORD=matomo_password
+#:db|      - MYSQL_ROOT_PASSWORD=matomo_root_password
+#:db|    volumes:
+#:db|      - db:/var/lib/mysql
+#:db|    deploy:
+#:db|      replicas: 1
+#:db|      placement:
+#:db|        constraints:
+#:db|          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  external_network:
+    external: true
+#:db|  internal_network:
+#:db|    internal: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-matomo}/data"
+#:db|  db:
+#:db|    driver_opts:
+#:db|      type: "nfs"
+#:db|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:db|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-matomo}/db"
