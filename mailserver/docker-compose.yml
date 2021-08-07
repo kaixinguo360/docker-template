@@ -1,0 +1,95 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  mail:
+    image: ${DEPLOY_IMAGE_MAIL:-mailserver/docker-mailserver:10.0.0}
+#:log |    logging: *loki-logging
+    ports:
+      - target: 25
+        published: ${DEPLOY_PORT_MAIL_SMTP:-25}
+        protocol: tcp
+        mode: host
+#:port-smtps   |      - target: 465
+#:port-smtps   |        published: ${DEPLOY_PORT_MAIL_SMTPS:-465}
+#:port-smtps   |        protocol: tcp
+#:port-smtps   |        mode: host
+#:port-starttls|      - target: 587
+#:port-starttls|        published: ${DEPLOY_PORT_MAIL_STARTTLS:-587}
+#:port-starttls|        protocol: tcp
+#:port-starttls|        mode: host
+#:port-pop3    |      - target: 110
+#:port-pop3    |        published: ${DEPLOY_PORT_MAIL_POP3:-110}
+#:port-pop3    |        protocol: tcp
+#:port-pop3    |        mode: host
+#:port-pop3s   |      - target: 995
+#:port-pop3s   |        published: ${DEPLOY_PORT_MAIL_POP3S:-995}
+#:port-pop3s   |        protocol: tcp
+#:port-pop3s   |        mode: host
+#:port-imap    |      - target: 143
+#:port-imap    |        published: ${DEPLOY_PORT_MAIL_IMAP:-143}
+#:port-imap    |        protocol: tcp
+#:port-imap    |        mode: host
+#:port-imaps   |      - target: 993
+#:port-imaps   |        published: ${DEPLOY_PORT_MAIL_IMAPS:-993}
+#:port-imaps   |        protocol: tcp
+#:port-imaps   |        mode: host
+    environment:
+      - OVERRIDE_HOSTNAME=${DEPLOY_SUBDOMAIN:-mail}.${DEPLOY_HOSTNAME}
+      - ONE_DIR=1
+    env_file: ${DEPLOY_CONFIG_MAIL:-config/mailserver.env}
+    networks:
+      - external_network
+    volumes:
+      - maildata:/var/mail
+      - mailstate:/var/mail-state
+      - maillogs:/var/log/mail
+      - config:/tmp/docker-mailserver
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_MAIL:-node.labels.ignore != true}
+
+# Reference Project: docker-mailserver
+# GitHub:
+#   - https://github.com/docker-mailserver/docker-mailserver
+# DockerHub:
+#   - https://hub.docker.com/r/mailserver/docker-mailserver
+# Documentation:
+#   - https://docker-mailserver.github.io/docker-mailserver/v10.0
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  maildata:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mailserver}/maildata"
+  mailstate:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mailserver}/mailstate"
+  maillogs:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mailserver}/maillogs"
+  config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mailserver}/config"
