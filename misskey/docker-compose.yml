@@ -14,7 +14,7 @@ services:
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
     environment:
-      BASE_URL: ${DEPLOY_SUBDOMAIN:-misskey}.${DEPLOY_HOSTNAME}
+      BASE_URL: https://${DEPLOY_SUBDOMAIN:-misskey}.${DEPLOY_HOSTNAME}
     networks:
       - internal_network
       - external_network
@@ -53,8 +53,10 @@ services:
 #:log |    logging: *loki-logging
     networks:
       - internal_network
-    env_file:
-      - config/docker.env
+    environment:
+      - POSTGRES_PASSWORD=misskey
+      - POSTGRES_USER=misskey
+      - POSTGRES_DB=misskey
     volumes:
       - db:/var/lib/postgresql/data
     deploy:
@@ -81,7 +83,7 @@ networks:
 
 configs:
   misskey-config:
-    file: ./config/default.yml
+    file: ./config/misskey.yml
     template_driver: golang
 
 volumes:
