@@ -13,21 +13,15 @@ services:
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
-    env_file: ./config/production.env
+    env_file: ${DEPLOY_CONFIG_MASTODON:-config/mastodon.env}
     environment:
-      - LOCAL_DOMAIN
-      - SINGLE_USER_MODE
-      - SECRET_KEY_BASE
-      - OTP_SECRET
-      - VAPID_PRIVATE_KEY
-      - VAPID_PUBLIC_KEY
-      - SMTP_SERVER
-      - SMTP_PORT
-      - SMTP_LOGIN
-      - SMTP_PASSWORD
-      - SMTP_AUTH_METHOD
-      - SMTP_OPENSSL_VERIFY_MODE
-      - SMTP_FROM_ADDRESS
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASS=
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
     networks:
       - external_network
@@ -104,14 +98,15 @@ services:
   streaming:
     image: ${DEPLOY_IMAGE_STREAMING:-tootsuite/mastodon:v3.2.0}
 #:log |    logging: *loki-logging
-    env_file: ./config/production.env
+    env_file: ${DEPLOY_CONFIG_MASTODON:-config/mastodon.env}
     environment:
-      - LOCAL_DOMAIN
-      - SINGLE_USER_MODE
-      - SECRET_KEY_BASE
-      - OTP_SECRET
-      - VAPID_PRIVATE_KEY
-      - VAPID_PUBLIC_KEY
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASS=
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     command: node ./streaming
     networks:
       - external_network
@@ -132,14 +127,15 @@ services:
   sidekiq:
     image: ${DEPLOY_IMAGE_SIDEKIQ:-tootsuite/mastodon:v3.2.0}
 #:log |    logging: *loki-logging
-    env_file: ./config/production.env
+    env_file: ${DEPLOY_CONFIG_MASTODON:-config/mastodon.env}
     environment:
-      - LOCAL_DOMAIN
-      - SINGLE_USER_MODE
-      - SECRET_KEY_BASE
-      - OTP_SECRET
-      - VAPID_PRIVATE_KEY
-      - VAPID_PUBLIC_KEY
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASS=
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     command: bundle exec sidekiq
     depends_on:
       - db
