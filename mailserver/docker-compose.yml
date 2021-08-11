@@ -9,41 +9,48 @@ x-logging: &loki-logging
 
 services:
   mail:
-    image: ${DEPLOY_IMAGE_MAIL:-mailserver/docker-mailserver:10.0.0}
+    image: ${DEPLOY_IMAGE_MAILSERVER:-mailserver/docker-mailserver:10.0.0}
 #:log |    logging: *loki-logging
     ports:
-      - target: 25
-        published: ${DEPLOY_PORT_MAIL_SMTP:-25}
-        protocol: tcp
-        mode: host
-#:port-smtps   |      - target: 465
-#:port-smtps   |        published: ${DEPLOY_PORT_MAIL_SMTPS:-465}
-#:port-smtps   |        protocol: tcp
-#:port-smtps   |        mode: host
-#:port-starttls|      - target: 587
-#:port-starttls|        published: ${DEPLOY_PORT_MAIL_STARTTLS:-587}
-#:port-starttls|        protocol: tcp
-#:port-starttls|        mode: host
-#:port-pop3    |      - target: 110
-#:port-pop3    |        published: ${DEPLOY_PORT_MAIL_POP3:-110}
-#:port-pop3    |        protocol: tcp
-#:port-pop3    |        mode: host
-#:port-pop3s   |      - target: 995
-#:port-pop3s   |        published: ${DEPLOY_PORT_MAIL_POP3S:-995}
-#:port-pop3s   |        protocol: tcp
-#:port-pop3s   |        mode: host
-#:port-imap    |      - target: 143
-#:port-imap    |        published: ${DEPLOY_PORT_MAIL_IMAP:-143}
-#:port-imap    |        protocol: tcp
-#:port-imap    |        mode: host
-#:port-imaps   |      - target: 993
-#:port-imaps   |        published: ${DEPLOY_PORT_MAIL_IMAPS:-993}
-#:port-imaps   |        protocol: tcp
-#:port-imaps   |        mode: host
+      - ${DEPLOY_PORT_MAILSERVER_SMTP:-25}:25 #!host
+#:port-smtps   |      - ${DEPLOY_PORT_MAILSERVER_SMTPS:-465}:465    #!host
+#:port-starttls|      - ${DEPLOY_PORT_MAILSERVER_STARTTLS:-587}:587 #!host
+#:port-pop3    |      - ${DEPLOY_PORT_MAILSERVER_POP3:-110}:110     #!host
+#:port-pop3s   |      - ${DEPLOY_PORT_MAILSERVER_POP3S:-995}:995    #!host
+#:port-imap    |      - ${DEPLOY_PORT_MAILSERVER_IMAP:-143}:143     #!host
+#:port-imaps   |      - ${DEPLOY_PORT_MAILSERVER_IMAPS:-993}:993    #!host
+#:host|      - target: 25
+#:host|        published: ${DEPLOY_PORT_MAILSERVER_SMTP:-25}
+#:host|        protocol: tcp
+#:host|        mode: host
+#:host|#:port-smtps   |      - target: 465
+#:host|#:port-smtps   |        published: ${DEPLOY_PORT_MAILSERVER_SMTPS:-465}
+#:host|#:port-smtps   |        protocol: tcp
+#:host|#:port-smtps   |        mode: host
+#:host|#:port-starttls|      - target: 587
+#:host|#:port-starttls|        published: ${DEPLOY_PORT_MAILSERVER_STARTTLS:-587}
+#:host|#:port-starttls|        protocol: tcp
+#:host|#:port-starttls|        mode: host
+#:host|#:port-pop3    |      - target: 110
+#:host|#:port-pop3    |        published: ${DEPLOY_PORT_MAILSERVER_POP3:-110}
+#:host|#:port-pop3    |        protocol: tcp
+#:host|#:port-pop3    |        mode: host
+#:host|#:port-pop3s   |      - target: 995
+#:host|#:port-pop3s   |        published: ${DEPLOY_PORT_MAILSERVER_POP3S:-995}
+#:host|#:port-pop3s   |        protocol: tcp
+#:host|#:port-pop3s   |        mode: host
+#:host|#:port-imap    |      - target: 143
+#:host|#:port-imap    |        published: ${DEPLOY_PORT_MAILSERVER_IMAP:-143}
+#:host|#:port-imap    |        protocol: tcp
+#:host|#:port-imap    |        mode: host
+#:host|#:port-imaps   |      - target: 993
+#:host|#:port-imaps   |        published: ${DEPLOY_PORT_MAILSERVER_IMAPS:-993}
+#:host|#:port-imaps   |        protocol: tcp
+#:host|#:port-imaps   |        mode: host
     environment:
       - OVERRIDE_HOSTNAME=${DEPLOY_SUBDOMAIN:-mail}.${DEPLOY_HOSTNAME}
       - ONE_DIR=1
-    env_file: ${DEPLOY_CONFIG_MAIL:-config/mailserver.env}
+    env_file: ${DEPLOY_CONFIG_MAILSERVER:-config/mailserver.env}
     networks:
       - external_network
     volumes:
@@ -51,6 +58,7 @@ services:
       - mailstate:/var/mail-state
       - maillogs:/var/log/mail
       - config:/tmp/docker-mailserver
+#:traefik-ssl|      - traefik:/etc/letsencrypt
     cap_add:
       - NET_ADMIN
       - SYS_PTRACE
@@ -58,7 +66,18 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_MAIL:-node.labels.ignore != true}
+          - ${DEPLOY_NODE_MAILSERVER:-node.labels.ignore != true}
+
+#:traefik-web|  whoami:
+#:traefik-web|    image: docker.io/traefik/whoami:latest
+#:traefik-web|    deploy:
+#:traefik-web|      replicas: 1
+#:traefik-web|      labels:
+#:traefik-web|        - "traefik.enable=true"
+#:traefik-web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mailserver}.rule=Host(`${DEPLOY_SUBDOMAIN:-mail}.${DEPLOY_HOSTNAME}`)"
+#:traefik-web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mailserver}.entrypoints=webhttps"
+#:traefik-web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mailserver}.tls.certresolver=le"
+#:traefik-web|        - "traefik.http.services.${DEPLOY_STACK_NAME:-mailserver}.loadbalancer.server.port=80"
 
 # Reference Project: docker-mailserver
 # GitHub:
@@ -93,3 +112,8 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mailserver}/config"
+#:traefik-ssl|  traefik:
+#:traefik-ssl|    driver_opts:
+#:traefik-ssl|      type: "nfs"
+#:traefik-ssl|      o: "addr=$DEPLOY_TRAEFIK_HOST,nolock,soft,rw"
+#:traefik-ssl|      device: ":$DEPLOY_TRAEFIK_ROOT"
