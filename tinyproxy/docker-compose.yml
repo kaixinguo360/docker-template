@@ -36,5 +36,5 @@ networks:
 
 configs:
   tinyproxy-config:
-    file: ./config/tinyproxy.conf
+    file: ${DEPLOY_CONFIG_TINYPROXY:-config/tinyproxy.conf}
     template_driver: golang

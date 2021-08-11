@@ -83,7 +83,7 @@ networks:
 
 configs:
   misskey-config:
-    file: ./config/misskey.yml
+    file: ${DEPLOY_CONFIG_MISSKEY:-config/misskey.yml}
     template_driver: golang
 
 volumes:

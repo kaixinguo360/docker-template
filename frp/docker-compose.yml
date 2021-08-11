@@ -53,6 +53,6 @@ networks:
 
 configs:
   frp-config:
-    file: ${DEPLOY_CONFIG_CEREBRO:-config/frps.ini}
+    file: ${DEPLOY_CONFIG_FRP:-config/frps.ini}
     template_driver: golang
 

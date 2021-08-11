@@ -55,9 +55,9 @@ networks:
 
 configs:
   traefik-config:
-    file: ./config/traefik.yml
+    file: ${DEPLOY_CONFIG_TRAEFIK:-config/traefik.yml}
   dynamic-config:
-    file: ./config/dynamic.yml
+    file: ${DEPLOY_CONFIG_TRAEFIK_DYNAMIC:-config/dynamic.yml}
 
 volumes:
   data:

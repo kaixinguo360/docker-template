@@ -34,8 +34,7 @@ services:
 #:port|      - ${DEPLOY_PORT_NAMENODE:-9870}:9870
     environment:
       - CLUSTER_NAME=${CLUSTER_NAME:-test}
-    env_file:
-      - ./config/hadoop.env
+    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
     networks:
       - internal_network
     volumes:
@@ -57,8 +56,7 @@ services:
 #:port|       mode: host
     environment:
       SERVICE_PRECONDITION: "namenode:9000"
-    env_file:
-      - ./config/hadoop.env
+    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
     networks:
       - internal_network
     volumes:
@@ -78,8 +76,7 @@ services:
 #:yarn|      disable: true
 #:yarn|    environment:
 #:yarn|        SERVICE_PRECONDITION: "namenode:9000 datanode:9864"
-#:yarn|    env_file:
-#:yarn|      - ./config/hadoop.env
+#:yarn|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
 #:yarn|    networks:
 #:yarn|      - internal_network
 #:yarn|    deploy:
@@ -119,8 +116,7 @@ services:
 #:yarn|      disable: true
 #:yarn|    environment:
 #:yarn|        SERVICE_PRECONDITION: "namenode:9000 datanode:9864 resourcemanager:8088"
-#:yarn|    env_file:
-#:yarn|      - ./config/hadoop.env
+#:yarn|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
 #:yarn|    networks:
 #:yarn|      - internal_network
 #:yarn|    deploy:
@@ -138,8 +134,7 @@ services:
 #:historyserver|      disable: true
 #:historyserver|    environment:
 #:historyserver|        SERVICE_PRECONDITION: "namenode:9000 datanode:9864 resourcemanager:8088"
-#:historyserver|    env_file:
-#:historyserver|      - ./config/hadoop.env
+#:historyserver|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
 #:historyserver|    volumes:
 #:historyserver|      - historyserver:/hadoop/yarn/timeline #!local-volume
 #:historyserver|#:local-volume|      - ${DEPLOY_LOCAL_DATA_ROOT:?please set local volume location}/${DEPLOY_STACK_NAME:-hadoop}/historyserver:/hadoop/yarn/timeline
@@ -174,8 +169,7 @@ services:
 #:hive|    image: ${DEPLOY_IMAGE_HIVE:-bde2020/hive:2.3.2-postgresql-metastore}
 #:hive|#:port|    ports:
 #:hive|#:port|      - ${DEPLOY_PORT_HIVE:-10000}:10000
-#:hive|    env_file:
-#:hive|      - ./config/hadoop.env
+#:hive|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
 #:hive|    environment:
 #:hive|      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
 #:hive|      SERVICE_PRECONDITION: "hive-metastore:9083"
@@ -191,8 +185,7 @@ services:
 #:hive|    image: ${DEPLOY_IMAGE_HIVE_METASTORE:-bde2020/hive:2.3.2-postgresql-metastore}
 #:hive|#:port|    ports:
 #:hive|#:port|      - ${DEPLOY_PORT_HIVE_METASTORE:-9083}:9083
-#:hive|    env_file:
-#:hive|      - ./config/hadoop.env
+#:hive|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
 #:hive|    command: /opt/hive/bin/hive --service metastore
 #:hive|    environment:
 #:hive|      SERVICE_PRECONDITION: "namenode:9000 datanode:9864 hive-metastore-postgresql:5432"

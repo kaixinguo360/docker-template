@@ -36,9 +36,9 @@ services:
 
 configs:
   searx-config:
-    file: ./config/settings.yml
+    file: ${DEPLOY_CONFIG_SEARX:-config/searx.yml}
   uwsgi-config:
-    file: ./config/uwsgi.ini
+    file: ${DEPLOY_CONFIG_UWSGI:-config/uwsgi.ini}
 
 networks:
   external_network:

@@ -14,7 +14,7 @@ services:
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8000}:8000
     command: server 0.0.0.0:8000
-    env_file: ./config/docker.env
+    env_file: ${DEPLOY_CONFIG_WEB:-config/docker.env}
     environment:
       - TZ=Asia/Shanghai
     networks:

@@ -38,7 +38,7 @@ networks:
 
 configs:
   mango-config:
-    file: ./config/config.yml
+    file: ${DEPLOY_CONFIG_MANGO:-config/mango.yml}
 
 volumes:
   config:
