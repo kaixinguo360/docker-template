@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-codysk/bgmi-all-in-one:latest}
+    image: ${DEPLOY_IMAGE_WEB:-codysk/bgmi-all-in-one:1.1.8}
 #:log |    logging: *loki-logging
     ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80

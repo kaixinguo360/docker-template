@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-gkiko/streama:latest}
+    image: ${DEPLOY_IMAGE_WEB:-gkiko/streama:v1.10.3}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8080}:8080

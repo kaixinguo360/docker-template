@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   agent:
-    image: ${DEPLOY_IMAGE_AGENT:-portainer/agent:latest}
+    image: ${DEPLOY_IMAGE_AGENT:-portainer/agent:2.6.2-alpine}
 #:log |    logging: *loki-logging
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -22,7 +22,7 @@ services:
         constraints: [node.platform.os == linux]
 
   portainer:
-    image: ${DEPLOY_IMAGE_PORTAINER:-portainer/portainer:latest}
+    image: ${DEPLOY_IMAGE_PORTAINER:-portainer/portainer:1.24.2-alpine}
 #:log |    logging: *loki-logging
     command: -H tcp://tasks.agent:9001 --tlsskipverify
 #:port|    ports: #!edge_compute

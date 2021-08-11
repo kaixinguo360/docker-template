@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-kodcloud/kodexplorer:latest}
+    image: ${DEPLOY_IMAGE_WEB:-kodcloud/kodexplorer:v4.45}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80

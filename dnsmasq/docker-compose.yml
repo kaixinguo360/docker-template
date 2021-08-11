@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-jpillora/dnsmasq:latest}
+    image: ${DEPLOY_IMAGE_WEB:-jpillora/dnsmasq:1.1.0}
     entrypoint:
       - "webproc"
       - "--config"

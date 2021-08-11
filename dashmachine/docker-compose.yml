@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-rmountjoy/dashmachine:latest}
+    image: ${DEPLOY_IMAGE_WEB:-rmountjoy/dashmachine:v0.5-4}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-5000}:5000

@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-nikisweeting/archivebox:latest}
+    image: ${DEPLOY_IMAGE_WEB:-nikisweeting/archivebox:0.6}
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8000}:8000
