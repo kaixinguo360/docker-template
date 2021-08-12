@@ -8,84 +8,108 @@ x-logging: &loki-logging
       loki-batch-size: 400
 
 services:
-  web: #!port
-    image: alpine/socat:latest #!port
-    command: tcp-listen:9870,fork tcp:namenode:9870 #!port
-    networks: #!port
-      - external_network #!port
-      - internal_network #!port
-    deploy: #!port
-      replicas: 1 #!port
-      placement: #!port
-        constraints:  #!port
-          - ${DEPLOY_NODE_NAMENODE:-node.labels.ignore != true} #!port
-      labels: #!port
-        - "traefik.enable=true" #!port
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.rule=Host(`${DEPLOY_SUBDOMAIN_NAMENODE:-namenode-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.entrypoints=webhttps" #!port
-#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.options=sslVerifyClient@file" #!port
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.certresolver=le" #!port
-        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_namenode.loadbalancer.server.port=9870" #!port
 
-  namenode:
-    image: ${DEPLOY_IMAGE_NAMENODE:-bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8}
-#:log |    logging: *loki-logging
-#:port|    ports:
-#:port|      - ${DEPLOY_PORT_NAMENODE:-9870}:9870
-    environment:
-      - CLUSTER_NAME=${CLUSTER_NAME:-test}
-    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
-    networks:
-      - internal_network
-    volumes:
-      - namenode:/hadoop/dfs/name #!local-volume
-#:local-volume|      - ${DEPLOY_LOCAL_DATA_ROOT:?please set local volume location}/${DEPLOY_STACK_NAME:-hadoop}/namenode:/hadoop/dfs/name
-    deploy:
-      replicas: 1
-      placement:
-        constraints: 
-          - ${DEPLOY_NODE_NAMENODE:-node.labels.ignore != true}
+#:hdfs|  # --------- #
+#:hdfs|  # Name Node #
+#:hdfs|  # --------- #
+#:hdfs|  namenode:
+#:hdfs|    image: ${DEPLOY_IMAGE_HDFS_NAMENODE:-bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8}
+#:hdfs|#:log |    logging: *loki-logging
+#:hdfs|#:port|    ports:
+#:hdfs|#:port|      - ${DEPLOY_PORT_HDFS_NAMENODE:-9870}:9870
+#:hdfs|    environment:
+#:hdfs|      - CLUSTER_NAME=${CLUSTER_NAME:-test}
+#:hdfs|    env_file:
+#:hdfs|      - ${DEPLOY_CONFIG_HDFS:-config/hdfs.env}
+#:hdfs|    networks:
+#:hdfs|      - internal_network
+#:hdfs|    volumes:
+#:hdfs|      - namenode:/hadoop/dfs/name #!local-volume
+#:hdfs|#:local-volume|      - ${DEPLOY_LOCAL_DATA_ROOT:?please set local volume location}/${DEPLOY_STACK_NAME:-hadoop}/namenode:/hadoop/dfs/name
+#:hdfs|    deploy:
+#:hdfs|      replicas: 1
+#:hdfs|      endpoint_mode: dnsrr
+#:hdfs|      placement:
+#:hdfs|        constraints: 
+#:hdfs|          - ${DEPLOY_NODE_HDFS_NAMENODE:-node.labels.ignore != true}
+#:hdfs|
+#:hdfs|  # --------------- #
+#:hdfs|  # Name Node - Web #
+#:hdfs|  # --------------- #
+#:hdfs|  namenode-web: #!port
+#:hdfs|    image: alpine/socat:latest #!port
+#:hdfs|    command: tcp-listen:9870,fork tcp:namenode:9870 #!port
+#:hdfs|    networks: #!port
+#:hdfs|      - external_network #!port
+#:hdfs|      - internal_network #!port
+#:hdfs|    deploy: #!port
+#:hdfs|      replicas: 1 #!port
+#:hdfs|      placement: #!port
+#:hdfs|        constraints:  #!port
+#:hdfs|          - ${DEPLOY_NODE_HDFS_NAMENODE:-node.labels.ignore != true} #!port
+#:hdfs|      labels: #!port
+#:hdfs|        - "traefik.enable=true" #!port
+#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.rule=Host(`${DEPLOY_SUBDOMAIN_HDFS_NAMENODE:-namenode-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
+#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.entrypoints=webhttps" #!port
+#:hdfs|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.options=sslVerifyClient@file" #!port
+#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.certresolver=le" #!port
+#:hdfs|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_namenode.loadbalancer.server.port=9870" #!port
+#:hdfs|
+#:hdfs|  # --------- #
+#:hdfs|  # Data Node #
+#:hdfs|  # --------- #
+#:hdfs|  datanode:
+#:hdfs|    image: ${DEPLOY_IMAGE_HDFS_DATANODE:-bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8}
+#:hdfs|#:log |    logging: *loki-logging
+#:hdfs|#:port|    ports:
+#:hdfs|#:port|      - target: 9864
+#:hdfs|#:port|        published: ${DEPLOY_PORT_HDFS_DATANODE:-9864}
+#:hdfs|#:port|        protocol: tcp
+#:hdfs|#:port|        mode: host
+#:hdfs|    hostname: "datanode.{{.Node.Hostname}}"
+#:hdfs|    environment:
+#:hdfs|      SERVICE_PRECONDITION: "namenode:9000"
+#:hdfs|    env_file:
+#:hdfs|      - ${DEPLOY_CONFIG_HDFS:-config/hdfs.env}
+#:hdfs|    networks:
+#:hdfs|      - internal_network
+#:hdfs|    volumes:
+#:hdfs|      - ${DEPLOY_LOCAL_DATA_ROOT:?please set local volume location}/${DEPLOY_STACK_NAME:-hadoop}/datanode:/hadoop/dfs/data
+#:hdfs|    deploy:
+#:hdfs|      mode: global
+#:hdfs|      endpoint_mode: dnsrr
+#:hdfs|      placement:
+#:hdfs|        constraints: 
+#:hdfs|          - ${DEPLOY_NODE_HDFS_DATANODE:-node.labels.ignore != true}
 
-  datanode:
-    image: ${DEPLOY_IMAGE_DATANODE:-bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8}
-#:log |    logging: *loki-logging
-#:port|    ports:
-#:port|     - target: 9864
-#:port|       published: ${DEPLOY_PORT_DATANODE:-9864}
-#:port|       protocol: tcp
-#:port|       mode: host
-    environment:
-      SERVICE_PRECONDITION: "namenode:9000"
-    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
-    networks:
-      - internal_network
-    volumes:
-      - ${DEPLOY_LOCAL_DATA_ROOT:?please set local volume location}/${DEPLOY_STACK_NAME:-hadoop}/datanode:/hadoop/dfs/data
-    deploy:
-      mode: global
-      placement:
-        constraints: 
-          - ${DEPLOY_NODE_DATANODE:-node.labels.ignore != true}
-
+#:yarn|  # ---------------- #
+#:yarn|  # Resource Manager #
+#:yarn|  # ---------------- #
 #:yarn|  resourcemanager:
-#:yarn|    image: ${DEPLOY_IMAGE_RESOURCEMANAGER:-bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8}
+#:yarn|    image: ${DEPLOY_IMAGE_YARN_RM:-bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8}
 #:yarn|#:log |    logging: *loki-logging
 #:yarn|#:port|    ports:
-#:yarn|#:port|      - ${DEPLOY_PORT_RESOURCEMANAGER:-8088}:8088
+#:yarn|#:port|      - ${DEPLOY_PORT_YARN_RM:-8088}:8088
 #:yarn|    healthcheck:
 #:yarn|      disable: true
 #:yarn|    environment:
 #:yarn|        SERVICE_PRECONDITION: "namenode:9000 datanode:9864"
-#:yarn|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
+#:yarn|    env_file:
+#:yarn|      - ${DEPLOY_CONFIG_HDFS:-config/hdfs.env}
+#:yarn|      - ${DEPLOY_CONFIG_YARN:-config/yarn.env}
 #:yarn|    networks:
 #:yarn|      - internal_network
 #:yarn|    deploy:
 #:yarn|      replicas: 1
+#:yarn|      endpoint_mode: dnsrr
 #:yarn|      placement:
 #:yarn|        constraints: 
-#:yarn|          - ${DEPLOY_NODE_RESOURCEMANAGER:-node.labels.ignore != true}
+#:yarn|          - ${DEPLOY_NODE_YARN_RM:-node.labels.ignore != true}
 #:yarn|
-#:yarn|  web-resourcemanager: #!port
+#:yarn|  # ---------------------- #
+#:yarn|  # Resource Manager - Web #
+#:yarn|  # ---------------------- #
+#:yarn|  resourcemanager-web: #!port
 #:yarn|    image: alpine/socat:latest #!port
 #:yarn|    command: tcp-listen:8088,fork tcp:resourcemanager:8088 #!port
 #:yarn|    networks: #!port
@@ -95,81 +119,103 @@ services:
 #:yarn|      replicas: 1 #!port
 #:yarn|      placement: #!port
 #:yarn|        constraints:  #!port
-#:yarn|          - ${DEPLOY_NODE_RESOURCEMANAGER:-node.labels.ignore != true} #!port
+#:yarn|          - ${DEPLOY_NODE_YARN_RM:-node.labels.ignore != true} #!port
 #:yarn|      labels: #!port
 #:yarn|        - "traefik.enable=true" #!port
-#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.rule=Host(`${DEPLOY_SUBDOMAIN_RESOURCEMANAGER:-resourcemanager-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.rule=Host(`${DEPLOY_SUBDOMAIN_YARN_RM:-resourcemanager-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
 #:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.entrypoints=webhttps" #!port
 #:yarn|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.tls.options=sslVerifyClient@file" #!port
 #:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.tls.certresolver=le" #!port
 #:yarn|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.loadbalancer.server.port=8088" #!port
 #:yarn|
+#:yarn|  # ------------ #
+#:yarn|  # Node Manager #
+#:yarn|  # ------------ #
 #:yarn|  nodemanager:
-#:yarn|    image: ${DEPLOY_IMAGE_NODEMANAGER:-bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8}
+#:yarn|    image: ${DEPLOY_IMAGE_YARN_NM:-bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8}
 #:yarn|#:log |    logging: *loki-logging
 #:yarn|#:port|    ports:
-#:yarn|#:port|     - target: 8042
-#:yarn|#:port|       published: ${DEPLOY_PORT_NODEMANAGER:-8042}
-#:yarn|#:port|       protocol: tcp
-#:yarn|#:port|       mode: host
+#:yarn|#:port|      - target: 8042
+#:yarn|#:port|        published: ${DEPLOY_PORT_YARN_NM:-8042}
+#:yarn|#:port|        protocol: tcp
+#:yarn|#:port|        mode: host
 #:yarn|    healthcheck:
 #:yarn|      disable: true
+#:yarn|    hostname: "nodemanager.{{.Node.Hostname}}"
 #:yarn|    environment:
 #:yarn|        SERVICE_PRECONDITION: "namenode:9000 datanode:9864 resourcemanager:8088"
-#:yarn|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
+#:yarn|    env_file:
+#:yarn|      - ${DEPLOY_CONFIG_HDFS:-config/hdfs.env}
+#:yarn|      - ${DEPLOY_CONFIG_YARN:-config/yarn.env}
 #:yarn|    networks:
 #:yarn|      - internal_network
 #:yarn|    deploy:
 #:yarn|      mode: global
+#:yarn|      endpoint_mode: dnsrr
 #:yarn|      placement:
 #:yarn|        constraints: 
-#:yarn|          - ${DEPLOY_NODE_NODEMANAGER:-node.labels.ignore != true}
+#:yarn|          - ${DEPLOY_NODE_YARN_NM:-node.labels.ignore != true}
+#:yarn|
+#:yarn|  # -------------- #
+#:yarn|  # History Server #
+#:yarn|  # -------------- #
+#:yarn|  historyserver:
+#:yarn|    image: ${DEPLOY_IMAGE_YARN_HS:-bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8}
+#:yarn|#:log |    logging: *loki-logging
+#:yarn|#:port|    ports:
+#:yarn|#:port|      - ${DEPLOY_PORT_YARN_HS:-8188}:8188
+#:yarn|    healthcheck:
+#:yarn|      disable: true
+#:yarn|    environment:
+#:yarn|        SERVICE_PRECONDITION: "namenode:9000 datanode:9864 resourcemanager:8088"
+#:yarn|    env_file:
+#:yarn|      - ${DEPLOY_CONFIG_HDFS:-config/hdfs.env}
+#:yarn|      - ${DEPLOY_CONFIG_YARN:-config/yarn.env}
+#:yarn|    volumes:
+#:yarn|      - historyserver:/hadoop/yarn/timeline #!local-volume
+#:yarn|#:local-volume|      - ${DEPLOY_LOCAL_DATA_ROOT:?please set local volume location}/${DEPLOY_STACK_NAME:-hadoop}/historyserver:/hadoop/yarn/timeline
+#:yarn|    networks:
+#:yarn|      - internal_network
+#:yarn|    deploy:
+#:yarn|      replicas: 1
+#:yarn|      endpoint_mode: dnsrr
+#:yarn|      placement:
+#:yarn|        constraints: 
+#:yarn|          - ${DEPLOY_NODE_YARN_HS:-node.labels.ignore != true}
+#:yarn|
+#:yarn|  # -------------------- #
+#:yarn|  # History Server - Web #
+#:yarn|  # -------------------- #
+#:yarn|  historyserver-web: #!port
+#:yarn|    image: alpine/socat:latest #!port
+#:yarn|    command: tcp-listen:8188,fork tcp:historyserver:8188 #!port
+#:yarn|    networks: #!port
+#:yarn|      - external_network #!port
+#:yarn|      - internal_network #!port
+#:yarn|    deploy: #!port
+#:yarn|      replicas: 1 #!port
+#:yarn|      placement: #!port
+#:yarn|        constraints:  #!port
+#:yarn|          - ${DEPLOY_NODE_YARN_HS:-node.labels.ignore != true} #!port
+#:yarn|      labels: #!port
+#:yarn|        - "traefik.enable=true" #!port
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.rule=Host(`${DEPLOY_SUBDOMAIN_YARN_HS:-historyserver-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.entrypoints=webhttps" #!port
+#:yarn|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.options=sslVerifyClient@file" #!port
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.certresolver=le" #!port
+#:yarn|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_historyserver.loadbalancer.server.port=8188" #!port
 
-#:historyserver|  historyserver:
-#:historyserver|    image: ${DEPLOY_IMAGE_HISTORYSER:-bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8}
-#:historyserver|#:log |    logging: *loki-logging
-#:historyserver|#:port|    ports:
-#:historyserver|#:port|      - ${DEPLOY_PORT_HISTORYSERVER:-8188}:8188
-#:historyserver|    healthcheck:
-#:historyserver|      disable: true
-#:historyserver|    environment:
-#:historyserver|        SERVICE_PRECONDITION: "namenode:9000 datanode:9864 resourcemanager:8088"
-#:historyserver|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
-#:historyserver|    volumes:
-#:historyserver|      - historyserver:/hadoop/yarn/timeline #!local-volume
-#:historyserver|#:local-volume|      - ${DEPLOY_LOCAL_DATA_ROOT:?please set local volume location}/${DEPLOY_STACK_NAME:-hadoop}/historyserver:/hadoop/yarn/timeline
-#:historyserver|    networks:
-#:historyserver|      - internal_network
-#:historyserver|    deploy:
-#:historyserver|      replicas: 1
-#:historyserver|      placement:
-#:historyserver|        constraints: 
-#:historyserver|          - ${DEPLOY_NODE_HISTORYSER:-node.labels.ignore != true}
-#:historyserver|
-#:historyserver|  web-historyserver: #!port
-#:historyserver|    image: alpine/socat:latest #!port
-#:historyserver|    command: tcp-listen:8188,fork tcp:historyserver:8188 #!port
-#:historyserver|    networks: #!port
-#:historyserver|      - external_network #!port
-#:historyserver|      - internal_network #!port
-#:historyserver|    deploy: #!port
-#:historyserver|      replicas: 1 #!port
-#:historyserver|      placement: #!port
-#:historyserver|        constraints:  #!port
-#:historyserver|          - ${DEPLOY_NODE_HISTORYSER:-node.labels.ignore != true} #!port
-#:historyserver|      labels: #!port
-#:historyserver|        - "traefik.enable=true" #!port
-#:historyserver|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.rule=Host(`${DEPLOY_SUBDOMAIN_HISTORYSERVER:-historyserver-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
-#:historyserver|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.entrypoints=webhttps" #!port
-#:historyserver|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.options=sslVerifyClient@file" #!port
-#:historyserver|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.certresolver=le" #!port
-#:historyserver|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_historyserver.loadbalancer.server.port=8188" #!port
-
+#:hive|  # ---- #
+#:hive|  # Hive #
+#:hive|  # ---- #
 #:hive|  hive:
 #:hive|    image: ${DEPLOY_IMAGE_HIVE:-bde2020/hive:2.3.2-postgresql-metastore}
 #:hive|#:port|    ports:
 #:hive|#:port|      - ${DEPLOY_PORT_HIVE:-10000}:10000
-#:hive|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
+#:hive|    env_file:
+#:hive|      - ${DEPLOY_CONFIG_HDFS:-config/hdfs.env}
+#:hive|      - ${DEPLOY_CONFIG_YARN:-config/yarn.env}
+#:hive|      - ${DEPLOY_CONFIG_HIVE:-config/hive.env}
 #:hive|    environment:
 #:hive|      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
 #:hive|      SERVICE_PRECONDITION: "hive-metastore:9083"
@@ -177,15 +223,22 @@ services:
 #:hive|      - internal_network
 #:hive|    deploy:
 #:hive|      replicas: 1
+#:hive|      endpoint_mode: dnsrr
 #:hive|      placement:
 #:hive|        constraints: 
 #:hive|          - ${DEPLOY_NODE_HIVE:-node.labels.ignore != true}
 #:hive|
+#:hive|  # -------------- #
+#:hive|  # Hive Metastore #
+#:hive|  # -------------- #
 #:hive|  hive-metastore:
 #:hive|    image: ${DEPLOY_IMAGE_HIVE_METASTORE:-bde2020/hive:2.3.2-postgresql-metastore}
 #:hive|#:port|    ports:
 #:hive|#:port|      - ${DEPLOY_PORT_HIVE_METASTORE:-9083}:9083
-#:hive|    env_file: ${DEPLOY_CONFIG_HADOOP:-config/hadoop.env}
+#:hive|    env_file:
+#:hive|      - ${DEPLOY_CONFIG_HDFS:-config/hdfs.env}
+#:hive|      - ${DEPLOY_CONFIG_YARN:-config/yarn.env}
+#:hive|      - ${DEPLOY_CONFIG_HIVE:-config/hive.env}
 #:hive|    command: /opt/hive/bin/hive --service metastore
 #:hive|    environment:
 #:hive|      SERVICE_PRECONDITION: "namenode:9000 datanode:9864 hive-metastore-postgresql:5432"
@@ -193,10 +246,14 @@ services:
 #:hive|      - internal_network
 #:hive|    deploy:
 #:hive|      replicas: 1
+#:hive|      endpoint_mode: dnsrr
 #:hive|      placement:
 #:hive|        constraints: 
 #:hive|          - ${DEPLOY_NODE_HIVE_METASTORE:-node.labels.ignore != true}
 #:hive|
+#:hive|  # ------------------------- #
+#:hive|  # Hive Metastore PostgreSQL #
+#:hive|  # ------------------------- #
 #:hive|  hive-metastore-postgresql:
 #:hive|    image: ${DEPLOY_IMAGE_HIVE_METASTORE_POSTGRESQL:-bde2020/hive-metastore-postgresql:2.3.0}
 #:hive|    networks:
@@ -206,28 +263,100 @@ services:
 #:hive|#:local-volume|      - ${DEPLOY_LOCAL_DATA_ROOT:?please set local volume location}/${DEPLOY_STACK_NAME:-hadoop}/hive:/var/lib/postgresql/data
 #:hive|    deploy:
 #:hive|      replicas: 1
+#:hive|      endpoint_mode: dnsrr
 #:hive|      placement:
 #:hive|        constraints: 
 #:hive|          - ${DEPLOY_NODE_HIVE_METASTORE:-node.labels.ignore != true}
 
-#:presto-coordinator|  presto-coordinator:
-#:presto-coordinator|    image: ${DEPLOY_IMAGE_PRESTO_COORDINATOR:-shawnzhu/prestodb:0.181}
-#:presto-coordinator|#:port|    ports:
-#:presto-coordinator|#:port|      - ${DEPLOY_PORT_PRESTO_COORDINATOR:-8080}:8080
-#:presto-coordinator|    networks:
-#:presto-coordinator|      - internal_network
-#:presto-coordinator|    deploy:
-#:presto-coordinator|      replicas: 1
-#:presto-coordinator|      placement:
-#:presto-coordinator|        constraints: 
-#:presto-coordinator|          - ${DEPLOY_NODE_PRESTO_COORDINATOR:-node.labels.ignore != true}
-#:presto-coordinator|      labels:
-#:presto-coordinator|        - "traefik.enable=true" #!port
-#:presto-coordinator|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_presto-coordinator.rule=Host(`${DEPLOY_SUBDOMAIN_NAMENODE:-presto-coordinator-hadoop}.${DEPLOY_HOSTNAME}`)"
-#:presto-coordinator|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_presto-coordinator.entrypoints=webhttps"
-#:presto-coordinator|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_presto-coordinator.tls.options=sslVerifyClient@file"
-#:presto-coordinator|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_presto-coordinator.tls.certresolver=le"
-#:presto-coordinator|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_presto-coordinator.loadbalancer.server.port=8080"
+#:hbase|  # --------- #
+#:hbase|  # ZooKeeper #
+#:hbase|  # --------- #
+#:hbase|  zookeeper:
+#:hbase|    image: ${DEPLOY_IMAGE_HBASE_ZK:-zookeeper:3.4.10}
+#:hbase|#:port|    ports:
+#:hbase|#:port|      - ${DEPLOY_PORT_HBASE_ZK:-2181}:2181
+#:hbase|    environment:
+#:hbase|      ZOO_MY_ID: 1
+#:hbase|      ZOO_SERVERS: "server.1=0.0.0.0:2888:3888"
+#:hbase|    networks:
+#:hbase|      - internal_network
+#:hbase|    deploy:
+#:hbase|      replicas: 1
+#:hbase|      endpoint_mode: dnsrr
+#:hbase|      placement:
+#:hbase|        constraints: 
+#:hbase|          - ${DEPLOY_NODE_HBASE_ZK:-node.labels.ignore != true}
+#:hbase|
+#:hbase|  # ------------ #
+#:hbase|  # HBase Master #
+#:hbase|  # ------------ #
+#:hbase|  hbase-master:
+#:hbase|    image: ${DEPLOY_IMAGE_HBASE_MASTER:-bde2020/hbase-master:1.0.0-hbase1.2.6}
+#:hbase|#:port|    ports:
+#:hbase|#:port|      - ${DEPLOY_PORT_HBASE_MASTER:-16010}:16010
+#:hbase|    env_file:
+#:hbase|      - ${DEPLOY_CONFIG_HDFS:-config/hdfs.env}
+#:hbase|      - ${DEPLOY_CONFIG_YARN:-config/yarn.env}
+#:hbase|      - ${DEPLOY_CONFIG_HBASE:-config/hbase.env}
+#:hbase|    environment:
+#:hbase|      SERVICE_PRECONDITION: "namenode:9000 datanode:9864 zookeeper:2181"
+#:hbase|    networks:
+#:hbase|      - internal_network
+#:hbase|    deploy:
+#:hbase|      replicas: 1
+#:hbase|      endpoint_mode: dnsrr
+#:hbase|      placement:
+#:hbase|        constraints: 
+#:hbase|          - ${DEPLOY_NODE_HBASE_MASTER:-node.labels.ignore != true}
+#:hbase|
+#:hbase|  # ------------------ #
+#:hbase|  # HBase Master - Web #
+#:hbase|  # ------------------ #
+#:hbase|  hbase-master-web: #!port
+#:hbase|    image: alpine/socat:latest #!port
+#:hbase|    command: tcp-listen:16010,fork tcp:hbase-master:16010 #!port
+#:hbase|    networks: #!port
+#:hbase|      - external_network #!port
+#:hbase|      - internal_network #!port
+#:hbase|    deploy: #!port
+#:hbase|      replicas: 1 #!port
+#:hbase|      placement: #!port
+#:hbase|        constraints:  #!port
+#:hbase|          - ${DEPLOY_NODE_HBASE_MASTER:-node.labels.ignore != true} #!port
+#:hbase|      labels: #!port
+#:hbase|        - "traefik.enable=true" #!port
+#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.rule=Host(`${DEPLOY_SUBDOMAIN_HBASE:-hbase-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
+#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.entrypoints=webhttps" #!port
+#:hbase|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.tls.options=sslVerifyClient@file" #!port
+#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.tls.certresolver=le" #!port
+#:hbase|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.loadbalancer.server.port=16010" #!port
+#:hbase|
+#:hbase|  # ------------ #
+#:hbase|  # HBase Region #
+#:hbase|  # ------------ #
+#:hbase|  hbase-region:
+#:hbase|    image: ${DEPLOY_IMAGE_HBASE_REGION:-bde2020/hbase-regionserver:1.0.0-hbase1.2.6}
+#:hbase|    hostname: "hbase-region.{{.Node.Hostname}}"
+#:hbase|#:port|    ports:
+#:hbase|#:port|      - target: 16030
+#:hbase|#:port|        published: ${DEPLOY_PORT_HBASE_REGION:-16030}
+#:hbase|#:port|        protocol: tcp
+#:hbase|#:port|        mode: host
+#:hbase|    env_file:
+#:hbase|      - ${DEPLOY_CONFIG_HDFS:-config/hdfs.env}
+#:hbase|      - ${DEPLOY_CONFIG_YARN:-config/yarn.env}
+#:hbase|      - ${DEPLOY_CONFIG_HBASE:-config/hbase.env}
+#:hbase|    environment:
+#:hbase|      HBASE_CONF_hbase_regionserver_hostname: "hbase-region.{{.Node.Hostname}}"
+#:hbase|      SERVICE_PRECONDITION: "namenode:9000 datanode:9864 zookeeper:2181 hbase-master:16010"
+#:hbase|    networks:
+#:hbase|      - internal_network
+#:hbase|    deploy:
+#:hbase|      mode: global
+#:hbase|      endpoint_mode: dnsrr
+#:hbase|      placement:
+#:hbase|        constraints: 
+#:hbase|          - ${DEPLOY_NODE_HBASE_REGION:-node.labels.ignore != true}
 
 # Reference Project: big-data-europe
 # GitHub:
@@ -248,16 +377,16 @@ networks:
     external: true
 
 volumes: #!local-volume
-  namenode: #!local-volume
-    driver_opts: #!local-volume
-      type: "nfs" #!local-volume
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!local-volume
-      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-hadoop}/namenode" #!local-volume
-#:historyserver|  historyserver: #!local-volume
-#:historyserver|    driver_opts: #!local-volume
-#:historyserver|      type: "nfs" #!local-volume
-#:historyserver|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!local-volume
-#:historyserver|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-hadoop}/historyserver" #!local-volume
+#:hdfs|  namenode: #!local-volume
+#:hdfs|    driver_opts: #!local-volume
+#:hdfs|      type: "nfs" #!local-volume
+#:hdfs|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!local-volume
+#:hdfs|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-hadoop}/namenode" #!local-volume
+#:yarn|  historyserver: #!local-volume
+#:yarn|    driver_opts: #!local-volume
+#:yarn|      type: "nfs" #!local-volume
+#:yarn|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!local-volume
+#:yarn|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-hadoop}/historyserver" #!local-volume
 #:hive|  hive: #!local-volume
 #:hive|    driver_opts: #!local-volume
 #:hive|      type: "nfs" #!local-volume
