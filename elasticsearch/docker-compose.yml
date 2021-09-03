@@ -1,0 +1,102 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  es:
+    image: ${DEPLOY_IMAGE_ES:-elasticsearch:7.13.3}
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_ES_9200:-9200}:9200
+#:port|      - ${DEPLOY_PORT_ES_9300:-9300}:9300
+    environment:
+      - discovery.type=single-node
+    env_file:
+      - ${DEPLOY_CONFIG_ES:-config/es.env}
+    networks:
+      internal_network:
+    volumes:
+      - data:/usr/share/elasticsearch/data
+    deploy:
+      resources:
+        limits:
+           cpus: '1'
+           memory: '800M'
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_ES:-node.labels.ignore != true}
+
+  es-web: #!no-proxy
+    image: alpine/socat:latest #!no-proxy
+    command: tcp-listen:9200,fork tcp:es:9200 #!no-proxy
+    networks: #!no-proxy
+      - external_network #!no-proxy
+      - internal_network #!no-proxy
+    deploy: #!no-proxy
+      replicas: 1 #!no-proxy
+      placement: #!no-proxy
+        constraints: #!no-proxy
+          - ${DEPLOY_NODE_ES:-node.labels.ignore != true} #!no-proxy
+      labels: #!no-proxy
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_es.rule=Host(`${DEPLOY_SUBDOMAIN_ES:-es}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_es.entrypoints=webhttps" #!no-proxy
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_es.tls.options=sslVerifyClient@file" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_es.tls.certresolver=le" #!no-proxy
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-elasticsearch}_es.loadbalancer.server.port=9200" #!no-proxy
+
+#:cerebro|  cerebro:
+#:cerebro|    image: ${DEPLOY_IMAGE_CEREBRO:-lmenezes/cerebro:0.9.4}
+#:cerebro|#:log |    logging: *loki-logging
+#:cerebro|#:port|    ports:
+#:cerebro|#:port|      - ${DEPLOY_PORT_CEREBRO:-9000}:9000
+#:cerebro|    environment:
+#:cerebro|      - AUTH_TYPE=${AUTH_TYPE:-basic}
+#:cerebro|      - BASIC_AUTH_USER=${BASIC_AUTH_USER:-admin}
+#:cerebro|      - BASIC_AUTH_PWD=${BASIC_AUTH_PWD:-admin}
+#:cerebro|    networks:
+#:cerebro|      - internal_network
+#:cerebro|      - external_network
+#:cerebro|    configs:
+#:cerebro|      - source: cerebro-config
+#:cerebro|        target: /opt/cerebro/conf/application.conf
+#:cerebro|    deploy:
+#:cerebro|      resources:
+#:cerebro|        limits:
+#:cerebro|           cpus: '0.5'
+#:cerebro|           memory: '512M'
+#:cerebro|      replicas: 1
+#:cerebro|      placement:
+#:cerebro|        constraints: 
+#:cerebro|          - ${DEPLOY_NODE_CEREBRO:-node.labels.ignore != true}
+#:cerebro|      labels:
+#:cerebro|        - "traefik.enable=true" #!no-proxy
+#:cerebro|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.rule=Host(`${DEPLOY_SUBDOMAIN_CEREBRO:-cerebro}.${DEPLOY_HOSTNAME}`)"
+#:cerebro|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.entrypoints=webhttps"
+#:cerebro|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.tls.options=sslVerifyClient@file"
+#:cerebro|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.tls.certresolver=le"
+#:cerebro|        - "traefik.http.services.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.loadbalancer.server.port=9000"
+
+networks:
+  internal_network:
+    external: true
+    name: "${DEPLOY_NETWORK_ES:-es_network}"
+  external_network:
+    external: true
+
+#:cerebro|configs:
+#:cerebro|  cerebro-config:
+#:cerebro|    file: ${DEPLOY_CONFIG_CEREBRO:-config/cerebro.conf}
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-elasticsearch}/data"
