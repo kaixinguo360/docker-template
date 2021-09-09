@@ -23,7 +23,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-mediagoblin}.rule=Host(`${DEPLOY_SUBDOMAIN:-mediagoblin}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-mediagoblin}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-mediagoblin}.tls.certresolver=le"

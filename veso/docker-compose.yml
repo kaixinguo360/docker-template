@@ -26,7 +26,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-veso}.rule=Host(`${DEPLOY_SUBDOMAIN:-veso}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-veso}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-veso}.tls.certresolver=le"

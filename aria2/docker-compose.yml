@@ -22,7 +22,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.rule=Host(`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.options=sslVerifyClient@file"
@@ -68,7 +68,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_ARIA2:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.rule=Host(`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}`)&&PathPrefix(`/jsonrpc`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.tls.options=sslVerifyClient@file"

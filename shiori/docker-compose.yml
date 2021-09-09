@@ -23,7 +23,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-shiori}.rule=Host(`${DEPLOY_SUBDOMAIN:-shiori}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-shiori}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-shiori}.tls.certresolver=le"

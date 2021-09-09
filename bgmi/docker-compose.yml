@@ -13,7 +13,7 @@ services:
 #:log |    logging: *loki-logging
     ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80
-#:port-webui|      - ${DEPLOY_PORT_TRANSMISSION_WEBUI:-9091}:9091
+#:port-transmission-webui|      - ${DEPLOY_PORT_TRANSMISSION_WEBUI:-9091}:9091
       - ${DEPLOY_PORT_TRANSMISSION:-51413}:51413/tcp
       - ${DEPLOY_PORT_TRANSMISSION:-51413}:51413/udp
     environment:
@@ -31,7 +31,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
 
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_web.rule=Host(`${DEPLOY_SUBDOMAIN:-bgmi}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bgmi}_web.entrypoints=webhttps"

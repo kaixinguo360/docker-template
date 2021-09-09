@@ -20,7 +20,7 @@ services:
       - WEBMIN_ENABLED
       - WEBMIN_INIT_REDIRECT_PORT=443
       - WEBMIN_INIT_SSL_ENABLED=false
-      - WEBMIN_INIT_REFERERS=${DEPLOY_SUBDOMAIN:-bind}.${DEPLOY_HOSTNAME} #!port
+      - WEBMIN_INIT_REFERERS=${DEPLOY_SUBDOMAIN:-bind}.${DEPLOY_HOSTNAME} #!no-proxy
     networks:
       - external_network
     volumes:
@@ -31,7 +31,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bind}.rule=Host(`${DEPLOY_SUBDOMAIN:-bind}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-bind}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-bind}.tls.options=sslVerifyClient@file"

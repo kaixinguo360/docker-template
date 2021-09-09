@@ -40,7 +40,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-wordpress}.rule=Host(`${DEPLOY_SUBDOMAIN:-wordpress}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-wordpress}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-wordpress}.tls.options=sslVerifyClient@file"

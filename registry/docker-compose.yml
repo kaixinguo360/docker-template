@@ -23,7 +23,7 @@ services:
         constraints: 
           - node.role == manager
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.rule=Host(`${DEPLOY_SUBDOMAIN:-docker}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.tls.certresolver=le"

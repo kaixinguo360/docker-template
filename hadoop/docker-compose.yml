@@ -36,24 +36,24 @@ services:
 #:hdfs|  # --------------- #
 #:hdfs|  # Name Node - Web #
 #:hdfs|  # --------------- #
-#:hdfs|  namenode-web: #!port
-#:hdfs|    image: alpine/socat:latest #!port
-#:hdfs|    command: tcp-listen:9870,fork tcp:namenode:9870 #!port
-#:hdfs|    networks: #!port
-#:hdfs|      - external_network #!port
-#:hdfs|      - internal_network #!port
-#:hdfs|    deploy: #!port
-#:hdfs|      replicas: 1 #!port
-#:hdfs|      placement: #!port
-#:hdfs|        constraints:  #!port
-#:hdfs|          - ${DEPLOY_NODE_HDFS_NAMENODE:-node.labels.ignore != true} #!port
-#:hdfs|      labels: #!port
-#:hdfs|        - "traefik.enable=true" #!port
-#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.rule=Host(`${DEPLOY_SUBDOMAIN_HDFS_NAMENODE:-namenode-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
-#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.entrypoints=webhttps" #!port
-#:hdfs|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.options=sslVerifyClient@file" #!port
-#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.certresolver=le" #!port
-#:hdfs|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_namenode.loadbalancer.server.port=9870" #!port
+#:hdfs|  namenode-web: #!no-proxy
+#:hdfs|    image: alpine/socat:latest #!no-proxy
+#:hdfs|    command: tcp-listen:9870,fork tcp:namenode:9870 #!no-proxy
+#:hdfs|    networks: #!no-proxy
+#:hdfs|      - external_network #!no-proxy
+#:hdfs|      - internal_network #!no-proxy
+#:hdfs|    deploy: #!no-proxy
+#:hdfs|      replicas: 1 #!no-proxy
+#:hdfs|      placement: #!no-proxy
+#:hdfs|        constraints:  #!no-proxy
+#:hdfs|          - ${DEPLOY_NODE_HDFS_NAMENODE:-node.labels.ignore != true} #!no-proxy
+#:hdfs|      labels: #!no-proxy
+#:hdfs|        - "traefik.enable=true" #!no-proxy
+#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.rule=Host(`${DEPLOY_SUBDOMAIN_HDFS_NAMENODE:-namenode-hadoop}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.entrypoints=webhttps" #!no-proxy
+#:hdfs|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.options=sslVerifyClient@file" #!no-proxy
+#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.certresolver=le" #!no-proxy
+#:hdfs|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_namenode.loadbalancer.server.port=9870" #!no-proxy
 #:hdfs|
 #:hdfs|  # --------- #
 #:hdfs|  # Data Node #
@@ -109,24 +109,24 @@ services:
 #:yarn|  # ---------------------- #
 #:yarn|  # Resource Manager - Web #
 #:yarn|  # ---------------------- #
-#:yarn|  resourcemanager-web: #!port
-#:yarn|    image: alpine/socat:latest #!port
-#:yarn|    command: tcp-listen:8088,fork tcp:resourcemanager:8088 #!port
-#:yarn|    networks: #!port
-#:yarn|      - external_network #!port
-#:yarn|      - internal_network #!port
-#:yarn|    deploy: #!port
-#:yarn|      replicas: 1 #!port
-#:yarn|      placement: #!port
-#:yarn|        constraints:  #!port
-#:yarn|          - ${DEPLOY_NODE_YARN_RM:-node.labels.ignore != true} #!port
-#:yarn|      labels: #!port
-#:yarn|        - "traefik.enable=true" #!port
-#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.rule=Host(`${DEPLOY_SUBDOMAIN_YARN_RM:-resourcemanager-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
-#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.entrypoints=webhttps" #!port
-#:yarn|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.tls.options=sslVerifyClient@file" #!port
-#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.tls.certresolver=le" #!port
-#:yarn|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.loadbalancer.server.port=8088" #!port
+#:yarn|  resourcemanager-web: #!no-proxy
+#:yarn|    image: alpine/socat:latest #!no-proxy
+#:yarn|    command: tcp-listen:8088,fork tcp:resourcemanager:8088 #!no-proxy
+#:yarn|    networks: #!no-proxy
+#:yarn|      - external_network #!no-proxy
+#:yarn|      - internal_network #!no-proxy
+#:yarn|    deploy: #!no-proxy
+#:yarn|      replicas: 1 #!no-proxy
+#:yarn|      placement: #!no-proxy
+#:yarn|        constraints:  #!no-proxy
+#:yarn|          - ${DEPLOY_NODE_YARN_RM:-node.labels.ignore != true} #!no-proxy
+#:yarn|      labels: #!no-proxy
+#:yarn|        - "traefik.enable=true" #!no-proxy
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.rule=Host(`${DEPLOY_SUBDOMAIN_YARN_RM:-resourcemanager-hadoop}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.entrypoints=webhttps" #!no-proxy
+#:yarn|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.tls.options=sslVerifyClient@file" #!no-proxy
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.tls.certresolver=le" #!no-proxy
+#:yarn|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.loadbalancer.server.port=8088" #!no-proxy
 #:yarn|
 #:yarn|  # ------------ #
 #:yarn|  # Node Manager #
@@ -186,24 +186,24 @@ services:
 #:yarn|  # -------------------- #
 #:yarn|  # History Server - Web #
 #:yarn|  # -------------------- #
-#:yarn|  historyserver-web: #!port
-#:yarn|    image: alpine/socat:latest #!port
-#:yarn|    command: tcp-listen:8188,fork tcp:historyserver:8188 #!port
-#:yarn|    networks: #!port
-#:yarn|      - external_network #!port
-#:yarn|      - internal_network #!port
-#:yarn|    deploy: #!port
-#:yarn|      replicas: 1 #!port
-#:yarn|      placement: #!port
-#:yarn|        constraints:  #!port
-#:yarn|          - ${DEPLOY_NODE_YARN_HS:-node.labels.ignore != true} #!port
-#:yarn|      labels: #!port
-#:yarn|        - "traefik.enable=true" #!port
-#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.rule=Host(`${DEPLOY_SUBDOMAIN_YARN_HS:-historyserver-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
-#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.entrypoints=webhttps" #!port
-#:yarn|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.options=sslVerifyClient@file" #!port
-#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.certresolver=le" #!port
-#:yarn|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_historyserver.loadbalancer.server.port=8188" #!port
+#:yarn|  historyserver-web: #!no-proxy
+#:yarn|    image: alpine/socat:latest #!no-proxy
+#:yarn|    command: tcp-listen:8188,fork tcp:historyserver:8188 #!no-proxy
+#:yarn|    networks: #!no-proxy
+#:yarn|      - external_network #!no-proxy
+#:yarn|      - internal_network #!no-proxy
+#:yarn|    deploy: #!no-proxy
+#:yarn|      replicas: 1 #!no-proxy
+#:yarn|      placement: #!no-proxy
+#:yarn|        constraints:  #!no-proxy
+#:yarn|          - ${DEPLOY_NODE_YARN_HS:-node.labels.ignore != true} #!no-proxy
+#:yarn|      labels: #!no-proxy
+#:yarn|        - "traefik.enable=true" #!no-proxy
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.rule=Host(`${DEPLOY_SUBDOMAIN_YARN_HS:-historyserver-hadoop}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.entrypoints=webhttps" #!no-proxy
+#:yarn|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.options=sslVerifyClient@file" #!no-proxy
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.certresolver=le" #!no-proxy
+#:yarn|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_historyserver.loadbalancer.server.port=8188" #!no-proxy
 
 #:hive|  # ---- #
 #:hive|  # Hive #
@@ -312,24 +312,24 @@ services:
 #:hbase|  # ------------------ #
 #:hbase|  # HBase Master - Web #
 #:hbase|  # ------------------ #
-#:hbase|  hbase-master-web: #!port
-#:hbase|    image: alpine/socat:latest #!port
-#:hbase|    command: tcp-listen:16010,fork tcp:hbase-master:16010 #!port
-#:hbase|    networks: #!port
-#:hbase|      - external_network #!port
-#:hbase|      - internal_network #!port
-#:hbase|    deploy: #!port
-#:hbase|      replicas: 1 #!port
-#:hbase|      placement: #!port
-#:hbase|        constraints:  #!port
-#:hbase|          - ${DEPLOY_NODE_HBASE_MASTER:-node.labels.ignore != true} #!port
-#:hbase|      labels: #!port
-#:hbase|        - "traefik.enable=true" #!port
-#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.rule=Host(`${DEPLOY_SUBDOMAIN_HBASE:-hbase-hadoop}.${DEPLOY_HOSTNAME}`)" #!port
-#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.entrypoints=webhttps" #!port
-#:hbase|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.tls.options=sslVerifyClient@file" #!port
-#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.tls.certresolver=le" #!port
-#:hbase|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.loadbalancer.server.port=16010" #!port
+#:hbase|  hbase-master-web: #!no-proxy
+#:hbase|    image: alpine/socat:latest #!no-proxy
+#:hbase|    command: tcp-listen:16010,fork tcp:hbase-master:16010 #!no-proxy
+#:hbase|    networks: #!no-proxy
+#:hbase|      - external_network #!no-proxy
+#:hbase|      - internal_network #!no-proxy
+#:hbase|    deploy: #!no-proxy
+#:hbase|      replicas: 1 #!no-proxy
+#:hbase|      placement: #!no-proxy
+#:hbase|        constraints:  #!no-proxy
+#:hbase|          - ${DEPLOY_NODE_HBASE_MASTER:-node.labels.ignore != true} #!no-proxy
+#:hbase|      labels: #!no-proxy
+#:hbase|        - "traefik.enable=true" #!no-proxy
+#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.rule=Host(`${DEPLOY_SUBDOMAIN_HBASE:-hbase-hadoop}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.entrypoints=webhttps" #!no-proxy
+#:hbase|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.tls.options=sslVerifyClient@file" #!no-proxy
+#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.tls.certresolver=le" #!no-proxy
+#:hbase|        - "traefik.http.services.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.loadbalancer.server.port=16010" #!no-proxy
 #:hbase|
 #:hbase|  # ------------ #
 #:hbase|  # HBase Region #

@@ -41,7 +41,7 @@ services:
       placement:
         constraints: [node.role == manager]
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.rule=Host(`${DEPLOY_SUBDOMAIN:-swarm}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.tls.certresolver=le"

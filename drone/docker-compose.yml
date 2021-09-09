@@ -101,7 +101,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-drone}.rule=Host(`${DEPLOY_SUBDOMAIN:-drone}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-drone}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-drone}.tls.certresolver=le"

@@ -23,7 +23,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_GRAFANA:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-grafana}.rule=Host(`${DEPLOY_SUBDOMAIN:-grafana}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-grafana}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-grafana}.tls.certresolver=le"
@@ -42,7 +42,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_LOKI:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-loki}.rule=Host(`${DEPLOY_SUBDOMAIN:-loki}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-loki}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-loki}.tls.certresolver=le"

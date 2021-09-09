@@ -41,7 +41,7 @@ services:
         constraints: 
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
-        - "traefik.enable=true" #!port
+        - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-dnsmasq}.rule=Host(`${DEPLOY_SUBDOMAIN:-dnsmasq}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-dnsmasq}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-dnsmasq}.tls.options=sslVerifyClient@file"
