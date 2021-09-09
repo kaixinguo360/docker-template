@@ -1,0 +1,77 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  db:
+    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
+#:log |    logging: *loki-logging
+#:port|#:host|    ports:
+#:port|    ports: #!host
+#:port|      - ${DEPLOY_PORT_DB:-3306}:3306
+#:host|    ports: #!port
+#:host|      - target: 3306
+#:host|        published: ${DEPLOY_PORT_DB:-3306}
+#:host|        protocol: tcp
+#:host|        mode: host
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-test}
+      - MYSQL_USER=${MYSQL_USER:-test}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-1234567}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-1234567}
+    networks:
+      internal_network:
+        aliases:
+          - mysql
+    volumes:
+      - db:/var/lib/mysql
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+#:adminer|  adminer:
+#:adminer|    image: ${DEPLOY_IMAGE_ADMINER:-adminer:4}
+#:adminer|#:log |    logging: *loki-logging
+#:adminer|#:port-adminer|    ports:
+#:adminer|#:port-adminer|      - ${DEPLOY_PORT_ADMINER:-8080}:8080
+#:adminer|    environment:
+#:adminer|      - ADMINER_DEFAULT_SERVER=db
+#:adminer|      - ADMINER_PLUGINS
+#:adminer|      - ADMINER_DESIGN
+#:adminer|    networks:
+#:adminer|      - internal_network
+#:adminer|      - external_network
+#:adminer|    deploy:
+#:adminer|      replicas: 1
+#:adminer|      placement:
+#:adminer|        constraints:
+#:adminer|          - ${DEPLOY_NODE_ADMINER:-node.labels.ignore != true}
+#:adminer|      labels:
+#:adminer|        - "traefik.enable=true" #!no-proxy
+#:adminer|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mysql}_adminer.rule=Host(`${DEPLOY_SUBDOMAIN_ADMINER:-adminer}.${DEPLOY_HOSTNAME}`)"
+#:adminer|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mysql}_adminer.entrypoints=webhttps"
+#:adminer|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mysql}_adminer.tls.options=sslVerifyClient@file"
+#:adminer|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mysql}_adminer.tls.certresolver=le"
+#:adminer|        - "traefik.http.services.${DEPLOY_STACK_NAME:-mysql}_adminer.loadbalancer.server.port=8080"
+
+networks:
+  internal_network:
+    internal: true #!custom-network
+#:custom-network|    external: true
+#:custom-network|    name: "${DEPLOY_NETWORK_DB:-db_network}"
+  external_network:
+    external: true
+
+volumes:
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mysql}/db"
