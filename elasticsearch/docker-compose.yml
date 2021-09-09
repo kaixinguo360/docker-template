@@ -85,8 +85,9 @@ services:
 
 networks:
   internal_network:
-    external: true
-    name: "${DEPLOY_NETWORK_ES:-es_network}"
+    internal: true #!custom-network
+#:custom-network|    external: true
+#:custom-network|    name: "${DEPLOY_NETWORK_ES:-es_network}"
   external_network:
     external: true
 
