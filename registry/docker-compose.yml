@@ -26,8 +26,30 @@ services:
         - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.rule=Host(`${DEPLOY_SUBDOMAIN:-docker}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-registry}.loadbalancer.server.port=5000"
+
+#:web|  web:
+#:web|    image: ${DEPLOY_IMAGE_WEB:-jessfraz/reg:latest}
+#:web|#:log |    logging: *loki-logging
+#:web|#:port-web|    ports:
+#:web|#:port-web|      - ${DEPLOY_PORT_WEB:-8080}:8080
+#:web|    command: server -r ${DEPLOY_SUBDOMAIN:-docker}.${DEPLOY_HOSTNAME}
+#:web|    networks:
+#:web|      - external_network
+#:web|    deploy:
+#:web|      replicas: 1
+#:web|      placement:
+#:web|        constraints: 
+#:web|          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+#:web|      labels:
+#:web|        - "traefik.enable=true" #!no-proxy
+#:web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}_web.rule=Host(`${DEPLOY_SUBDOMAIN_WEB:-web-docker}.${DEPLOY_HOSTNAME}`)"
+#:web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}_web.entrypoints=webhttps"
+#:web|#:client-ssl-web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}_web.tls.options=sslVerifyClient@file"
+#:web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}_web.tls.certresolver=le"
+#:web|        - "traefik.http.services.${DEPLOY_STACK_NAME:-registry}_web.loadbalancer.server.port=8080"
 
 networks:
   external_network:
