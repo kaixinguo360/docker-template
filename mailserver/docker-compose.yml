@@ -11,42 +11,43 @@ services:
   mail:
     image: ${DEPLOY_IMAGE_MAILSERVER:-mailserver/docker-mailserver:10.0.0}
 #:log |    logging: *loki-logging
-    ports:
-      - ${DEPLOY_PORT_MAILSERVER_SMTP:-25}:25 #!host
-#:port-smtps   |      - ${DEPLOY_PORT_MAILSERVER_SMTPS:-465}:465    #!host
-#:port-starttls|      - ${DEPLOY_PORT_MAILSERVER_STARTTLS:-587}:587 #!host
-#:port-pop3    |      - ${DEPLOY_PORT_MAILSERVER_POP3:-110}:110     #!host
-#:port-pop3s   |      - ${DEPLOY_PORT_MAILSERVER_POP3S:-995}:995    #!host
-#:port-imap    |      - ${DEPLOY_PORT_MAILSERVER_IMAP:-143}:143     #!host
-#:port-imaps   |      - ${DEPLOY_PORT_MAILSERVER_IMAPS:-993}:993    #!host
-#:host|      - target: 25
-#:host|        published: ${DEPLOY_PORT_MAILSERVER_SMTP:-25}
-#:host|        protocol: tcp
-#:host|        mode: host
-#:host|#:port-smtps   |      - target: 465
-#:host|#:port-smtps   |        published: ${DEPLOY_PORT_MAILSERVER_SMTPS:-465}
-#:host|#:port-smtps   |        protocol: tcp
-#:host|#:port-smtps   |        mode: host
-#:host|#:port-starttls|      - target: 587
-#:host|#:port-starttls|        published: ${DEPLOY_PORT_MAILSERVER_STARTTLS:-587}
-#:host|#:port-starttls|        protocol: tcp
-#:host|#:port-starttls|        mode: host
-#:host|#:port-pop3    |      - target: 110
-#:host|#:port-pop3    |        published: ${DEPLOY_PORT_MAILSERVER_POP3:-110}
-#:host|#:port-pop3    |        protocol: tcp
-#:host|#:port-pop3    |        mode: host
-#:host|#:port-pop3s   |      - target: 995
-#:host|#:port-pop3s   |        published: ${DEPLOY_PORT_MAILSERVER_POP3S:-995}
-#:host|#:port-pop3s   |        protocol: tcp
-#:host|#:port-pop3s   |        mode: host
-#:host|#:port-imap    |      - target: 143
-#:host|#:port-imap    |        published: ${DEPLOY_PORT_MAILSERVER_IMAP:-143}
-#:host|#:port-imap    |        protocol: tcp
-#:host|#:port-imap    |        mode: host
-#:host|#:port-imaps   |      - target: 993
-#:host|#:port-imaps   |        published: ${DEPLOY_PORT_MAILSERVER_IMAPS:-993}
-#:host|#:port-imaps   |        protocol: tcp
-#:host|#:port-imaps   |        mode: host
+#:network-overlay|    ports:
+#:network-overlay|#:port-smtp    |      - ${DEPLOY_PORT_MAILSERVER_SMTP:-25}:25
+#:network-overlay|#:port-smtps   |      - ${DEPLOY_PORT_MAILSERVER_SMTPS:-465}:465
+#:network-overlay|#:port-starttls|      - ${DEPLOY_PORT_MAILSERVER_STARTTLS:-587}:587
+#:network-overlay|#:port-pop3    |      - ${DEPLOY_PORT_MAILSERVER_POP3:-110}:110
+#:network-overlay|#:port-pop3s   |      - ${DEPLOY_PORT_MAILSERVER_POP3S:-995}:995
+#:network-overlay|#:port-imap    |      - ${DEPLOY_PORT_MAILSERVER_IMAP:-143}:143
+#:network-overlay|#:port-imaps   |      - ${DEPLOY_PORT_MAILSERVER_IMAPS:-993}:993
+#:network-host   |    ports:
+#:network-host   |#:port-smtp    |      - target: 25
+#:network-host   |#:port-smtp    |        published: ${DEPLOY_PORT_MAILSERVER_SMTP:-25}
+#:network-host   |#:port-smtp    |        protocol: tcp
+#:network-host   |#:port-smtp    |        mode: host
+#:network-host   |#:port-smtps   |      - target: 465
+#:network-host   |#:port-smtps   |        published: ${DEPLOY_PORT_MAILSERVER_SMTPS:-465}
+#:network-host   |#:port-smtps   |        protocol: tcp
+#:network-host   |#:port-smtps   |        mode: host
+#:network-host   |#:port-starttls|      - target: 587
+#:network-host   |#:port-starttls|        published: ${DEPLOY_PORT_MAILSERVER_STARTTLS:-587}
+#:network-host   |#:port-starttls|        protocol: tcp
+#:network-host   |#:port-starttls|        mode: host
+#:network-host   |#:port-pop3    |      - target: 110
+#:network-host   |#:port-pop3    |        published: ${DEPLOY_PORT_MAILSERVER_POP3:-110}
+#:network-host   |#:port-pop3    |        protocol: tcp
+#:network-host   |#:port-pop3    |        mode: host
+#:network-host   |#:port-pop3s   |      - target: 995
+#:network-host   |#:port-pop3s   |        published: ${DEPLOY_PORT_MAILSERVER_POP3S:-995}
+#:network-host   |#:port-pop3s   |        protocol: tcp
+#:network-host   |#:port-pop3s   |        mode: host
+#:network-host   |#:port-imap    |      - target: 143
+#:network-host   |#:port-imap    |        published: ${DEPLOY_PORT_MAILSERVER_IMAP:-143}
+#:network-host   |#:port-imap    |        protocol: tcp
+#:network-host   |#:port-imap    |        mode: host
+#:network-host   |#:port-imaps   |      - target: 993
+#:network-host   |#:port-imaps   |        published: ${DEPLOY_PORT_MAILSERVER_IMAPS:-993}
+#:network-host   |#:port-imaps   |        protocol: tcp
+#:network-host   |#:port-imaps   |        mode: host
     environment:
       - OVERRIDE_HOSTNAME=${DEPLOY_SUBDOMAIN:-mail}.${DEPLOY_HOSTNAME}
       - ONE_DIR=1
