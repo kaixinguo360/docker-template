@@ -1,0 +1,50 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-diygod/rsshub:latest}
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-1200}:1200
+    networks:
+      - external_network
+#:browserless|      - internal_network
+#:browserless|    environment:
+#:browserless|      PUPPETEER_WS_ENDPOINT: ws://browserless:3000
+    env_file: ${DEPLOY_CONFIG_RSSHUB:-config/rsshub.env}
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-rsshub}.rule=Host(`${DEPLOY_SUBDOMAIN:-rsshub}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-rsshub}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-rsshub}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-rsshub}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-rsshub}.loadbalancer.server.port=1200"
+
+#:browserless|  browserless:
+#:browserless|    # See issue 6680
+#:browserless|    image: browserless/chrome:1.43-chrome-stable
+#:browserless|    networks:
+#:browserless|      - internal_network
+#:browserless|    deploy:
+#:browserless|      replicas: 1
+#:browserless|      placement:
+#:browserless|        constraints: 
+#:browserless|          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+
+networks:
+  external_network:
+    external: true
+#:browserless|  internal_network:
+#:browserless|    internal: true
