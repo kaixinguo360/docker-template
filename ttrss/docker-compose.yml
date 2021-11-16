@@ -1,0 +1,79 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-wangqiru/ttrss:latest}
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
+    environment:
+      - SELF_URL_PATH=https://${DEPLOY_SUBDOMAIN:-ttrss}.${DEPLOY_HOSTNAME}/
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=ttrss
+      - DB_USER=ttrss
+      - DB_PASS=1234567
+      - PUID=1000
+      - PGID=1000
+      # Doc: http://ttrss.henry.wang/zh/#支持的环境变量列表
+    networks:
+      - external_network
+      - internal_network
+    volumes:
+      - feed-icons:/var/www/feed-icons
+#:media |      - media:/media
+#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!port
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-ttrss}.rule=Host(`${DEPLOY_SUBDOMAIN:-ttrss}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-ttrss}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-ttrss}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-ttrss}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-ttrss}.loadbalancer.server.port=80"
+
+  db:
+    image: ${DEPLOY_IMAGE_DB:-postgres:12.2-alpine}
+#:log |    logging: *loki-logging
+    environment:
+      - POSTGRES_DB=ttrss
+      - POSTGRES_USER=ttrss
+      - POSTGRES_PASSWORD=1234567
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  external_network:
+    external: true
+  internal_network:
+    internal: true
+
+volumes:
+  feed-icons:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-ttrss}/feed-icons"
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-ttrss}/db"
