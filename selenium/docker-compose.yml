@@ -1,0 +1,37 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  webdriver:
+    image: ${DEPLOY_IMAGE_WEBDRIVER:-selenium/standalone-chrome:latest}
+#:log |    logging: *loki-logging
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEBDRIVER:-4444}:4444
+#:env |    env_file: ${DEPLOY_CONFIG_WEB}
+    networks:
+      - external_network
+    deploy:
+      resources:
+        limits:
+           memory: '512M'
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEBDRIVER:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-selenium}.rule=Host(`${DEPLOY_SUBDOMAIN:-selenium}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-selenium}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-selenium}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-selenium}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-selenium}.loadbalancer.server.port=4444"
+
+networks:
+  external_network:
+    external: true
