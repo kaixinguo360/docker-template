@@ -11,6 +11,7 @@ services:
   db:
     image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_DB}
 #:port|#:host|    ports:
 #:port|    ports: #!host
 #:port|      - ${DEPLOY_PORT_DB:-3306}:3306
@@ -39,6 +40,7 @@ services:
 #:adminer|  adminer:
 #:adminer|    image: ${DEPLOY_IMAGE_ADMINER:-adminer:4}
 #:adminer|#:log |    logging: *loki-logging
+#:adminer|#:env |    env_file: ${DEPLOY_ENV_ADMINER}
 #:adminer|#:port-adminer|    ports:
 #:adminer|#:port-adminer|      - ${DEPLOY_PORT_ADMINER:-8080}:8080
 #:adminer|    environment:

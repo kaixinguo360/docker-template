@@ -11,6 +11,7 @@ services:
   proxy:
     image: ${DEPLOY_IMAGE_PROXY:-traefik:v2.3}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_PROXY}
     command:
       - "--configFile=/config/traefik.yml"
     ports:

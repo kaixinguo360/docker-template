@@ -20,6 +20,7 @@ services:
       - "--conf-file=/config/dnsmasq.conf"
       - "--conf-dir=/config"
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
     logging:            #!log
       driver: json-file #!log
       options:          #!log

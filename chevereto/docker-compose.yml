@@ -11,6 +11,7 @@ services:
   web:
     image: ${DEPLOY_IMAGE_WEB:-linuxserver/chevereto:version-1.4.0}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80
     environment:

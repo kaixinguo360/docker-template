@@ -11,6 +11,7 @@ services:
   web:
     image: ${DEPLOY_IMAGE_WEB:-verdaccio/verdaccio:4}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-4873}:4873
     networks:

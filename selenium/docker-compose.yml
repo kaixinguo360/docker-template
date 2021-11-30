@@ -11,9 +11,9 @@ services:
   webdriver:
     image: ${DEPLOY_IMAGE_WEBDRIVER:-selenium/standalone-chrome:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEBDRIVER:-4444}:4444
-#:env |    env_file: ${DEPLOY_CONFIG_WEB}
     networks:
       - external_network
     deploy:

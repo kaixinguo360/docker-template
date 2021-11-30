@@ -13,7 +13,7 @@ services:
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
-    env_file: ${DEPLOY_CONFIG_WEB:-config/config.env}
+    env_file: ${DEPLOY_ENV_WEB:-config/config.env}
     networks:
       - external_network
 #:rclone|#:media |    volumes:

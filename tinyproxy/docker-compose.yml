@@ -11,6 +11,7 @@ services:
   proxy:
     image: ${DEPLOY_IMAGE_PROXY:-vimagick/tinyproxy:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_PROXY}
     ports: #!global-deploy
       - ${DEPLOY_PORT_PROXY:-8888}:8888 #!global-deploy
 #:global-deploy|    ports:

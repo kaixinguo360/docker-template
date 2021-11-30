@@ -12,6 +12,7 @@ services:
     image: ${DEPLOY_IMAGE_WEB:-p3terx/ariang:latest}
     command: --port 80
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80
     networks:
@@ -33,6 +34,7 @@ services:
     # Reference: https://p3terx.com/archives/docker-aria2-pro.html
     image: ${DEPLOY_IMAGE_ARIA2:-p3terx/aria2-pro:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_ARIA2}
     logging:            #!log
       driver: json-file #!log
       options:          #!log

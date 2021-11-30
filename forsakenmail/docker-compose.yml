@@ -11,6 +11,7 @@ services:
   web:
     image: ${DEPLOY_IMAGE_WEB:-denghongcai/forsaken-mail:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
     ports:
       - ${DEPLOY_PORT_SMTP:-25}:25
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000

@@ -11,6 +11,7 @@ services:
   web:
     image: ${DEPLOY_IMAGE_WEB:-gitea/gitea:1.14}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
     ports:
       - ${DEPLOY_PORT_SSH:-22}:22
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000

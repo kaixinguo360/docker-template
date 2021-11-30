@@ -11,6 +11,7 @@ services:
   web:
     image: ${DEPLOY_IMAGE_WEB:-xavierniu/cloudreve:sha-8b33eb1}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-5212}:5212
     working_dir: /cloudreve

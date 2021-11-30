@@ -16,8 +16,7 @@ services:
 #:port|      - ${DEPLOY_PORT_ES_9300:-9300}:9300
     environment:
       - discovery.type=single-node
-    env_file:
-      - ${DEPLOY_CONFIG_ES:-config/es.env}
+    env_file: ${DEPLOY_ENV_ES:-config/es.env}
     networks:
       internal_network:
     volumes:
@@ -54,6 +53,7 @@ services:
 #:cerebro|  cerebro:
 #:cerebro|    image: ${DEPLOY_IMAGE_CEREBRO:-lmenezes/cerebro:0.9.4}
 #:cerebro|#:log |    logging: *loki-logging
+#:cerebro|#:env |    env_file: ${DEPLOY_ENV_CEREBRO}
 #:cerebro|#:port|    ports:
 #:cerebro|#:port|      - ${DEPLOY_PORT_CEREBRO:-9000}:9000
 #:cerebro|    environment:

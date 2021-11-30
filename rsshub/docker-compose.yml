@@ -11,6 +11,7 @@ services:
   web:
     image: ${DEPLOY_IMAGE_WEB:-diygod/rsshub:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-1200}:1200
     networks:
@@ -18,7 +19,7 @@ services:
 #:browserless|      - internal_network
 #:browserless|    environment:
 #:browserless|      PUPPETEER_WS_ENDPOINT: ws://browserless:3000
-    env_file: ${DEPLOY_CONFIG_RSSHUB:-config/rsshub.env}
+    env_file: ${DEPLOY_ENV_RSSHUB:-config/rsshub.env}
     deploy:
       replicas: 1
       placement:

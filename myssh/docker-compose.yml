@@ -11,6 +11,7 @@ services:
   web:
     image: ${DEPLOY_IMAGE_WEB:-myssh-web:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-80}:80
     environment:
@@ -39,6 +40,7 @@ services:
   honeypot:
     image: ${DEPLOY_IMAGE_HONEYPOT:-myssh-honeypot:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_HONEYPOT}
     environment:
       - MYSQL_HOST=db
       - MYSQL_DATABASE=myssh
@@ -60,6 +62,7 @@ services:
   db:
     image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_DB}
     environment:
       - MYSQL_ROOT_PASSWORD=1234567
       - MYSQL_DATABASE=myssh

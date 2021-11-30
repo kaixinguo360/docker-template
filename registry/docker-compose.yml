@@ -11,6 +11,7 @@ services:
   registry:
     image: ${DEPLOY_IMAGE_REGISTRY:-registry:2}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_REGISTRY}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_REGISTORY:-5000}:5000
     networks:
@@ -33,6 +34,7 @@ services:
 #:web|  web:
 #:web|    image: ${DEPLOY_IMAGE_WEB:-jessfraz/reg:latest}
 #:web|#:log |    logging: *loki-logging
+#:web|#:env |    env_file: ${DEPLOY_ENV_WEB}
 #:web|#:port-web|    ports:
 #:web|#:port-web|      - ${DEPLOY_PORT_WEB:-8080}:8080
 #:web|    command: server -r ${DEPLOY_SUBDOMAIN:-docker}.${DEPLOY_HOSTNAME}

@@ -11,6 +11,7 @@ services:
   grafana:
     image: ${DEPLOY_IMAGE_GRAFANA:-grafana/grafana:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_GRAFANA}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_GRAFANA:-3000}:3000
     networks:
@@ -32,6 +33,7 @@ services:
   loki:
     image: ${DEPLOY_IMAGE_LOKI:-grafana/loki:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_LOKI}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_LOKI:-3100}:3100
     networks:
@@ -52,6 +54,7 @@ services:
   influxdb:
     image: ${DEPLOY_IMAGE_INFLUXDB:-influxdb:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_INFLUXDB}
     networks:
       - external_network
     deploy:
@@ -63,6 +66,7 @@ services:
   telegraf:
     image: ${DEPLOY_IMAGE_TELEGRF:-telegraf:latest}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_TELEGRF}
     hostname: "{{.Node.Hostname}}"
     networks:
       - external_network

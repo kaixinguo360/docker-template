@@ -51,7 +51,7 @@ services:
     environment:
       - OVERRIDE_HOSTNAME=${DEPLOY_SUBDOMAIN:-mail}.${DEPLOY_HOSTNAME}
       - ONE_DIR=1
-    env_file: ${DEPLOY_CONFIG_MAILSERVER:-config/mailserver.env}
+    env_file: ${DEPLOY_ENV_MAILSERVER:-config/mailserver.env}
     networks:
       - external_network
     volumes:

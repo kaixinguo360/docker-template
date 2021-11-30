@@ -13,7 +13,7 @@ services:
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
-    env_file: ${DEPLOY_CONFIG_MASTODON:-config/mastodon.env}
+    env_file: ${DEPLOY_ENV_MASTODON:-config/mastodon.env}
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -49,6 +49,7 @@ services:
   db:
     image: ${DEPLOY_IMAGE_DB:-postgres:9.6-alpine}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_DB}
     networks:
       - internal_network
     healthcheck:
@@ -64,6 +65,7 @@ services:
   redis:
     image: ${DEPLOY_IMAGE_REDIS:-redis:6.0-alpine}
 #:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_REDIS}
     networks:
       - internal_network
     healthcheck:
@@ -79,6 +81,7 @@ services:
 #  es:
 #    image: ${DEPLOY_IMAGE_ES:-docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10}
 ##:log |    logging: *loki-logging
+##:env |    env_file: ${DEPLOY_ENV_ES}
 #    environment:
 #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
 #      - "cluster.name=es-mastodon"
@@ -98,7 +101,7 @@ services:
   streaming:
     image: ${DEPLOY_IMAGE_STREAMING:-tootsuite/mastodon:v3.2.0}
 #:log |    logging: *loki-logging
-    env_file: ${DEPLOY_CONFIG_MASTODON:-config/mastodon.env}
+    env_file: ${DEPLOY_ENV_MASTODON:-config/mastodon.env}
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -127,7 +130,7 @@ services:
   sidekiq:
     image: ${DEPLOY_IMAGE_SIDEKIQ:-tootsuite/mastodon:v3.2.0}
 #:log |    logging: *loki-logging
-    env_file: ${DEPLOY_CONFIG_MASTODON:-config/mastodon.env}
+    env_file: ${DEPLOY_ENV_MASTODON:-config/mastodon.env}
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -156,6 +159,7 @@ services:
 #  tor:
 #    image: ${DEPLOY_IMAGE_TOR:-sirboops/tor:latest}
 ##:log |    logging: *loki-logging
+##:env |    env_file: ${DEPLOY_ENV_TOR}
 #    networks:
 #      - external_network
 #      - internal_network
@@ -163,6 +167,7 @@ services:
 #  privoxy:
 #    image: ${DEPLOY_IMAGE_PRIVOXY:-sirboops/privoxy:latest}
 ##:log |    logging: *loki-logging
+##:env |    env_file: ${DEPLOY_ENV_PRIVOXY}
 #    volumes:
 #      - ./priv-config:/opt/config
 #    networks:
