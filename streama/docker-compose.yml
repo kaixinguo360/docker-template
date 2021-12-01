@@ -47,8 +47,6 @@ services:
 
   db:
     image: ${DEPLOY_IMAGE_DB:-mysql:5.6}
-#:log |    logging: *loki-logging
-#:env |    env_file: ${DEPLOY_ENV_DB}
     environment:
       MYSQL_ROOT_PASSWORD: streama_root_password
       MYSQL_USER: streama

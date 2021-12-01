@@ -51,11 +51,11 @@ services:
 
   db:
     image: ${DEPLOY_IMAGE_DB:-mongo:4.0}
-    volumes:
-     - db:/data/db
     command: mongod --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1
     networks:
       - internal_network
+    volumes:
+     - db:/data/db
     deploy:
       replicas: 1
       placement:

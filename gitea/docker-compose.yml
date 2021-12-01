@@ -43,13 +43,13 @@ services:
 
 #:db|  db:
 #:db|    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
-#:db|    networks:
-#:db|      - internal_network
 #:db|    environment:
 #:db|      - MYSQL_DATABASE=gitea
 #:db|      - MYSQL_USER=gitea
 #:db|      - MYSQL_PASSWORD=gitea_password
 #:db|      - MYSQL_ROOT_PASSWORD=gitea_root_password
+#:db|    networks:
+#:db|      - internal_network
 #:db|    volumes:
 #:db|      - db:/var/lib/mysql
 #:db|    deploy:

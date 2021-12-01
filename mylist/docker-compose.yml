@@ -40,8 +40,6 @@ services:
 
   db:
     image: ${DEPLOY_IMAGE_DB:-postgres:12.2-alpine}
-#:log |    logging: *loki-logging
-#:env |    env_file: ${DEPLOY_ENV_DB}
     environment:
       - POSTGRES_DB=mylist
       - POSTGRES_USER=mylist

@@ -48,12 +48,10 @@ services:
 
   db:
     image: ${DEPLOY_IMAGE_DB:-postgres:9.6-alpine}
-#:log |    logging: *loki-logging
-#:env |    env_file: ${DEPLOY_ENV_DB}
-    networks:
-      - internal_network
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
+    networks:
+      - internal_network
     volumes:
       - postgres:/var/lib/postgresql/data
     deploy:

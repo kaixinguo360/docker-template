@@ -50,13 +50,13 @@ services:
 
 #:db|  db:
 #:db|    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
-#:db|    networks:
-#:db|      - internal_network
 #:db|    environment:
 #:db|      - MYSQL_DATABASE=wordpress
 #:db|      - MYSQL_USER=wordpress
 #:db|      - MYSQL_PASSWORD=wordpress_password
 #:db|      - MYSQL_ROOT_PASSWORD=wordpress_root_password
+#:db|    networks:
+#:db|      - internal_network
 #:db|    volumes:
 #:db|      - db:/var/lib/mysql
 #:db|    deploy:

@@ -52,14 +52,12 @@ services:
 
   db:
     image: ${DEPLOY_IMAGE_DB:-postgres:12.2-alpine}
-#:log |    logging: *loki-logging
-#:env |    env_file: ${DEPLOY_ENV_DB}
-    networks:
-      - internal_network
     environment:
       - POSTGRES_PASSWORD=misskey
       - POSTGRES_USER=misskey
       - POSTGRES_DB=misskey
+    networks:
+      - internal_network
     volumes:
       - db:/var/lib/postgresql/data
     deploy:

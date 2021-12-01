@@ -47,15 +47,13 @@ services:
 
   db:
     image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
-#:log |    logging: *loki-logging
-#:env |    env_file: ${DEPLOY_ENV_DB}
-    networks:
-      - internal_network
     environment:
       - MYSQL_DATABASE=photoview
       - MYSQL_USER=photoview
       - MYSQL_PASSWORD=photoview_password
       - MYSQL_ROOT_PASSWORD=photoview_root_password
+    networks:
+      - internal_network
     volumes:
       - db:/var/lib/mysql
     deploy:
