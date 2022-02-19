@@ -1,0 +1,56 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-zhaojun1998/zfile:3.2.1}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
+    networks:
+      - external_network
+    volumes:
+      - data:/root/.zfile
+#:media |      - media:/media
+#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-zfile}.rule=Host(`${DEPLOY_SUBDOMAIN:-zfile}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-zfile}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-zfile}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-zfile}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-zfile}.loadbalancer.server.port=8080"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-zfile}/data"
+#:media |  media:
+#:media |    driver_opts:
+#:media |      type: "nfs"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      device: ":$DEPLOY_MEDIA_ROOT"
+#:rclone|  rclone:
+#:rclone|    driver: "sapk/plugin-rclone:latest"
+#:rclone|    driver_opts:
+#:rclone|      args: "--allow-root --allow-other --attr-timeout 60s --vfs-cache-mode full"
+#:rclone|      config: "$DEPLOY_RCLONE_CONFIG"
+#:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"
