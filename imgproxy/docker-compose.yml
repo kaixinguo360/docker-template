@@ -8,12 +8,12 @@ x-logging: &loki-logging
       loki-batch-size: 400
 
 services:
-  web:
-    image: ${DEPLOY_IMAGE_WEB:-darthsim/imgproxy:v2}
+  proxy:
+    image: ${DEPLOY_IMAGE_PROXY:-darthsim/imgproxy:v2}
 #:log |    logging: *loki-logging
 #:port|    ports:
-#:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
-    env_file: ${DEPLOY_ENV_WEB:-config/config.env}
+#:port|      - ${DEPLOY_PORT_PROXY:-8080}:8080
+    env_file: ${DEPLOY_ENV_PROXY:-config/config.env}
     networks:
       - external_network
 #:rclone|#:media |    volumes:
@@ -25,18 +25,50 @@ services:
       replicas: 1
       placement:
         constraints: 
-          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+          - ${DEPLOY_NODE_PROXY:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.rule=Host(`${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.rule=Host(`${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}`)" #!nginx
+#:nginx|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.rule=Host(`origin-${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-imgproxy}.loadbalancer.server.port=8080"
 
+#:nginx|  nginx:
+#:nginx|    image: ${DEPLOY_IMAGE_NGINX:-nginx:alpine}
+#:nginx|#:log |    logging: *loki-logging
+#:nginx|#:port|    ports:
+#:nginx|#:port|      - ${DEPLOY_PORT_NGINX:-80}:80
+#:nginx|    env_file: ${DEPLOY_ENV_NGINX:-config/config.env}
+#:nginx|    environment:
+#:nginx|      - ORIGIN_URL=https://origin-${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}
+#:nginx|    networks:
+#:nginx|      - external_network
+#:nginx|    configs:
+#:nginx|      - source: nginx-config
+#:nginx|        target: /etc/nginx/conf.d/default.conf
+#:nginx|    deploy:
+#:nginx|      replicas: 1
+#:nginx|      placement:
+#:nginx|        constraints:
+#:nginx|          - ${DEPLOY_NODE_NGINX:-node.labels.ignore != true}
+#:nginx|      labels:
+#:nginx|        - "traefik.enable=true" #!no-proxy
+#:nginx|        - "traefik.http.routers.nginx-${DEPLOY_STACK_NAME:-imgproxy}.rule=Host(`${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}`)"
+#:nginx|        - "traefik.http.routers.nginx-${DEPLOY_STACK_NAME:-imgproxy}.entrypoints=webhttps"
+#:nginx|#:client-ssl|        - "traefik.http.routers.nginx-${DEPLOY_STACK_NAME:-imgproxy}.tls.options=sslVerifyClient@file"
+#:nginx|        - "traefik.http.routers.nginx-${DEPLOY_STACK_NAME:-imgproxy}.tls.certresolver=le"
+#:nginx|        - "traefik.http.services.nginx-${DEPLOY_STACK_NAME:-imgproxy}.loadbalancer.server.port=80"
+
 networks:
   external_network:
     external: true
+
+configs:
+  nginx-config:
+    file: ${DEPLOY_CONFIG_NGINX:-config/nginx-site.conf}
+    template_driver: golang
 
 #:rclone|#:media |volumes:
 #:media |volumes: #!rclone
