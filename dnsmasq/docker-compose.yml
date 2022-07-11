@@ -32,6 +32,12 @@ services:
     environment:
       - HTTP_USER
       - HTTP_PASS
+    healthcheck:
+      test: ["CMD", "nslookup", "baidu.com", "127.0.0.1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     networks:
       - external_network
     volumes:
