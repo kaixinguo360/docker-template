@@ -41,10 +41,12 @@ services:
       mode: replicated
       replicas: 1
       placement:
-        constraints: [node.role == manager]
+        constraints:
+          - node.role == manager
+          - ${DEPLOY_NODE_PORTAINER:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.rule=Host(`${DEPLOY_SUBDOMAIN:-swarm}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.rule=Host(`${DEPLOY_SUBDOMAIN:-portainer}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-portainer}.loadbalancer.server.port=9000"
