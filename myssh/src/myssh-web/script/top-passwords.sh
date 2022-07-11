@@ -14,7 +14,7 @@ esac
 cd $(dirname $0)
 
 echo "SELECT password FROM passwords \
-    WHERE time < DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+    WHERE time > DATE_SUB(CURDATE(), INTERVAL 1 DAY)
     GROUP BY password
     ORDER BY count(*) DESC
     LIMIT $1
