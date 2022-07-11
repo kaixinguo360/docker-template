@@ -1,0 +1,52 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  db:
+    image: ${DEPLOY_IMAGE_DB:-postgres:12.2-alpine}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_DB}
+#:port|#:host|    ports:
+#:port|    ports: #!host
+#:port|      - ${DEPLOY_PORT_DB:-5432}:5432
+#:host|    ports: #!port
+#:host|      - target: 5432
+#:host|        published: ${DEPLOY_PORT_DB:-5432}
+#:host|        protocol: tcp
+#:host|        mode: host
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-test}
+      - POSTGRES_USER=${POSTGRES_USER:-test}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-1234567}
+    networks:
+      internal_network:
+        aliases:
+          - postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  internal_network:
+    internal: true #!custom-network
+#:custom-network|    external: true
+#:custom-network|    name: "${DEPLOY_NETWORK_DB:-db_network}"
+  external_network:
+    external: true
+
+volumes:
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-postgres}/db"
