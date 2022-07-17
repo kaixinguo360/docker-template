@@ -1,0 +1,45 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  proxy:
+    image: ${DEPLOY_IMAGE_PROXY:-nginx:alpine}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_PROXY}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_PROXY:-80}:80
+    environment:
+      - PROXY_URL
+    networks:
+      - external_network
+    configs:
+      - source: nginx-config
+        target: /etc/nginx/conf.d/default.conf
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_PROXY:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.rule=Host(`${DEPLOY_SUBDOMAIN:-nginx}.${DEPLOY_HOSTNAME}`)" #!custom-router-rule
+#:custom-router-rule|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.rule=$DEPLOY_CUSTOM_ROUTER_RULE"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-nginx}.loadbalancer.server.port=80"
+
+networks:
+  external_network:
+    external: true
+
+configs:
+  nginx-config:
+    file: ${DEPLOY_CONFIG_PROXY:-config/nginx-site.conf}
+    template_driver: golang
