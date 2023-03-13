@@ -20,6 +20,7 @@ services:
       - DB_HOST=$DEPLOY_DB_HOST #!db
       - DB_PORT=$DEPLOY_DB_PORT #!db
       - DB_LOCAL_PORT=$DEPLOY_DB_LOCAL_PORT
+      - NGINX_ONLY=$DEPLOY_NGINX_ONLY
       - DEBUG=$DEPLOY_DEBUG
     networks:
       - external_network
