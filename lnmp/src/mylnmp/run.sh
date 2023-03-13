@@ -43,7 +43,12 @@ fi
 
 # Run #
 
-php-fpm &
+if [ -n "$NGINX_ONLY" -a "$NGINX_ONLY" != 'false' ]; then
+    printf 'NGINX_ONLY=true\n'
+else
+    printf 'NGINX_ONLY=false\n'
+    php-fpm &
+fi
 
 if [ -n "$DB_HOST" ]; then
 
