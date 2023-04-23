@@ -1,0 +1,87 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-linuxserver/piwigo:13.6.0}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
+    networks:
+      - external_network
+#:db|      - internal_network
+    volumes:
+      - config:/config
+      - data:/gallery
+#:media |      - media:/media
+#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-piwigo}.rule=Host(`${DEPLOY_SUBDOMAIN:-piwigo}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-piwigo}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-piwigo}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-piwigo}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-piwigo}.loadbalancer.server.port=80"
+
+#:db|  db:
+#:db|    image: ${DEPLOY_IMAGE_DB:-mariadb:10.5}
+#:db|    environment:
+#:db|      - MYSQL_DATABASE=piwigo
+#:db|      - MYSQL_USER=piwigo
+#:db|      - MYSQL_PASSWORD=piwigo_password
+#:db|      - MYSQL_ROOT_PASSWORD=piwigo_root_password
+#:db|    networks:
+#:db|      - internal_network
+#:db|    volumes:
+#:db|      - db:/var/lib/mysql
+#:db|    deploy:
+#:db|      replicas: 1
+#:db|      placement:
+#:db|        constraints: 
+#:db|          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  external_network:
+    external: true
+  internal_network:
+    internal: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-piwigo}/data"
+  config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-piwigo}/config"
+#:db|  db:
+#:db|    driver_opts:
+#:db|      type: "nfs"
+#:db|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:db|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-piwigo}/db"
+#:media |  media:
+#:media |    driver_opts:
+#:media |      type: "nfs"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      device: ":$DEPLOY_MEDIA_ROOT"
+#:rclone|  rclone:
+#:rclone|    driver: "sapk/plugin-rclone:latest"
+#:rclone|    driver_opts:
+#:rclone|      args: "--allow-root --allow-other --attr-timeout 60s --vfs-cache-mode full"
+#:rclone|      config: "$DEPLOY_RCLONE_CONFIG"
+#:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"
