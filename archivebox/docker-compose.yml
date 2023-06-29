@@ -13,7 +13,7 @@ services:
 #:log |    logging: *loki-logging
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8000}:8000
-    command: server 0.0.0.0:8000
+    entrypoint: sh -c '/app/bin/docker_entrypoint.sh init; dumb-init -- /app/bin/docker_entrypoint.sh server 0.0.0.0:8000'
     env_file: ${DEPLOY_ENV_WEB:-config/docker.env}
     environment:
       - TZ=Asia/Shanghai
@@ -30,7 +30,7 @@ services:
         - "traefik.enable=true" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.rule=Host(`${DEPLOY_SUBDOMAIN:-archivebox}.${DEPLOY_HOSTNAME}`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.entrypoints=webhttps"
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.options=sslVerifyClient@file"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-archivebox}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-archivebox}.loadbalancer.server.port=8000"
 
