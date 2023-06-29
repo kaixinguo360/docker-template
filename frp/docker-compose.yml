@@ -15,6 +15,7 @@ services:
     ports:
       - ${DEPLOY_PORT_WEB_BIND:-7000}:7000
 #:port|      - ${DEPLOY_PORT_WEB_DASHBOARD:-7500}:7500
+#:exposed-ports|      - ${DEPLOY_PORT_EXPOSED:-7001-7100}:${DEPLOY_PORT_EXPOSED:-7001-7100}
     command: "-c /etc/frp/frps.ini"
     environment:
       DASHBOARD_USER: ${DASHBOARD_USER:-admin}
