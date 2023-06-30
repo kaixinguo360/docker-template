@@ -1,0 +1,81 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  authelia:
+    image: ${DEPLOY_IMAGE_AUTHELIA:-authelia/authelia:latest}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_AUTHELIA}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_AUTHELIA:-9091}:9091
+    environment:
+      TZ: Asia/Shanghai
+      DEFAULT_REDIRECTION_URL: https://${DEPLOY_SUBDOMAIN:-authelia}.${DEPLOY_HOSTNAME}
+      DOMAIN_TO_PROTECT: ${DEPLOY_HOSTNAME}
+    networks:
+      - external_network
+    configs:
+      - source: authelia-configuration
+        target: /config/configuration.yml
+      - source: authelia-users-database
+        target: /config/users_database.yml
+    volumes:
+      - data:/config
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_AUTHELIA:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.authelia.rule=Host(`${DEPLOY_SUBDOMAIN:-authelia}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.authelia.entryPoints=webhttps"
+        - "traefik.http.routers.authelia.tls.certresolver=le"
+        - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+        # Middleware for authelia authorization
+        - "traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https://${DEPLOY_SUBDOMAIN:-authelia}.${DEPLOY_HOSTNAME}"
+        - "traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true"
+        - "traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
+        # Middleware for authelia-basic authorization
+        - "traefik.http.middlewares.authelia-basic.forwardAuth.address=http://authelia:9091/api/verify?auth=basic"
+        - "traefik.http.middlewares.authelia-basic.forwardAuth.trustForwardHeader=true"
+        - "traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
+
+#:test|  test:
+#:test|    image: containous/whoami
+#:test|    networks:
+#:test|      - external_network
+#:test|    deploy:
+#:test|      labels:
+#:test|        - "traefik.enable=true"
+#:test|        - "traefik.http.routers.test-authelia.rule=Host(`test-${DEPLOY_SUBDOMAIN:-authelia}.${DEPLOY_HOSTNAME}`)"
+#:test|        - "traefik.http.routers.test-authelia.entryPoints=webhttps"
+#:test|        - "traefik.http.routers.test-authelia.tls.certresolver=le"
+#:test|        - "traefik.http.services.secure.loadbalancer.server.port=80"
+#:test|        # Authelia authorization
+#:test|        - "traefik.http.routers.test-authelia.middlewares=authelia@docker"
+
+networks:
+  external_network:
+    external: true
+
+configs:
+  authelia-configuration:
+    file: ${DEPLOY_CONFIG_AUTHELIA_CONFIGURATION:-config/configuration.yml}
+    template_driver: golang
+  authelia-users-database:
+    file: ${DEPLOY_CONFIG_AUTHELIA_USERS_DATABASE:-config/users_database.yml}
+    template_driver: golang
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-authelia}/data"
