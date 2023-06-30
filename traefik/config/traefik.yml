@@ -29,3 +29,5 @@ certificatesresolvers:
       email: user@example.com
       storage: /data/acme.json
 
+api: {}
+

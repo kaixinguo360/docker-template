@@ -49,6 +49,12 @@ services:
         - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
         # 最最关键的一步，创建一个noop虚服务的loadbalancer，port随便选，不然上述重定向配置不会生效
         - "traefik.http.services.noop.loadbalancer.server.port=9999"
+#:dashboard|        # 仪表盘
+#:dashboard|        - "traefik.http.routers.api.rule=Host(`${DEPLOY_SUBDOMAIN:-traefik}.${DEPLOY_HOSTNAME}`)"
+#:dashboard|        - "traefik.http.routers.api.entrypoints=webhttps"
+#:dashboard|#:client-ssl|        - "traefik.http.routers.api.tls.options=sslVerifyClient@file"
+#:dashboard|        - "traefik.http.routers.api.tls.certresolver=le"
+#:dashboard|        - "traefik.http.routers.api.service=api@internal"
 
 networks:
   external_network:
