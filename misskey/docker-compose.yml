@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-misskey/misskey:12.47.0}
+    image: ${DEPLOY_IMAGE_WEB:-misskey/misskey:13.13.2}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
@@ -37,7 +37,7 @@ services:
         - "traefik.http.services.${DEPLOY_STACK_NAME:-misskey}.loadbalancer.server.port=3000"
 
   redis:
-    image: ${DEPLOY_IMAGE_REDIS:-redis:4.0-alpine}
+    image: ${DEPLOY_IMAGE_REDIS:-redis:6.2.0-alpine}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_REDIS}
     networks:
