@@ -89,11 +89,6 @@ configs:
     template_driver: golang
 
 volumes:
-  config:
-    driver_opts:
-      type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
-      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-misskey}/config"
   files:
     driver_opts:
       type: "nfs"
