@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-nextcloud:20-apache}
+    image: ${DEPLOY_IMAGE_WEB:-nextcloud:27-apache}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
@@ -26,6 +26,7 @@ services:
       - data:/var/www/html/data
       - config:/var/www/html/config
       - custom_apps:/var/www/html/custom_apps
+      - themes:/var/www/html/themes
 #:media |      - media:/media
 #:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
     deploy:
@@ -81,6 +82,11 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-nextcloud}/custom_apps"
+  themes:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-nextcloud}/themes"
   db:
     driver_opts:
       type: "nfs"
