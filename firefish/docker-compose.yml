@@ -1,0 +1,106 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-registry.joinfirefish.org/firefish/firefish:v1.0.3}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
+    environment:
+      BASE_URL: https://${DEPLOY_SUBDOMAIN:-firefish}.${DEPLOY_HOSTNAME}
+    networks:
+      - internal_network
+      - external_network
+    volumes:
+      - files:/firefish/files
+    configs:
+      - source: firefish-config
+        target: /firefish/.config/default.yml
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-firefish}.rule=Host(`${DEPLOY_SUBDOMAIN:-firefish}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-firefish}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-firefish}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-firefish}.loadbalancer.server.port=3000"
+
+  redis:
+    image: ${DEPLOY_IMAGE_REDIS:-redis:7.0-alpine}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_REDIS}
+    networks:
+      - internal_network
+    volumes:
+      - redis:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
+
+  db:
+    image: ${DEPLOY_IMAGE_DB:-postgres:12.2-alpine}
+    environment:
+      - POSTGRES_PASSWORD=firefish
+      - POSTGRES_USER=firefish
+      - POSTGRES_DB=firefish
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+#  es:
+#    image: ${DEPLOY_IMAGE_ES:-docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.2}
+##:log |    logging: *loki-logging
+##:env |    env_file: ${DEPLOY_ENV_ES}
+#    environment:
+#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#    networks:
+#      - internal_network
+#    volumes:
+#      - ./elasticsearch:/usr/share/elasticsearch/data
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+    external: true
+
+configs:
+  firefish-config:
+    file: ${DEPLOY_CONFIG_MISSKEY:-config/firefish.yml}
+    template_driver: golang
+
+volumes:
+  files:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-firefish}/files"
+  redis:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-firefish}/redis"
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-firefish}/db"
