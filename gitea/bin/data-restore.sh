@@ -1,25 +1,25 @@
 #!/bin/sh
 
 # Default Params
-TEMPLATE_NAME="$(basename $(realpath $(dirname $0)/..))"
+TEMPLATE_NAME="$(basename "$(realpath "$(dirname "$0")/..")")"
 if [ -n "$DEPLOY_BACKUP_ROOT" ]; then
     DEFAULT_BACKUP_PATH="$DEPLOY_BACKUP_ROOT/$TEMPLATE_NAME"
 else
-    DEFAULT_BACKUP_PATH="$(realpath $(dirname $0)/../backup)"
+    DEFAULT_BACKUP_PATH="$(realpath "$(dirname "$0")/../backup")"
 fi
 
 # Display Help Information
 if [ "$1" = "-h" -o "$1" = "--help" -o -z "$*" ]; then
-    printf 'Usage: %s <profile> <backup_file =$BACKUP_FILE>\n' "$(basename $0)"
+    printf 'Usage: %s <profile> <backup_file =$BACKUP_FILE>\n' "$(basename "$0")"
     printf '       %s <profile> <backup_id =$BACKUP_ID>\n\t\t       [backup_path =$BACKUP_PATH default=%s]\n' \
-        "$(basename $0)" \
+        "$(basename "$0")" \
         "$DEFAULT_BACKUP_PATH"
     exit 0
 fi
 
 ## Restore Begin ##
 
-. $(dirname $0)/lib.sh
+. "$(dirname "$0")/lib.sh"
 
 printf 'Restoring stack %s...\n' "$DEPLOY_STACK_NAME"
 
@@ -42,10 +42,10 @@ printf '  done\n'
 
 printf '  Checking file... '
 if [ -n "$BACKUP_ID" ]; then
-    BACKUP_FILE=$(find "$BACKUP_PATH" -type f -name "*$BACKUP_ID*" \
+    BACKUP_FILE="$(find "$BACKUP_PATH" -type f -name "*$BACKUP_ID*" \
         | grep -E '^.*\.(tar\.gz|tar|gz|tgz)$' \
-        | grep -Ev '^.*.config\.(tar\.gz|tar|gz|tgz)$') 2>/dev/null
-    COUNT=$(echo "$BACKUP_FILE" | wc -l)
+        | grep -Ev '^.*.config\.(tar\.gz|tar|gz|tgz)$')" 2>/dev/null
+    COUNT="$(echo "$BACKUP_FILE" | wc -l)"
     if [ -z "$BACKUP_FILE" ]; then
         printf 'not found\n'
         exit 1
@@ -58,7 +58,7 @@ if [ -n "$BACKUP_ID" ]; then
         echo "$BACKUP_FILE" | cat -n | expand -t1 | tr -s '[:space:]' | sed 's/^/   /g'
         read -p "  Which one? [1-$COUNT] " input
         [ "$input" -le "$COUNT" -a "$input" -gt '0' ] 2>/dev/null || exit 0
-        BACKUP_FILE=$(echo "$BACKUP_FILE" | head -n ${input} | tail -n1) 2>/dev/null
+        BACKUP_FILE="$(echo "$BACKUP_FILE" | head -n "${input}" | tail -n1)" 2>/dev/null
         [ -z "$BACKUP_FILE" ] && exit 0
     fi
 else
@@ -100,7 +100,7 @@ docker run --rm \
     alpine:3 sh -c "
     if [ ! -d '/data/$DEPLOY_STACK_NAME' ]; then
       mkdir '/data/$DEPLOY_STACK_NAME'
-      tar -zxpf /backup.tgz -C /data/$DEPLOY_STACK_NAME
+      tar -zxpf /backup.tgz -C "/data/$DEPLOY_STACK_NAME"
       printf 'ok\n'
     else
       printf 'exists, interrupted\n'

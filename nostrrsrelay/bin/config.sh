@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $(dirname $0)/lib.sh
+. "$(dirname "$0")/lib.sh"
 
 cat docker-compose.yml | {
     if [ -n "$DEPLOY_ENABLED_FEATURE" ]; then
