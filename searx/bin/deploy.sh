@@ -1,12 +1,12 @@
 #!/bin/sh
 
-. $(dirname $0)/lib.sh
+. "$(dirname "$0")/lib.sh"
 
 # Show Deploy Info
 printf '+ %s\n' "./bin/info.sh $PROFILE"
 printf '========================================'
 printf '========================================\n'
-./bin/info.sh $PROFILE 2>&1
+./bin/info.sh "$PROFILE" 2>&1
 printf '========================================'
 printf '========================================\n'
 
@@ -49,10 +49,10 @@ if [ -d './var' ]; then
         "$DEPLOY_STACK_NAME"
     docker run --rm \
         -v tmp_volume:/data \
-        -v $(realpath ./var):/template \
+        -v "$(realpath ./var)":/template \
         alpine:3 sh -c "
         if [ ! -d '/data/$DEPLOY_STACK_NAME' ]; then
-          cp -Ta /template /data/$DEPLOY_STACK_NAME
+          cp -Ta /template '/data/$DEPLOY_STACK_NAME'
           printf 'ok\n'
         else
           printf 'skipped\n'
@@ -61,7 +61,7 @@ if [ -d './var' ]; then
 
     printf '  Cleaning gitkeep file in data dir... '
     docker run --rm -v tmp_volume:/data alpine:3 \
-        sh -c "rm -f /data/$DEPLOY_STACK_NAME/*/.gitkeep" \
+        sh -c "rm -f '/data/$DEPLOY_STACK_NAME/*/.gitkeep'" \
         && printf 'ok\n' \
         || exit 1
 
@@ -76,7 +76,7 @@ fi
 printf 'Initing stack with bin/init.sh... '
 if [ -x "./bin/init.sh" ]; then
     printf '\n' 
-    ./bin/init.sh $PROFILE 2>&1 | sed 's/^/  /g' || exit 1
+    ./bin/init.sh "$PROFILE" 2>&1 | sed 's/^/  /g' || exit 1
 else
     printf 'skipped\n'
 fi

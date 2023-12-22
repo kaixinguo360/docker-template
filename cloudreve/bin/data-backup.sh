@@ -1,18 +1,18 @@
 #!/bin/sh
 
 # Default Params
-TEMPLATE_NAME="$(basename $(realpath $(dirname $0)/..))"
-TEMPLATE_PATH="$(realpath $(dirname $0)/..)"
+TEMPLATE_NAME="$(basename "$(realpath "$(dirname "$0")/..")")"
+TEMPLATE_PATH="$(realpath "$(dirname "$0")/..")"
 if [ -n "$DEPLOY_BACKUP_ROOT" ]; then
     DEFAULT_BACKUP_PATH="$DEPLOY_BACKUP_ROOT/$TEMPLATE_NAME"
 else
-    DEFAULT_BACKUP_PATH="$(realpath $(dirname $0)/../backup)"
+    DEFAULT_BACKUP_PATH="$(realpath "$(dirname "$0")/../backup")"
 fi
 
 # Display Help Information
 if [ "$1" = "-h" -o "$1" = "--help" -o -z "$*" ]; then
     printf 'Usage: %s <profile> <backup_message =$BACKUP_MSG>\n\t\t      [backup_path =$BACKUP_PATH default=%s]\n\t\t      [backup_time =$BACKUP_TIME default=$(date "%s")]\n' \
-        "$(basename $0)" \
+        "$(basename "$0")" \
         "$DEFAULT_BACKUP_PATH" \
         "+%Y-%m-%d_%H-%M-%S"
     exit 0
@@ -20,7 +20,7 @@ fi
 
 ## Backup Begin ##
 
-. $(dirname $0)/lib.sh
+. "$(dirname "$0")/lib.sh"
 
 printf 'Backuping stack %s...\n' "$DEPLOY_STACK_NAME"
 
@@ -72,9 +72,9 @@ else
         cd "/data/$DEPLOY_STACK_NAME" \
             && printf '    Packaging... ' \
             && tar -zcpf /tmp/backup.tgz * \
-            && printf '%s\n' \$(du -h /tmp/backup.tgz|awk '{print \$1}') \
+            && printf '%s\n' "\$(du -h /tmp/backup.tgz|awk '{print \$1}')" \
             && printf '    Generating ID... ' \
-            && ID=\$(md5sum /tmp/backup.tgz|awk '{print \$1}'|head -c 7) \
+            && ID="\$(md5sum /tmp/backup.tgz|awk '{print \$1}'|head -c 7)" \
             && printf '%s\n' "\$ID" \
             && printf '    Archiving... ' \
             && BACKUP_NAME="${DEPLOY_STACK_NAME}_[$BACKUP_TIME]_[\$ID]_[$BACKUP_MSG].data.tgz" \
@@ -91,21 +91,21 @@ HERE
     printf '  done\n'
 fi
 
-printf "  Backuping config from %s... " $(realpath $TEMPLATE_PATH)
+printf "  Backuping config from %s... " "$(realpath "$TEMPLATE_PATH")"
 if [ -n "$SKIP" -a -n "$(echo "$SKIP"|grep -E 'config|C')" ]; then
     printf 'skipped\n'
 else
     printf '\n'
     docker run --rm -i \
-        -v "$(dirname $TEMPLATE_PATH)":/data \
+        -v "$(dirname "$TEMPLATE_PATH")":/data \
         -v "$BACKUP_PATH":/backup \
         alpine:3 sh << HERE || exit 1
         cd /data \
             && printf '    Packaging... ' \
             && tar -zcpf /tmp/backup.tgz "$TEMPLATE_NAME" \
-            && printf '%s\n' \$(du -h /tmp/backup.tgz|awk '{print \$1}') \
+            && printf '%s\n' "\$(du -h /tmp/backup.tgz|awk '{print \$1}')" \
             && printf '    Generating ID... ' \
-            && ID=\$(md5sum /tmp/backup.tgz|awk '{print \$1}'|head -c 7) \
+            && ID="\$(md5sum /tmp/backup.tgz|awk '{print \$1}'|head -c 7)" \
             && printf '%s\n' "\$ID" \
             && printf '    Archiving... ' \
             && BACKUP_NAME="${DEPLOY_STACK_NAME}_[${BACKUP_TIME}]_[\${ID}]_[${BACKUP_MSG}].config.tgz" \

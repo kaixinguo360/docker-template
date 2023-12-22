@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $(dirname $0)/lib.sh
+. "$(dirname "$0")/lib.sh"
 
 cat << HERE
 # Use \`info.sh > deploy.env\` to save current config as default profile
