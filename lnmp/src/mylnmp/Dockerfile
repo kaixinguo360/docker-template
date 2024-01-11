@@ -1,4 +1,4 @@
-FROM php:7.2-fpm-alpine
+FROM php:8.3-fpm-alpine
 
 # Plugin
 RUN docker-php-ext-install \
@@ -16,9 +16,9 @@ COPY php-dev.ini php-prod.ini "$PHP_INI_DIR/"
 RUN apk add --no-cache \
         nginx \
         socat \
-    && mkdir /run/nginx \
-    && mkdir /etc/nginx/conf.ext
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+    && mkdir -p /run/nginx \
+    && mkdir -p /etc/nginx/conf.ext
+COPY nginx.conf /etc/nginx/http.d/default.conf
 EXPOSE 80
 WORKDIR /var/www
 
