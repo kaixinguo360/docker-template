@@ -26,9 +26,9 @@ else
 fi
 
 [ -f './nginx.conf' ] \
-    && replace ./nginx.conf /etc/nginx/conf.d/default.conf
+    && replace ./nginx.conf /etc/nginx/http.d/default.conf
 [ -d './nginx.conf.d' ] \
-    && replace ./nginx.conf.d /etc/nginx/conf.d
+    && replace ./nginx.conf.d /etc/nginx/http.d
 [ -d './nginx.ext' ] \
     && replace ./nginx.ext /etc/nginx/conf.ext
 [ -d './nginx' ] \
