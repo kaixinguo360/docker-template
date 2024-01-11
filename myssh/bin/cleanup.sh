@@ -21,7 +21,7 @@ fi
 ## Cleanup Begin ##
 
 printf 'Cleaning data volume... '
-if [ -d './var' ]; then
+if [ -d './volume' ]; then
     printf '\n' 
 
     printf '  Preparing tmp volume... '

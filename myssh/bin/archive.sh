@@ -26,13 +26,13 @@ BACKUP_MSG="${1:-${BACKUP_MSG:-archive}}"
 ## Archive Begin ##
 
 printf 'Archiving data... '
-if [ -d './var' ]; then
+if [ -d './volume' ]; then
     printf '\n' 
 
     #./bin/data-backup.sh "$PROFILE" "$BACKUP_MSG" 2>&1 | sed 's/^/  /g' || exit 1
 
     printf '  Cleaning volume... '
-    if [ -d './var' ]; then
+    if [ -d './volume' ]; then
         printf '\n' 
 
         printf '    Preparing tmp volume... '
