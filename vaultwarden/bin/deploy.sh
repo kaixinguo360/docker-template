@@ -22,7 +22,7 @@ esac
 ## Deploy Begin ##
 
 printf 'Initing data volume... '
-if [ -d './var' ]; then
+if [ -d './volume' ]; then
     printf '\n' 
 
     printf '  Preparing tmp volume... '
@@ -49,7 +49,7 @@ if [ -d './var' ]; then
         "$DEPLOY_STACK_NAME"
     docker run --rm \
         -v tmp_volume:/data \
-        -v "$(realpath ./var)":/template \
+        -v "$(realpath ./volume)":/template \
         alpine:3 sh -c "
         if [ ! -d '/data/$DEPLOY_STACK_NAME' ]; then
           cp -Ta /template '/data/$DEPLOY_STACK_NAME'
