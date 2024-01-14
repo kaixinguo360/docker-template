@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   grafana:
-    image: ${DEPLOY_IMAGE_GRAFANA:-grafana/grafana:latest}
+    image: ${DEPLOY_IMAGE_GRAFANA:-grafana/grafana:10.2.2}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_GRAFANA}
 #:port|    ports:
@@ -25,19 +25,25 @@ services:
           - ${DEPLOY_NODE_GRAFANA:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-grafana}.rule=Host(`${DEPLOY_SUBDOMAIN:-grafana}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-grafana}.entrypoints=webhttps"
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-grafana}.tls.certresolver=le"
-        - "traefik.http.services.${DEPLOY_STACK_NAME:-grafana}.loadbalancer.server.port=3000"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_grafana.rule=Host(`${DEPLOY_SUBDOMAIN:-grafana}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_grafana.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_grafana.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-plg}_grafana.loadbalancer.server.port=3000"
 
   loki:
-    image: ${DEPLOY_IMAGE_LOKI:-grafana/loki:latest}
+    image: ${DEPLOY_IMAGE_LOKI:-grafana/loki:2.9.2}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_LOKI}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_LOKI:-3100}:3100
+    command: "-config.file=/etc/loki/config.yaml"
     networks:
       - external_network
+    volumes:
+      - loki:/loki
+    configs:
+      - source: loki-config
+        target: /etc/loki/config.yaml
     deploy:
       replicas: 1
       placement:
@@ -45,46 +51,69 @@ services:
           - ${DEPLOY_NODE_LOKI:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-loki}.rule=Host(`${DEPLOY_SUBDOMAIN:-loki}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-loki}.entrypoints=webhttps"
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-loki}.tls.certresolver=le"
-        - "traefik.http.services.${DEPLOY_STACK_NAME:-loki}.loadbalancer.server.port=3100"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_loki.rule=Host(`${DEPLOY_SUBDOMAIN:-loki}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_loki.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_loki.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-plg}_loki.loadbalancer.server.port=3100"
 
-  # Reference: https://github.com/mlabouardy/swarm-tig
-  influxdb:
-    image: ${DEPLOY_IMAGE_INFLUXDB:-influxdb:latest}
-#:log |    logging: *loki-logging
-#:env |    env_file: ${DEPLOY_ENV_INFLUXDB}
-    networks:
-      - external_network
-    deploy:
-      replicas: 1
-      placement:
-        constraints: 
-          - ${DEPLOY_NODE_INFLUXDB:-node.labels.ignore != true}
+#:promtail|  promtail:
+#:promtail|    image: grafana/promtail:2.9.0
+#:promtail|    entrypoint: [ "/bin/sh","-c" ]
+#:promtail|    command:
+#:promtail|      - |
+#:promtail|        export HOSTNAME=$$(cat /etc/hostname)
+#:promtail|        /usr/bin/promtail -config.file=/etc/promtail/config.yml -config.expand-env=true
+#:promtail|    networks:
+#:promtail|      - external_network
+#:promtail|    volumes:
+#:promtail|      - promtail:/promtail
+#:promtail|      - /var/log:/var/log:ro
+#:promtail|      - /etc/hostname:/etc/hostname:ro
+#:promtail|    configs:
+#:promtail|      - source: promtail-config
+#:promtail|        target: /etc/promtail/config.yml
+#:promtail|    deploy:
+#:promtail|      mode: global
 
-  telegraf:
-    image: ${DEPLOY_IMAGE_TELEGRF:-telegraf:latest}
-#:log |    logging: *loki-logging
-#:env |    env_file: ${DEPLOY_ENV_TELEGRF}
-    hostname: "{{.Node.Hostname}}"
-    networks:
-      - external_network
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    configs:
-      - source: telegraf-config
-        target: /etc/telegraf/telegraf.conf
-    deploy:
-      mode: global
+#:influxdb|  # Reference: https://github.com/mlabouardy/swarm-tig
+#:influxdb|  influxdb:
+#:influxdb|    image: ${DEPLOY_IMAGE_INFLUXDB:-influxdb:latest}
+#:influxdb|#:log |    logging: *loki-logging
+#:influxdb|#:env |    env_file: ${DEPLOY_ENV_INFLUXDB}
+#:influxdb|    networks:
+#:influxdb|      - external_network
+#:influxdb|    deploy:
+#:influxdb|      replicas: 1
+#:influxdb|      placement:
+#:influxdb|        constraints: 
+#:influxdb|          - ${DEPLOY_NODE_INFLUXDB:-node.labels.ignore != true}
+
+#:telegraf|  telegraf:
+#:telegraf|    image: ${DEPLOY_IMAGE_TELEGRF:-telegraf:latest}
+#:telegraf|#:log |    logging: *loki-logging
+#:telegraf|#:env |    env_file: ${DEPLOY_ENV_TELEGRF}
+#:telegraf|    hostname: "{{.Node.Hostname}}"
+#:telegraf|    networks:
+#:telegraf|      - external_network
+#:telegraf|    volumes:
+#:telegraf|      - /var/run/docker.sock:/var/run/docker.sock:ro
+#:telegraf|    configs:
+#:telegraf|      - source: telegraf-config
+#:telegraf|        target: /etc/telegraf/telegraf.conf
+#:telegraf|    deploy:
+#:telegraf|      mode: global
 
 networks:
   external_network:
     external: true
 
 configs:
-  telegraf-config:
-    file: ./config/telegraf.conf
+  loki-config:
+    file: ./config/loki-config.yaml
+#:promtail|  promtail-config:
+#:promtail|    file: ./config/promtail-config.yaml
+#:telegraf|  telegraf-config:
+#:telegraf|    file: ./config/telegraf.conf
 
 volumes:
   grafana:
@@ -92,3 +121,9 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-plg}/grafana"
+  loki:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-plg}/loki"
+#:promtail|  promtail:
