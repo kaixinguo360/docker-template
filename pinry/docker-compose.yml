@@ -49,8 +49,6 @@ volumes:
 #:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
 #:media |      device: ":$DEPLOY_MEDIA_ROOT"
 #:rclone|  rclone:
-#:rclone|    driver: "sapk/plugin-rclone:latest"
+#:rclone|    driver: "rclone"
 #:rclone|    driver_opts:
-#:rclone|      args: "--allow-root --allow-other --attr-timeout 60s --vfs-cache-mode full"
-#:rclone|      config: "$DEPLOY_RCLONE_CONFIG"
 #:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"
