@@ -24,8 +24,10 @@ services:
       #POSTGRES_PORT: 5432
       #LOG_SQL: 0 (1 for verbose SQL logs)
     networks:
-      - internal_network
-      - external_network
+      internal_network:
+      external_network:
+        aliases:
+          - ${DEPLOY_STACK_NAME:-szurubooru}_server
     configs:
       - source: szurubooru-config
         target: /opt/app/config.yaml
@@ -46,7 +48,7 @@ services:
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_CLIENT:-80}:80
     environment:
-      BACKEND_HOST: server
+      BACKEND_HOST: ${DEPLOY_STACK_NAME:-szurubooru}_server
       BASE_URL:
     networks:
       - internal_network
