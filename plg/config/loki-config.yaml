@@ -40,3 +40,18 @@ ruler:
 # If you would like to disable reporting, uncomment the following lines:
 analytics:
   reporting_enabled: false
+
+compactor:
+  # 启用日志删除功能
+  retention_enabled: true
+  # 指定 Compactor 定期检查更新过期表的间隔时间
+  compaction_interval: 10m
+  # 删除过期日志之前所暂停的时间间隔，简而言之，过期后多久删除
+  retention_delete_delay: 5m
+  # 删除表任务开启的 worker 服务的数量
+  retention_delete_worker_count: 150
+
+limits_config:
+  # 日志最大保留时间
+  retention_period: 90d
+
