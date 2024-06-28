@@ -1,0 +1,87 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-girlbossceo/conduwuit:v0.4.3-d875e0c1c00d8e42b83dd562c3945c077898746d}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8008}:8008
+    environment:
+      - CONDUIT_SERVER_NAME=${DEPLOY_SUBDOMAIN:-conduwuit}.${DEPLOY_HOSTNAME}
+      - CONDUWUIT_ADDRESS=0.0.0.0
+      - CONDUWUIT_DATABASE_PATH=/var/lib/conduwuit
+      - CONDUWUIT_DATABASE_BACKEND=rocksdb
+      - CONDUWUIT_PORT
+      - CONDUWUIT_MAX_REQUEST_SIZE
+      - CONDUWUIT_REGISTRATION_TOKEN
+      - CONDUWUIT_ALLOW_REGISTRATION
+      - CONDUWUIT_ALLOW_FEDERATION
+      - CONDUWUIT_ALLOW_CHECK_FOR_UPDATES
+      - CONDUWUIT_TRUSTED_SERVERS
+      #- CONDUWUIT_LOG='warn,state_res=warn'
+      #- CONDUWUIT_CONFIG='./conduwuit.toml' # Uncomment if you mapped config toml above
+    networks:
+      - external_network
+    volumes:
+      - data:/var/lib/conduwuit
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}.rule=Host(`${DEPLOY_SUBDOMAIN:-conduwuit}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-conduwuit}.loadbalancer.server.port=8008"
+
+  nginx:
+    image: ${DEPLOY_IMAGE_NGINX:-nginx:alpine}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_NGINX}
+    environment:
+      BASE_URL: https://${DEPLOY_SUBDOMAIN:-conduwuit}.${DEPLOY_HOSTNAME}
+      HOST: ${DEPLOY_SUBDOMAIN:-conduwuit}.${DEPLOY_HOSTNAME}
+    networks:
+      - external_network
+    configs:
+      - source: nginx-config
+        target: /etc/nginx/conf.d/default.conf
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_NGINX:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}_nginx.rule=Host(`${DEPLOY_SUBDOMAIN:-conduwuit}.${DEPLOY_HOSTNAME}`) && PathPrefix(`/.well-known`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}_nginx.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}_nginx.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}_nginx.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-conduwuit}_nginx.loadbalancer.server.port=80"
+
+networks:
+  external_network:
+    external: true
+
+configs:
+  nginx-config:
+    file: ${DEPLOY_CONFIG_PROXY:-config/nginx-site.conf}
+    template_driver: golang
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-conduwuit}/data"
