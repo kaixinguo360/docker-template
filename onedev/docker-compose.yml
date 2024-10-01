@@ -1,0 +1,47 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-1dev/server:11.0.9}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+    ports:
+      - ${DEPLOY_PORT_SSH:-6611}:6611
+#:port|      - ${DEPLOY_PORT_WEB:-6610}:6610
+    environment:
+      initial_server_url: https://${DEPLOY_SUBDOMAIN:-onedev}.${DEPLOY_HOSTNAME}
+      initial_ssh_root_url: ssh://${DEPLOY_SUBDOMAIN:-onedev}.${DEPLOY_HOSTNAME}:${DEPLOY_PORT_SSH:-6611}
+    networks:
+      - external_network
+    volumes:
+      - data:/opt/onedev
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-onedev}.rule=Host(`${DEPLOY_SUBDOMAIN:-onedev}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-onedev}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-onedev}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-onedev}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-onedev}.loadbalancer.server.port=6610"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-onedev}/data"
