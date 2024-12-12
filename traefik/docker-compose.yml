@@ -9,11 +9,14 @@ x-logging: &loki-logging
 
 services:
   proxy:
-    image: ${DEPLOY_IMAGE_PROXY:-traefik:v2.3}
+    image: ${DEPLOY_IMAGE_PROXY:-traefik:v2.11}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_PROXY}
     command:
       - "--configFile=/config/traefik.yml"
+      # 关闭匿名数据收集
+      - "--global.sendanonymoususage=false"
+      - "--global.checknewversion=false"
     ports:
       - target: 80
         published: ${DEPLOY_PORT_HTTP:-80}
