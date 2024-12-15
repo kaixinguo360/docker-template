@@ -16,6 +16,9 @@ services:
 #:port|      - ${DEPLOY_PORT_REGISTORY:-5000}:5000
     networks:
       - external_network
+    configs:
+      - source: registry-config
+        target: /etc/docker/registry/config.yml
     volumes:
       - data:/var/lib/registry
     deploy:
@@ -56,6 +59,11 @@ services:
 networks:
   external_network:
     external: true
+
+configs:
+  registry-config:
+    file: ${DEPLOY_CONFIG_REGISTRY:-config/config.yml}
+    template_driver: golang
 
 volumes:
   data:
