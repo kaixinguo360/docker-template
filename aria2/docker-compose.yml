@@ -40,11 +40,19 @@ services:
       options:          #!log
         max-size: 1m    #!log
     ports:
-      - ${DEPLOY_PORT_ARIA2_BT:-6888}:6888/tcp
-      - ${DEPLOY_PORT_ARIA2_BT:-6888}:6888/udp
+      - ${DEPLOY_PORT_ARIA2_BT:-6888}:${DEPLOY_PORT_ARIA2_BT:-6888}/tcp
+      - ${DEPLOY_PORT_ARIA2_BT:-6888}:${DEPLOY_PORT_ARIA2_BT:-6888}/udp
+#      - target: ${DEPLOY_PORT_ARIA2_BT:-6888}
+#        published: ${DEPLOY_PORT_ARIA2_BT:-6888}
+#        protocol: udp
+#        mode: host
+#      - target: ${DEPLOY_PORT_ARIA2_BT:-6888}
+#        published: ${DEPLOY_PORT_ARIA2_BT:-6888}
+#        protocol: tcp
+#        mode: host
 #:port|      - ${DEPLOY_PORT_ARIA2_RPC:-6800}:6800
     environment:
-      - LISTEN_PORT=6888
+      - LISTEN_PORT=${DEPLOY_PORT_ARIA2_BT:-6888}
       - RPC_PORT=6800
       - RPC_SECRET=${RPC_SECRET:-aria2}
       - PUID
