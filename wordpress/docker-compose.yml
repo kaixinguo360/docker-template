@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-wordpress:5-apache}
+    image: ${DEPLOY_IMAGE_WEB:-wordpress:php8.3}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
