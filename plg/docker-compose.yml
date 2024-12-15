@@ -85,6 +85,11 @@ services:
 #:promtail|      - external_network
 #:influxdb|    volumes:
 #:influxdb|      - influxdb:/var/lib/influxdb2
+#:influxdb|    configs:
+#:influxdb|      - source: influxdb-config
+#:influxdb|        target: /etc/influxdb2/config.toml
+#:influxdb|        uid: '1000'
+#:influxdb|        gid: '1000'
 #:influxdb|    deploy:
 #:influxdb|      replicas: 1
 #:influxdb|      placement:
@@ -131,6 +136,8 @@ configs:
 #:promtail|    file: ${DEPLOY_CONFIG_PROMTAIL:-config/promtail-config.yaml}
 #:telegraf|  telegraf-config:
 #:telegraf|    file: ${DEPLOY_CONFIG_TELEGRAF:-config/telegraf.conf}
+#:influxdb|  influxdb-config:
+#:influxdb|    file: ${DEPLOY_CONFIG_INFLUXDB:-config/influxdb.toml}
 
 volumes:
   grafana:
