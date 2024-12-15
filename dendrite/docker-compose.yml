@@ -1,0 +1,85 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-matrixdotorg/dendrite-monolith:v0.13.7}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8008}:8008
+    command: '--really-enable-open-registration'
+    environment:
+      - SERVER_NAME=${DEPLOY_SUBDOMAIN:-dendrite}.${DEPLOY_HOSTNAME}
+      - BASE_URL=https://${DEPLOY_SUBDOMAIN:-dendrite}.${DEPLOY_HOSTNAME}
+      - DB_HOST=db
+      - DB_USER=dendrite
+      - DB_PASSWORD=dendrite
+      - DB_DATABASE=dendrite
+      - APP_REGISTRATION_DISABLED=${APP_REGISTRATION_DISABLED:-true}
+      - APP_REGISTRATION_SHARED_SECRET
+    networks:
+      - internal_network
+      - external_network
+    configs:
+      - source: dendrite-config
+        target: /etc/dendrite/dendrite.yaml
+    volumes:
+      - data:/var/dendrite
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-dendrite}.rule=Host(`${DEPLOY_SUBDOMAIN:-dendrite}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-dendrite}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-dendrite}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-dendrite}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-dendrite}.loadbalancer.server.port=8008"
+
+  db:
+    image: ${DEPLOY_IMAGE_DB:-postgres:12.2-alpine}
+    environment:
+      - POSTGRES_DB=dendrite
+      - POSTGRES_USER=dendrite
+      - POSTGRES_PASSWORD=dendrite
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  internal_network:
+   internal: true
+  external_network:
+    external: true
+
+configs:
+  dendrite-config:
+    file: ${DEPLOY_CONFIG_DENDRITE:-config/dendrite.yaml}
+    template_driver: golang
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-dendrite}/data"
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-dendrite}/db"
