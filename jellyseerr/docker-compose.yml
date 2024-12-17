@@ -177,6 +177,33 @@ services:
 #:jproxy|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jproxy.tls.certresolver=le"
 #:jproxy|        - "traefik.http.services.${DEPLOY_STACK_NAME:-jellyseerr}-jproxy.loadbalancer.server.port=8117"
 
+#:prowlarr|  prowlarr:
+#:prowlarr|    image: ${DEPLOY_IMAGE_PROWLARR:-linuxserver/prowlarr:1.27.0}
+#:prowlarr|#:log |    logging: *loki-logging
+#:prowlarr|#:env |    env_file: ${DEPLOY_ENV_PROWLARR}
+#:prowlarr|#:port|    ports:
+#:prowlarr|#:port|      - ${DEPLOY_PORT_PROWLARR:-9696}:9696
+#:prowlarr|    environment:
+#:prowlarr|      - PUID=1000
+#:prowlarr|      - PGID=1000
+#:prowlarr|      - TZ=Asia/Shanghai
+#:prowlarr|    networks:
+#:prowlarr|      - external_network
+#:prowlarr|    volumes:
+#:prowlarr|      - prowlarr:/config
+#:prowlarr|    deploy:
+#:prowlarr|      replicas: 1
+#:prowlarr|      placement:
+#:prowlarr|        constraints: 
+#:prowlarr|          - ${DEPLOY_NODE_PROWLARR:-node.labels.ignore != true}
+#:prowlarr|      labels:
+#:prowlarr|        - "traefik.enable=true" #!no-proxy
+#:prowlarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.rule=Host(`${DEPLOY_SUBDOMAIN_PROWLARR:-prowlarr}.${DEPLOY_HOSTNAME}`)"
+#:prowlarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.entrypoints=webhttps"
+#:prowlarr|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.tls.options=sslVerifyClient@file"
+#:prowlarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.tls.certresolver=le"
+#:prowlarr|        - "traefik.http.services.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.loadbalancer.server.port=9696"
+
 networks:
   external_network:
     external: true
@@ -207,6 +234,11 @@ volumes:
 #:jproxy|      type: "nfs"
 #:jproxy|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
 #:jproxy|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/jproxy"
+#:prowlarr|  prowlarr:
+#:prowlarr|    driver_opts:
+#:prowlarr|      type: "nfs"
+#:prowlarr|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:prowlarr|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/prowlarr"
 #:media |  media:
 #:media |    driver_opts:
 #:media |      type: "nfs"
