@@ -26,7 +26,7 @@ services:
       - config:/cloudreve/config
       - db:/cloudreve/db
       - avatar:/Cloudreve/avatar
-#:media |      - media:/media
+#:media |      - media:$DEPLOY_MEDIA_MOUNT
 #:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
     deploy:
       replicas: 1

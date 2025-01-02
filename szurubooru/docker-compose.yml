@@ -33,7 +33,7 @@ services:
         target: /opt/app/config.yaml
     volumes:
       - data:/data
-#:media |      - media:/media
+#:media |      - media:$DEPLOY_MEDIA_MOUNT
 #:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
     deploy:
       replicas: 1
