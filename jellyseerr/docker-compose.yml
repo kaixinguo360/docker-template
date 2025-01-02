@@ -21,7 +21,7 @@ services:
     volumes:
       - jellyseerr:/app/config
 #:media |      - media:/media
-#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
     deploy:
       replicas: 1
       placement:
@@ -50,7 +50,7 @@ services:
 #:radarr|    volumes:
 #:radarr|      - radarr:/config
 #:radarr|#:media |      - media:/media
-#:radarr|#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+#:radarr|#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
 #:radarr|    deploy:
 #:radarr|      replicas: 1
 #:radarr|      placement:
@@ -79,7 +79,7 @@ services:
 #:sonarr|    volumes:
 #:sonarr|      - sonarr:/config
 #:sonarr|#:media |      - media:/media
-#:sonarr|#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+#:sonarr|#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
 #:sonarr|    deploy:
 #:sonarr|      replicas: 1
 #:sonarr|      placement:
@@ -109,7 +109,7 @@ services:
 #:jackett|    volumes:
 #:jackett|      - jackett:/config
 #:jackett|#:media |      - media:/media
-#:jackett|#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+#:jackett|#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
 #:jackett|    deploy:
 #:jackett|      replicas: 1
 #:jackett|      placement:

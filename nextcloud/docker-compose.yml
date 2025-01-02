@@ -28,7 +28,7 @@ services:
       - custom_apps:/var/www/html/custom_apps
       - themes:/var/www/html/themes
 #:media |      - media:/media
-#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
     deploy:
       replicas: 1
       placement:

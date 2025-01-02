@@ -23,7 +23,7 @@ services:
         source: /etc/timezone
         target: /etc/timezone
         read_only: true
-#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
     deploy:
       replicas: 1
       placement:

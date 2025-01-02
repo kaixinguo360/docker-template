@@ -87,7 +87,7 @@ services:
       - data:/photoprism/storage
       - library:/photoprism/originals
 #:media |      - media:/media
-#:rclone|      - rclone:$DEPLOY_RCLONE_LOCAL
+#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
 
     deploy:
       replicas: 1
