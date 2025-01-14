@@ -8,28 +8,6 @@ x-logging: &loki-logging
       loki-batch-size: 400
 
 services:
-  web:
-    image: ${DEPLOY_IMAGE_WEB:-p3terx/ariang:latest}
-    command: --port 80
-#:log |    logging: *loki-logging
-#:env |    env_file: ${DEPLOY_ENV_WEB}
-#:port|    ports:
-#:port|      - ${DEPLOY_PORT_WEB:-80}:80
-    networks:
-      - external_network
-    deploy:
-      replicas: 1
-      placement:
-        constraints: 
-          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
-      labels:
-        - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.rule=Host(`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}`)"
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.entrypoints=webhttps"
-#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.options=sslVerifyClient@file"
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.certresolver=le"
-        - "traefik.http.services.${DEPLOY_STACK_NAME:-aria2}_aria2.loadbalancer.server.port=80"
-
   aria2:
     # Reference: https://p3terx.com/archives/docker-aria2-pro.html
     image: ${DEPLOY_IMAGE_ARIA2:-p3terx/aria2-pro:latest}
@@ -40,16 +18,16 @@ services:
       options:          #!log
         max-size: 1m    #!log
     ports:
-      - ${DEPLOY_PORT_ARIA2_BT:-6888}:${DEPLOY_PORT_ARIA2_BT:-6888}/tcp
-      - ${DEPLOY_PORT_ARIA2_BT:-6888}:${DEPLOY_PORT_ARIA2_BT:-6888}/udp
-#      - target: ${DEPLOY_PORT_ARIA2_BT:-6888}
-#        published: ${DEPLOY_PORT_ARIA2_BT:-6888}
-#        protocol: udp
-#        mode: host
-#      - target: ${DEPLOY_PORT_ARIA2_BT:-6888}
-#        published: ${DEPLOY_PORT_ARIA2_BT:-6888}
-#        protocol: tcp
-#        mode: host
+      - ${DEPLOY_PORT_ARIA2_BT:-6888}:${DEPLOY_PORT_ARIA2_BT:-6888}/tcp #!host
+      - ${DEPLOY_PORT_ARIA2_BT:-6888}:${DEPLOY_PORT_ARIA2_BT:-6888}/udp #!host
+#:host|      - target: ${DEPLOY_PORT_ARIA2_BT:-6888}
+#:host|        published: ${DEPLOY_PORT_ARIA2_BT:-6888}
+#:host|        protocol: udp
+#:host|        mode: host
+#:host|      - target: ${DEPLOY_PORT_ARIA2_BT:-6888}
+#:host|        published: ${DEPLOY_PORT_ARIA2_BT:-6888}
+#:host|        protocol: tcp
+#:host|        mode: host
 #:port|      - ${DEPLOY_PORT_ARIA2_RPC:-6800}:6800
     environment:
       - LISTEN_PORT=${DEPLOY_PORT_ARIA2_BT:-6888}
@@ -68,8 +46,7 @@ services:
       - external_network
     volumes:
       - config:/config
-      - download:/downloads #!media_download
-#:media_download|      - media_download:/downloads
+      - download:/downloads
 #:media |      - media:$DEPLOY_MEDIA_MOUNT
 #:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
     deploy:
@@ -84,7 +61,29 @@ services:
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-aria2}_web.loadbalancer.server.port=6800"
- 
+
+#:webui|  web:
+#:webui|    image: ${DEPLOY_IMAGE_WEB:-p3terx/ariang:latest}
+#:webui|    command: --port 80
+#:webui|#:log |    logging: *loki-logging
+#:webui|#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:webui|#:port|    ports:
+#:webui|#:port|      - ${DEPLOY_PORT_WEB:-80}:80
+#:webui|    networks:
+#:webui|      - external_network
+#:webui|    deploy:
+#:webui|      replicas: 1
+#:webui|      placement:
+#:webui|        constraints: 
+#:webui|          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+#:webui|      labels:
+#:webui|        - "traefik.enable=true" #!no-proxy
+#:webui|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.rule=Host(`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}`)"
+#:webui|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.entrypoints=webhttps"
+#:webui|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.options=sslVerifyClient@file"
+#:webui|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.certresolver=le"
+#:webui|        - "traefik.http.services.${DEPLOY_STACK_NAME:-aria2}_aria2.loadbalancer.server.port=80"
+
 networks:
   external_network:
     external: true
@@ -100,11 +99,6 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-aria2}/config"
-#:media_download|  media_download:
-#:media_download|    driver_opts:
-#:media_download|      type: "nfs"
-#:media_download|      o: "addr=$DEPLOY_MEDIA_DOWNLOAD_HOST,nolock,soft,rw"
-#:media_download|      device: ":$DEPLOY_MEDIA_DOWNLOAD_ROOT"
 #:media |  media:
 #:media |    driver_opts:
 #:media |      type: "nfs"
