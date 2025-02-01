@@ -82,7 +82,7 @@ services:
 #:influxdb|#:log |    logging: *loki-logging
 #:influxdb|#:env |    env_file: ${DEPLOY_ENV_INFLUXDB}
 #:influxdb|    networks:
-#:promtail|      - external_network
+#:influxdb|      - external_network
 #:influxdb|    volumes:
 #:influxdb|      - influxdb:/var/lib/influxdb2
 #:influxdb|    configs:
