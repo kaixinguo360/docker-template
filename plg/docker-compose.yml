@@ -91,6 +91,9 @@ services:
 #:influxdb|        uid: '1000'
 #:influxdb|        gid: '1000'
 #:influxdb|    deploy:
+#:influxdb|#:influxdb-mem-limit|      resources:
+#:influxdb|#:influxdb-mem-limit|        limits:
+#:influxdb|#:influxdb-mem-limit|           memory: '${DEPLOY_INFLUXDB_MEM_LIMIT:-512M}'
 #:influxdb|      replicas: 1
 #:influxdb|      placement:
 #:influxdb|        constraints: 
