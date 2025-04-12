@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-linuxserver/bookstack:22.04.2}
+    image: ${DEPLOY_IMAGE_WEB:-linuxserver/bookstack:25.02.2}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
@@ -18,9 +18,10 @@ services:
       - PUID=1000
       - PGID=1000
       - APP_URL=https://${DEPLOY_SUBDOMAIN:-bookstack}.${DEPLOY_HOSTNAME} #!no-proxy
+      - APP_KEY=${APP_KEY:-base64:U1uOncMxtTjGmBAckpAXG5wCYnfEf9v2VC78nk95qqo=}
       - DB_HOST=db
-      - DB_USER=bookstack
-      - DB_PASS=bookstack_password
+      - DB_USERNAME=bookstack
+      - DB_PASSWORD=bookstack_password
       - DB_DATABASE=bookstack
     networks:
       - external_network
