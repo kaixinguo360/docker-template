@@ -1,0 +1,103 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-ghcr.io/immich-app/immich-server:v1.132.3}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-2283}:2283
+    environment:
+      - TZ=Asia/Shanghai
+      - DB_HOSTNAME=db
+      - DB_DATABASE_NAME=immich
+      - DB_USERNAME=immich
+      - DB_PASSWORD=immich
+    networks:
+      - internal_network
+      - external_network
+    volumes:
+      - data:/usr/src/app/upload
+#:media |      - media:$DEPLOY_MEDIA_MOUNT
+#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-immich}.rule=Host(`${DEPLOY_SUBDOMAIN:-immich}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-immich}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-immich}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-immich}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-immich}.loadbalancer.server.port=2283"
+
+  db:
+    image: ${DEPLOY_IMAGE_DB:-tensorchord/pgvecto-rs:pg16-v0.3.0}
+    environment:
+      - POSTGRES_PASSWORD=immich
+      - POSTGRES_USER=immich
+      - POSTGRES_DB=immich
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+  redis:
+    image: ${DEPLOY_IMAGE_REDIS:-redis:7.0-alpine}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_REDIS}
+    networks:
+      - internal_network
+    volumes:
+      - redis:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-immich}/data"
+  redis:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-immich}/redis"
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-immich}/db"
+#:media |  media:
+#:media |    driver_opts:
+#:media |      type: "nfs"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      device: ":$DEPLOY_MEDIA_ROOT"
+#:rclone|  rclone:
+#:rclone|    driver: "rclone"
+#:rclone|    driver_opts:
+#:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"
