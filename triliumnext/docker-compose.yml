@@ -14,6 +14,8 @@ services:
 #:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
+    environment:
+      - TZ=Asia/Shanghai
     networks:
       - external_network
     volumes:
