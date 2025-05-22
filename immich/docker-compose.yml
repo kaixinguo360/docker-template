@@ -15,6 +15,7 @@ services:
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-2283}:2283
     environment:
+#:microservices|      - IMMICH_WORKERS_INCLUDE=api
       - TZ=Asia/Shanghai
       - DB_HOSTNAME=db
       - DB_DATABASE_NAME=immich
@@ -39,6 +40,26 @@ services:
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-immich}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-immich}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-immich}.loadbalancer.server.port=2283"
+
+#:microservices|  microservices:
+#:microservices|    image: ${DEPLOY_IMAGE_WEB:-ghcr.io/immich-app/immich-server:v1.132.3}
+#:microservices|#:log |    logging: *loki-logging
+#:microservices|#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:microservices|    environment:
+#:microservices|      - IMMICH_WORKERS_INCLUDE=microservices
+#:microservices|      - TZ=Asia/Shanghai
+#:microservices|      - DB_HOSTNAME=db
+#:microservices|      - DB_DATABASE_NAME=immich
+#:microservices|      - DB_USERNAME=immich
+#:microservices|      - DB_PASSWORD=immich
+#:microservices|    networks:
+#:microservices|      - internal_network
+#:microservices|    volumes:
+#:microservices|      - data:/usr/src/app/upload
+#:microservices|#:media |      - media:$DEPLOY_MEDIA_MOUNT
+#:microservices|#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
+#:microservices|    deploy:
+#:microservices|      mode: global
 
   db:
     image: ${DEPLOY_IMAGE_DB:-tensorchord/pgvecto-rs:pg16-v0.3.0}
