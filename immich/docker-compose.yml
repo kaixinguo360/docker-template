@@ -61,6 +61,26 @@ services:
 #:microservices|    deploy:
 #:microservices|      mode: global
 
+#:folder-album-creator|  folder-album-creator:
+#:folder-album-creator|    image: ${DEPLOY_IMAGE_FOLDER_ALBUM_CREATOR:-salvoxia/immich-folder-album-creator:0.18.5}
+#:folder-album-creator|    environment:
+#:folder-album-creator|      - API_URL=http://web:2283/api
+#:folder-album-creator|      - API_KEY=${APP_FOLDER_ALBUM_CREATOR_API_KEY?The API_KEY of folder album creator}
+#:folder-album-creator|      - ROOT_PATH=${APP_FOLDER_ALBUM_CREATOR_ROOT_PATH?The ROOT_PATH of folder album creator}
+#:folder-album-creator|      - CRON_EXPRESSION=${APP_FOLDER_ALBUM_CREATOR_CRON_EXPRESSION:-0 * * * *}
+#:folder-album-creator|      - TZ=Asia/Shanghai
+#:folder-album-creator|    networks:
+#:folder-album-creator|      - internal_network
+#:folder-album-creator|    volumes:
+#:folder-album-creator|      - data:/usr/src/app/upload
+#:folder-album-creator|#:media |      - media:$DEPLOY_MEDIA_MOUNT
+#:folder-album-creator|#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
+#:folder-album-creator|    deploy:
+#:folder-album-creator|      replicas: 1
+#:folder-album-creator|      placement:
+#:folder-album-creator|        constraints:
+#:folder-album-creator|          - ${DEPLOY_NODE_FOLDER_ALBUM_CREATOR:-node.labels.ignore != true}
+
   db:
     image: ${DEPLOY_IMAGE_DB:-tensorchord/pgvecto-rs:pg16-v0.3.0}
     environment:
@@ -74,7 +94,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: 
+        constraints:
           - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
 
   redis:
@@ -88,7 +108,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: 
+        constraints:
           - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
 
 networks:
