@@ -1,0 +1,27 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  tunnel:
+    image: ${DEPLOY_IMAGE_WEB:-cloudflare/cloudflared:latest}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+    command: tunnel --no-autoupdate run --token "${DEPLOY_TOKEN_CLOUDFLARE?}"
+    networks:
+      - external_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+
+networks:
+  external_network:
+    external: true
+
