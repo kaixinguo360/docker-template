@@ -46,7 +46,7 @@ services:
           - ${DEPLOY_NODE_PORTAINER:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.rule=Host(\`${DEPLOY_SUBDOMAIN:-portainer}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.rule=${DEPLOY_ROUTER_PORTAINER:-Host(\`${DEPLOY_SUBDOMAIN:-portainer}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-portainer}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-portainer}.loadbalancer.server.port=9000"

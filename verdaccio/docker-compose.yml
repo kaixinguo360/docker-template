@@ -27,7 +27,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-verdaccio}.rule=Host(\`${DEPLOY_SUBDOMAIN:-verdaccio}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-verdaccio}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-verdaccio}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-verdaccio}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-verdaccio}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-verdaccio}.tls.certresolver=le"

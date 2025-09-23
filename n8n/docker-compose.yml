@@ -33,7 +33,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-n8n}.rule=Host(\`${DEPLOY_SUBDOMAIN:-n8n}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-n8n}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-n8n}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-n8n}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-n8n}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-n8n}.tls.certresolver=le"

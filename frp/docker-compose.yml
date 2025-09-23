@@ -35,7 +35,7 @@ services:
       labels:
         - "traefik.enable=true" #!no-proxy
 
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.rule=Host(\`${DEPLOY_SUBDOMAIN:-frp}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-frp}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-frp}_dashboard.tls.certresolver=le"

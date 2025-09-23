@@ -36,7 +36,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.rule=Host(\`${DEPLOY_SUBDOMAIN:-lnmp}.${DEPLOY_HOSTNAME}\`)" #!custom-router-rule
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-lnmp}.${DEPLOY_HOSTNAME}\`)}" #!custom-router-rule
 #:custom-router-rule|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.rule=$DEPLOY_CUSTOM_ROUTER_RULE"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.entrypoints=webhttps" #!client-ssl
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-lnmp}.tls.options=sslVerifyClient@file"

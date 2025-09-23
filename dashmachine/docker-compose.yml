@@ -25,7 +25,7 @@ services:
         constraints: [node.role == manager]
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-dashmachine}.rule=Host(\`${DEPLOY_SUBDOMAIN:-dash}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-dashmachine}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-dash}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-dashmachine}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-dashmachine}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-dashmachine}.loadbalancer.server.port=5000"

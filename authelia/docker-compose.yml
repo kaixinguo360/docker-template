@@ -34,7 +34,7 @@ services:
           - ${DEPLOY_NODE_AUTHELIA:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.authelia.rule=Host(\`${DEPLOY_SUBDOMAIN:-authelia}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.authelia.rule=${DEPLOY_ROUTER_AUTHELIA:-Host(\`${DEPLOY_SUBDOMAIN:-authelia}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.authelia.entryPoints=webhttps"
         - "traefik.http.routers.authelia.tls.certresolver=le"
         - "traefik.http.services.authelia.loadbalancer.server.port=9091"
@@ -54,7 +54,7 @@ services:
 #:test|    deploy:
 #:test|      labels:
 #:test|        - "traefik.enable=true"
-#:test|        - "traefik.http.routers.test-authelia.rule=Host(\`test-${DEPLOY_SUBDOMAIN:-authelia}.${DEPLOY_HOSTNAME}\`)"
+#:test|        - "traefik.http.routers.test-authelia.rule=${DEPLOY_ROUTER_TEST:-Host(\`test-${DEPLOY_SUBDOMAIN:-authelia}.${DEPLOY_HOSTNAME}\`)}"
 #:test|        - "traefik.http.routers.test-authelia.entryPoints=webhttps"
 #:test|        - "traefik.http.routers.test-authelia.tls.certresolver=le"
 #:test|        - "traefik.http.services.secure.loadbalancer.server.port=80"

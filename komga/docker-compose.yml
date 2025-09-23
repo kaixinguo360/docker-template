@@ -31,7 +31,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-komga}.rule=Host(\`${DEPLOY_SUBDOMAIN:-komga}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-komga}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-komga}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-komga}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-komga}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-komga}.loadbalancer.server.port=8080"

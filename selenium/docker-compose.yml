@@ -11,7 +11,7 @@ services:
   webdriver:
     image: ${DEPLOY_IMAGE_WEBDRIVER:-selenium/standalone-chrome:latest}
 #:log |    logging: *loki-logging
-#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:env |    env_file: ${DEPLOY_ENV_WEBDRIVER}
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEBDRIVER:-4444}:4444
     networks:
@@ -26,7 +26,7 @@ services:
           - ${DEPLOY_NODE_WEBDRIVER:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-selenium}.rule=Host(\`${DEPLOY_SUBDOMAIN:-selenium}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-selenium}.rule=${DEPLOY_ROUTER_WEBDRIVER:-Host(\`${DEPLOY_SUBDOMAIN:-selenium}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-selenium}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-selenium}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-selenium}.tls.certresolver=le"

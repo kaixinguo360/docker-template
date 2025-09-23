@@ -28,7 +28,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jenkins}.rule=Host(\`${DEPLOY_SUBDOMAIN:-jenkins}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jenkins}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-jenkins}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-jenkins}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-jenkins}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-jenkins}.loadbalancer.server.port=8080"

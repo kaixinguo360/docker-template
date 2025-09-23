@@ -25,7 +25,7 @@ services:
           - ${DEPLOY_NODE_GRAFANA:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_grafana.rule=Host(\`${DEPLOY_SUBDOMAIN_GRAFANA:-grafana}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_grafana.rule=${DEPLOY_ROUTER_GRAFANA:-Host(\`${DEPLOY_SUBDOMAIN_GRAFANA:-grafana}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_grafana.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_grafana.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-plg}_grafana.loadbalancer.server.port=3000"
@@ -52,7 +52,7 @@ services:
           - ${DEPLOY_NODE_LOKI:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_loki.rule=Host(\`${DEPLOY_SUBDOMAIN_LOKI:-loki}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_loki.rule=${DEPLOY_ROUTER_LOKI:-Host(\`${DEPLOY_SUBDOMAIN_LOKI:-loki}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_loki.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_loki.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-plg}_loki.loadbalancer.server.port=3100"
@@ -100,7 +100,7 @@ services:
 #:influxdb|          - ${DEPLOY_NODE_INFLUXDB:-node.labels.ignore != true}
 #:influxdb|      labels:
 #:influxdb|        - "traefik.enable=true" #!no-proxy
-#:influxdb|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_influxdb.rule=Host(\`${DEPLOY_SUBDOMAIN_INFLUXDB:-influxdb}.${DEPLOY_HOSTNAME}\`)"
+#:influxdb|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_influxdb.rule=${DEPLOY_ROUTER_INFLUXDB:-Host(\`${DEPLOY_SUBDOMAIN_INFLUXDB:-influxdb}.${DEPLOY_HOSTNAME}\`)}"
 #:influxdb|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_influxdb.entrypoints=webhttps"
 #:influxdb|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-plg}_influxdb.tls.certresolver=le"
 #:influxdb|        - "traefik.http.services.${DEPLOY_STACK_NAME:-plg}_influxdb.loadbalancer.server.port=8086"

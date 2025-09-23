@@ -33,7 +33,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-wallabag}.rule=Host(\`${DEPLOY_SUBDOMAIN:-wallabag}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-wallabag}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-wallabag}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-wallabag}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-wallabag}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-wallabag}.loadbalancer.server.port=80"

@@ -16,12 +16,21 @@ $(sed -nE 's/.*#[!:]([^ |]*).*/# - \1/p' docker-compose.yml | sort -u)
 #
 HERE
 
+{
 grep '${DEPLOY_[^\[}]\+}\|$DEPLOY_[A-Z_a-z0-9]\+' \
     -r -o -h \
     ./bin/* ./config/* ./docker-compose*.yml \
     2>/dev/null \
     | sort -u \
-    | xargs -n1 -I{} sh -c 'echo $(echo \{}|grep -o "DEPLOY_[A-Z_a-z0-9]\+")=\"{}\"' 2>&1 \
+    | xargs -n1 -I{} sh -c 'echo $(echo \{}|grep -o "DEPLOY_[A-Z_a-z0-9]\+")=\"{}\"' 2>&1
+grep '${DEPLOY_ROUTER_[A-Z_a-z0-9]\+:-Host\(.*\)}' \
+    -r -o -h \
+    ./bin/* ./config/* ./docker-compose*.yml \
+    2>/dev/null \
+    | sort -u \
+    | sed -E 's/`/\\`/g' \
+    | xargs -n1 -I{} sh -c 'echo $(echo '"'"'\{}'"'"'|grep -o "DEPLOY_ROUTER_[A-Z_a-z0-9]\+")=\"{}\"' 2>&1
+} \
     | sort -u \
     | sed -E '/^sh: ?.*(DEPLOY_[A-Z_a-z0-9]+): ?(.*)$/{
 s//\n [ERROR] required variable is missing a value\n   Name: \1\n   Info: \2\n   Fix:  add `\1=<your_value>` to deploy.env or deploy-<profile>.env\n/g

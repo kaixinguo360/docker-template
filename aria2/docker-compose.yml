@@ -56,7 +56,7 @@ services:
           - ${DEPLOY_NODE_ARIA2:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.rule=Host(\`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}\`)&&PathPrefix(\`/jsonrpc\`,\`/rpc\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.rule=${DEPLOY_ROUTER_ARIA2:-Host(\`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}\`)&&PathPrefix(\`/jsonrpc\`,\`/rpc\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_web.tls.certresolver=le"
@@ -78,7 +78,7 @@ services:
 #:webui|          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
 #:webui|      labels:
 #:webui|        - "traefik.enable=true" #!no-proxy
-#:webui|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.rule=Host(\`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}\`)"
+#:webui|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-aria2}.${DEPLOY_HOSTNAME}\`)}"
 #:webui|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.entrypoints=webhttps"
 #:webui|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.options=sslVerifyClient@file"
 #:webui|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-aria2}_aria2.tls.certresolver=le"

@@ -57,7 +57,7 @@ services:
 #:adminer|          - ${DEPLOY_NODE_ADMINER:-node.labels.ignore != true}
 #:adminer|      labels:
 #:adminer|        - "traefik.enable=true" #!no-proxy
-#:adminer|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mysql}_adminer.rule=Host(\`${DEPLOY_SUBDOMAIN_ADMINER:-adminer}.${DEPLOY_HOSTNAME}\`)"
+#:adminer|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mysql}_adminer.rule=${DEPLOY_ROUTER_ADMINER:-Host(\`${DEPLOY_SUBDOMAIN_ADMINER:-adminer}.${DEPLOY_HOSTNAME}\`)}"
 #:adminer|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mysql}_adminer.entrypoints=webhttps"
 #:adminer|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mysql}_adminer.tls.options=sslVerifyClient@file"
 #:adminer|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mysql}_adminer.tls.certresolver=le"

@@ -28,8 +28,8 @@ services:
           - ${DEPLOY_NODE_PROXY:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.rule=Host(\`${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}\`)" #!nginx
-#:nginx|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.rule=Host(\`origin-${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}\`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.rule=${DEPLOY_ROUTER_PROXY:-Host(\`${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}\`)}" #!nginx
+#:nginx|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.rule=${DEPLOY_ROUTER_PROXY:-Host(\`origin-${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-imgproxy}.tls.certresolver=le"
@@ -55,7 +55,7 @@ services:
 #:nginx|          - ${DEPLOY_NODE_NGINX:-node.labels.ignore != true}
 #:nginx|      labels:
 #:nginx|        - "traefik.enable=true" #!no-proxy
-#:nginx|        - "traefik.http.routers.nginx-${DEPLOY_STACK_NAME:-imgproxy}.rule=Host(\`${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}\`)"
+#:nginx|        - "traefik.http.routers.nginx-${DEPLOY_STACK_NAME:-imgproxy}.rule=${DEPLOY_ROUTER_NGINX:-Host(\`${DEPLOY_SUBDOMAIN:-imgproxy}.${DEPLOY_HOSTNAME}\`)}"
 #:nginx|        - "traefik.http.routers.nginx-${DEPLOY_STACK_NAME:-imgproxy}.entrypoints=webhttps"
 #:nginx|#:client-ssl|        - "traefik.http.routers.nginx-${DEPLOY_STACK_NAME:-imgproxy}.tls.options=sslVerifyClient@file"
 #:nginx|        - "traefik.http.routers.nginx-${DEPLOY_STACK_NAME:-imgproxy}.tls.certresolver=le"
