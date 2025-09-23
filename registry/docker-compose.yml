@@ -28,7 +28,7 @@ services:
           - ${DEPLOY_NODE_REGISTRY:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.rule=Host(`${DEPLOY_SUBDOMAIN:-docker}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.rule=Host(\`${DEPLOY_SUBDOMAIN:-docker}.${DEPLOY_HOSTNAME}\`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}.tls.certresolver=le"
@@ -50,7 +50,7 @@ services:
 #:web|          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
 #:web|      labels:
 #:web|        - "traefik.enable=true" #!no-proxy
-#:web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}_web.rule=Host(`${DEPLOY_SUBDOMAIN_WEB:-web-docker}.${DEPLOY_HOSTNAME}`)"
+#:web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}_web.rule=Host(\`${DEPLOY_SUBDOMAIN_WEB:-web-docker}.${DEPLOY_HOSTNAME}\`)"
 #:web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}_web.entrypoints=webhttps"
 #:web|#:client-ssl-web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}_web.tls.options=sslVerifyClient@file"
 #:web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-registry}_web.tls.certresolver=le"

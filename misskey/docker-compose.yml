@@ -31,7 +31,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-misskey}.rule=Host(`${DEPLOY_SUBDOMAIN:-misskey}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-misskey}.rule=Host(\`${DEPLOY_SUBDOMAIN:-misskey}.${DEPLOY_HOSTNAME}\`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-misskey}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-misskey}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-misskey}.loadbalancer.server.port=3000"

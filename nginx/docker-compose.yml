@@ -28,7 +28,7 @@ services:
           - ${DEPLOY_NODE_PROXY:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.rule=Host(`${DEPLOY_SUBDOMAIN:-nginx}.${DEPLOY_HOSTNAME}`)" #!custom-router-rule
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.rule=Host(\`${DEPLOY_SUBDOMAIN:-nginx}.${DEPLOY_HOSTNAME}\`)" #!custom-router-rule
 #:custom-router-rule|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.rule=$DEPLOY_CUSTOM_ROUTER_RULE"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nginx}.tls.options=sslVerifyClient@file"

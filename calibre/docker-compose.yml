@@ -31,7 +31,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-calibre}.rule=Host(`${DEPLOY_SUBDOMAIN:-book}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-calibre}.rule=Host(\`${DEPLOY_SUBDOMAIN:-book}.${DEPLOY_HOSTNAME}\`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-calibre}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-calibre}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-calibre}.loadbalancer.server.port=8083"

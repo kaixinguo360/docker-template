@@ -49,7 +49,7 @@ services:
 #:hdfs|          - ${DEPLOY_NODE_HDFS_NAMENODE:-node.labels.ignore != true} #!no-proxy
 #:hdfs|      labels: #!no-proxy
 #:hdfs|        - "traefik.enable=true" #!no-proxy
-#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.rule=Host(`${DEPLOY_SUBDOMAIN_HDFS_NAMENODE:-namenode-hadoop}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+#:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.rule=Host(\`${DEPLOY_SUBDOMAIN_HDFS_NAMENODE:-namenode-hadoop}.${DEPLOY_HOSTNAME}\`)" #!no-proxy
 #:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.entrypoints=webhttps" #!no-proxy
 #:hdfs|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.options=sslVerifyClient@file" #!no-proxy
 #:hdfs|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_namenode.tls.certresolver=le" #!no-proxy
@@ -122,7 +122,7 @@ services:
 #:yarn|          - ${DEPLOY_NODE_YARN_RM:-node.labels.ignore != true} #!no-proxy
 #:yarn|      labels: #!no-proxy
 #:yarn|        - "traefik.enable=true" #!no-proxy
-#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.rule=Host(`${DEPLOY_SUBDOMAIN_YARN_RM:-resourcemanager-hadoop}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.rule=Host(\`${DEPLOY_SUBDOMAIN_YARN_RM:-resourcemanager-hadoop}.${DEPLOY_HOSTNAME}\`)" #!no-proxy
 #:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.entrypoints=webhttps" #!no-proxy
 #:yarn|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.tls.options=sslVerifyClient@file" #!no-proxy
 #:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_resourcemanager.tls.certresolver=le" #!no-proxy
@@ -199,7 +199,7 @@ services:
 #:yarn|          - ${DEPLOY_NODE_YARN_HS:-node.labels.ignore != true} #!no-proxy
 #:yarn|      labels: #!no-proxy
 #:yarn|        - "traefik.enable=true" #!no-proxy
-#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.rule=Host(`${DEPLOY_SUBDOMAIN_YARN_HS:-historyserver-hadoop}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+#:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.rule=Host(\`${DEPLOY_SUBDOMAIN_YARN_HS:-historyserver-hadoop}.${DEPLOY_HOSTNAME}\`)" #!no-proxy
 #:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.entrypoints=webhttps" #!no-proxy
 #:yarn|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.options=sslVerifyClient@file" #!no-proxy
 #:yarn|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_historyserver.tls.certresolver=le" #!no-proxy
@@ -325,7 +325,7 @@ services:
 #:hbase|          - ${DEPLOY_NODE_HBASE_MASTER:-node.labels.ignore != true} #!no-proxy
 #:hbase|      labels: #!no-proxy
 #:hbase|        - "traefik.enable=true" #!no-proxy
-#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.rule=Host(`${DEPLOY_SUBDOMAIN_HBASE:-hbase-hadoop}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+#:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.rule=Host(\`${DEPLOY_SUBDOMAIN_HBASE:-hbase-hadoop}.${DEPLOY_HOSTNAME}\`)" #!no-proxy
 #:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.entrypoints=webhttps" #!no-proxy
 #:hbase|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.tls.options=sslVerifyClient@file" #!no-proxy
 #:hbase|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-hadoop}_hbase-master.tls.certresolver=le" #!no-proxy

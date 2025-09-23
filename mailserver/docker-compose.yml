@@ -75,7 +75,7 @@ services:
 #:traefik-web|      replicas: 1
 #:traefik-web|      labels:
 #:traefik-web|        - "traefik.enable=true"
-#:traefik-web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mailserver}.rule=Host(`${DEPLOY_SUBDOMAIN:-mail}.${DEPLOY_HOSTNAME}`)"
+#:traefik-web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mailserver}.rule=Host(\`${DEPLOY_SUBDOMAIN:-mail}.${DEPLOY_HOSTNAME}\`)"
 #:traefik-web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mailserver}.entrypoints=webhttps"
 #:traefik-web|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-mailserver}.tls.certresolver=le"
 #:traefik-web|        - "traefik.http.services.${DEPLOY_STACK_NAME:-mailserver}.loadbalancer.server.port=80"

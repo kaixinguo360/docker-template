@@ -10,5 +10,11 @@ cat docker-compose.yml | {
     else
         cat
     fi
+} | {
+sh << _____HERE_____
+cat << ____HERE____
+$(cat)
+____HERE____
+_____HERE_____
 }
 

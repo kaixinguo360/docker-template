@@ -31,7 +31,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-chevereto}.rule=Host(`${DEPLOY_SUBDOMAIN:-chevereto}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-chevereto}.rule=Host(\`${DEPLOY_SUBDOMAIN:-chevereto}.${DEPLOY_HOSTNAME}\`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-chevereto}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-chevereto}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-chevereto}.loadbalancer.server.port=80"

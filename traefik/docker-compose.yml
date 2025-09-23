@@ -43,7 +43,7 @@ services:
       labels:
         - "traefik.enable=true"
         # 全局重定向匹配路由规则，这里匹配了所有路由
-        - "traefik.http.routers.http2https.rule=HostRegexp(`{any:.+}`)"
+        - "traefik.http.routers.http2https.rule=HostRegexp(\`{any:.+}\`)"
         # 入口点选择上面配置的webhttp入口点
         - "traefik.http.routers.http2https.entrypoints=webhttp"
         # 路由中间件
@@ -53,7 +53,7 @@ services:
         # 最最关键的一步，创建一个noop虚服务的loadbalancer，port随便选，不然上述重定向配置不会生效
         - "traefik.http.services.noop.loadbalancer.server.port=9999"
 #:dashboard|        # 仪表盘
-#:dashboard|        - "traefik.http.routers.api.rule=Host(`${DEPLOY_SUBDOMAIN:-traefik}.${DEPLOY_HOSTNAME}`)"
+#:dashboard|        - "traefik.http.routers.api.rule=Host(\`${DEPLOY_SUBDOMAIN:-traefik}.${DEPLOY_HOSTNAME}\`)"
 #:dashboard|        - "traefik.http.routers.api.entrypoints=webhttps"
 #:dashboard|#:client-ssl|        - "traefik.http.routers.api.tls.options=sslVerifyClient@file"
 #:dashboard|        - "traefik.http.routers.api.tls.certresolver=le"

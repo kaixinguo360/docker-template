@@ -16,12 +16,12 @@ services:
 #:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
     command: >
       bash -c
-        "for i in `seq 1 30`; do
+        "for i in \`seq 1 30\`; do
           node main.js &&
-          s=$$? && break || s=$$?;
-          echo \"Tried $$i times. Waiting 5 secs...\";
+          s=\$? && break || s=\$?;
+          echo \"Tried \$i times. Waiting 5 secs...\";
           sleep 5;
-        done; (exit $$s)"
+        done; (exit \$s)"
     environment:
       PORT: "3000"
       ROOT_URL: https://${DEPLOY_SUBDOMAIN:-rocket}.${DEPLOY_HOSTNAME}
@@ -44,7 +44,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-rocket}.rule=Host(`${DEPLOY_SUBDOMAIN:-rocket}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-rocket}.rule=Host(\`${DEPLOY_SUBDOMAIN:-rocket}.${DEPLOY_HOSTNAME}\`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-rocket}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-rocket}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-rocket}.loadbalancer.server.port=3000"

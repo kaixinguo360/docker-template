@@ -39,7 +39,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}.rule=Host(`${DEPLOY_SUBDOMAIN:-conduwuit}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}.rule=Host(\`${DEPLOY_SUBDOMAIN:-conduwuit}.${DEPLOY_HOSTNAME}\`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}.tls.certresolver=le"
@@ -64,7 +64,7 @@ services:
           - ${DEPLOY_NODE_NGINX:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}_nginx.rule=Host(`${DEPLOY_SUBDOMAIN:-conduwuit}.${DEPLOY_HOSTNAME}`) && PathPrefix(`/.well-known`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}_nginx.rule=Host(\`${DEPLOY_SUBDOMAIN:-conduwuit}.${DEPLOY_HOSTNAME}\`) && PathPrefix(\`/.well-known\`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}_nginx.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}_nginx.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-conduwuit}_nginx.tls.certresolver=le"

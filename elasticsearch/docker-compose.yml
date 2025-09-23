@@ -44,7 +44,7 @@ services:
           - ${DEPLOY_NODE_ES:-node.labels.ignore != true} #!no-proxy
       labels: #!no-proxy
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_es.rule=Host(`${DEPLOY_SUBDOMAIN_ES:-es}.${DEPLOY_HOSTNAME}`)" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_es.rule=Host(\`${DEPLOY_SUBDOMAIN_ES:-es}.${DEPLOY_HOSTNAME}\`)" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_es.entrypoints=webhttps" #!no-proxy
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_es.tls.options=sslVerifyClient@file" #!no-proxy
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_es.tls.certresolver=le" #!no-proxy
@@ -77,7 +77,7 @@ services:
 #:cerebro|          - ${DEPLOY_NODE_CEREBRO:-node.labels.ignore != true}
 #:cerebro|      labels:
 #:cerebro|        - "traefik.enable=true" #!no-proxy
-#:cerebro|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.rule=Host(`${DEPLOY_SUBDOMAIN_CEREBRO:-cerebro}.${DEPLOY_HOSTNAME}`)"
+#:cerebro|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.rule=Host(\`${DEPLOY_SUBDOMAIN_CEREBRO:-cerebro}.${DEPLOY_HOSTNAME}\`)"
 #:cerebro|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.entrypoints=webhttps"
 #:cerebro|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.tls.options=sslVerifyClient@file"
 #:cerebro|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-elasticsearch}_cerebro.tls.certresolver=le"

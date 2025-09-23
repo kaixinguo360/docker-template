@@ -29,7 +29,7 @@ services:
           - ${DEPLOY_NODE_JELLYSEERR:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jellyseerr.rule=Host(`${DEPLOY_SUBDOMAIN_JELLYSEERR:-jellyseerr}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jellyseerr.rule=Host(\`${DEPLOY_SUBDOMAIN_JELLYSEERR:-jellyseerr}.${DEPLOY_HOSTNAME}\`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jellyseerr.entrypoints=webhttps"
 #:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jellyseerr.tls.options=sslVerifyClient@file"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jellyseerr.tls.certresolver=le"
@@ -58,7 +58,7 @@ services:
 #:radarr|          - ${DEPLOY_NODE_RADARR:-node.labels.ignore != true}
 #:radarr|      labels:
 #:radarr|        - "traefik.enable=true" #!no-proxy
-#:radarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-radarr.rule=Host(`${DEPLOY_SUBDOMAIN_RADARR:-radarr}.${DEPLOY_HOSTNAME}`)"
+#:radarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-radarr.rule=Host(\`${DEPLOY_SUBDOMAIN_RADARR:-radarr}.${DEPLOY_HOSTNAME}\`)"
 #:radarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-radarr.entrypoints=webhttps"
 #:radarr|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-radarr.tls.options=sslVerifyClient@file"
 #:radarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-radarr.tls.certresolver=le"
@@ -87,7 +87,7 @@ services:
 #:sonarr|          - ${DEPLOY_NODE_SONARR:-node.labels.ignore != true}
 #:sonarr|      labels:
 #:sonarr|        - "traefik.enable=true" #!no-proxy
-#:sonarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-sonarr.rule=Host(`${DEPLOY_SUBDOMAIN_SONARR:-sonarr}.${DEPLOY_HOSTNAME}`)"
+#:sonarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-sonarr.rule=Host(\`${DEPLOY_SUBDOMAIN_SONARR:-sonarr}.${DEPLOY_HOSTNAME}\`)"
 #:sonarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-sonarr.entrypoints=webhttps"
 #:sonarr|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-sonarr.tls.options=sslVerifyClient@file"
 #:sonarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-sonarr.tls.certresolver=le"
@@ -117,7 +117,7 @@ services:
 #:jackett|          - ${DEPLOY_NODE_JACKETT:-node.labels.ignore != true}
 #:jackett|      labels:
 #:jackett|        - "traefik.enable=true" #!no-proxy
-#:jackett|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jackett.rule=Host(`${DEPLOY_SUBDOMAIN_JACKETT:-jackett}.${DEPLOY_HOSTNAME}`)"
+#:jackett|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jackett.rule=Host(\`${DEPLOY_SUBDOMAIN_JACKETT:-jackett}.${DEPLOY_HOSTNAME}\`)"
 #:jackett|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jackett.entrypoints=webhttps"
 #:jackett|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jackett.tls.options=sslVerifyClient@file"
 #:jackett|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jackett.tls.certresolver=le"
@@ -143,7 +143,7 @@ services:
 #:flaresolverr|          - ${DEPLOY_NODE_FLARESOLVERR:-node.labels.ignore != true}
 #:flaresolverr|      labels:
 #:flaresolverr|        - "traefik.enable=true" #!no-proxy
-#:flaresolverr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-flaresolverr.rule=Host(`${DEPLOY_SUBDOMAIN_FLARESOLVERR:-flaresolverr}.${DEPLOY_HOSTNAME}`)"
+#:flaresolverr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-flaresolverr.rule=Host(\`${DEPLOY_SUBDOMAIN_FLARESOLVERR:-flaresolverr}.${DEPLOY_HOSTNAME}\`)"
 #:flaresolverr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-flaresolverr.entrypoints=webhttps"
 #:flaresolverr|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-flaresolverr.tls.options=sslVerifyClient@file"
 #:flaresolverr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-flaresolverr.tls.certresolver=le"
@@ -171,7 +171,7 @@ services:
 #:jproxy|          - ${DEPLOY_NODE_JPROXY:-node.labels.ignore != true}
 #:jproxy|      labels:
 #:jproxy|        - "traefik.enable=true" #!no-proxy
-#:jproxy|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jproxy.rule=Host(`${DEPLOY_SUBDOMAIN_JPROXY:-jproxy}.${DEPLOY_HOSTNAME}`)"
+#:jproxy|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jproxy.rule=Host(\`${DEPLOY_SUBDOMAIN_JPROXY:-jproxy}.${DEPLOY_HOSTNAME}\`)"
 #:jproxy|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jproxy.entrypoints=webhttps"
 #:jproxy|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jproxy.tls.options=sslVerifyClient@file"
 #:jproxy|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-jproxy.tls.certresolver=le"
@@ -198,11 +198,38 @@ services:
 #:prowlarr|          - ${DEPLOY_NODE_PROWLARR:-node.labels.ignore != true}
 #:prowlarr|      labels:
 #:prowlarr|        - "traefik.enable=true" #!no-proxy
-#:prowlarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.rule=Host(`${DEPLOY_SUBDOMAIN_PROWLARR:-prowlarr}.${DEPLOY_HOSTNAME}`)"
+#:prowlarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.rule=Host(\`${DEPLOY_SUBDOMAIN_PROWLARR:-prowlarr}.${DEPLOY_HOSTNAME}\`)"
 #:prowlarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.entrypoints=webhttps"
 #:prowlarr|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.tls.options=sslVerifyClient@file"
 #:prowlarr|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.tls.certresolver=le"
 #:prowlarr|        - "traefik.http.services.${DEPLOY_STACK_NAME:-jellyseerr}-prowlarr.loadbalancer.server.port=9696"
+
+#:medusa|  medusa:
+#:medusa|    image: ${DEPLOY_IMAGE_MEDUSA:-linuxserver/medusa:1.0.22}
+#:medusa|#:log |    logging: *loki-logging
+#:medusa|#:env |    env_file: ${DEPLOY_ENV_MEDUSA}
+#:medusa|#:port|    ports:
+#:medusa|#:port|      - ${DEPLOY_PORT_MEDUSA:-8081}:8081
+#:medusa|    environment:
+#:medusa|      - PUID=1000
+#:medusa|      - PGID=1000
+#:medusa|      - TZ=Asia/Shanghai
+#:medusa|    networks:
+#:medusa|      - external_network
+#:medusa|    volumes:
+#:medusa|      - medusa:/config
+#:medusa|    deploy:
+#:medusa|      replicas: 1
+#:medusa|      placement:
+#:medusa|        constraints: 
+#:medusa|          - ${DEPLOY_NODE_MEDUSA:-node.labels.ignore != true}
+#:medusa|      labels:
+#:medusa|        - "traefik.enable=true" #!no-proxy
+#:medusa|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-medusa.rule=Host(\`${DEPLOY_SUBDOMAIN_MEDUSA:-medusa}.${DEPLOY_HOSTNAME}\`)"
+#:medusa|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-medusa.entrypoints=webhttps"
+#:medusa|#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-medusa.tls.options=sslVerifyClient@file"
+#:medusa|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyseerr}-medusa.tls.certresolver=le"
+#:medusa|        - "traefik.http.services.${DEPLOY_STACK_NAME:-jellyseerr}-medusa.loadbalancer.server.port=8081"
 
 networks:
   external_network:
@@ -239,6 +266,11 @@ volumes:
 #:prowlarr|      type: "nfs"
 #:prowlarr|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
 #:prowlarr|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/prowlarr"
+#:medusa|  medusa:
+#:medusa|    driver_opts:
+#:medusa|      type: "nfs"
+#:medusa|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:medusa|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/medusa"
 #:media |  media:
 #:media |    driver_opts:
 #:media |      type: "nfs"

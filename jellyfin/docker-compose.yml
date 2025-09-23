@@ -28,7 +28,7 @@ services:
           - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
       labels:
         - "traefik.enable=true" #!no-proxy
-        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyfin}.rule=Host(`${DEPLOY_SUBDOMAIN:-jellyfin}.${DEPLOY_HOSTNAME}`)"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyfin}.rule=Host(\`${DEPLOY_SUBDOMAIN:-jellyfin}.${DEPLOY_HOSTNAME}\`)"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyfin}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-jellyfin}.tls.certresolver=le"
         - "traefik.http.services.${DEPLOY_STACK_NAME:-jellyfin}.loadbalancer.server.port=8096"
