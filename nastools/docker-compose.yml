@@ -1,0 +1,62 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-hsuyelin/nas-tools:3.4.1}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+      - TZ=Asia/Shanghai
+      - NASTOOL_AUTO_UPDATE=${DEPLOY_APP_NASTOOL_AUTO_UPDATE:-false} # 如需在启动容器时自动升级程序请设置为true
+      - NASTOOL_CN_UPDATE=${DEPLOY_APP_NASTOOL_CN_UPDATE:-false} # 如果开启了容器启动自动升级程序，并且网络不太友好时，可以设置为true，会使用国内源进行软件更新
+      - RCLONE_CONFIG=${DEPLOY_APP_RCLONE_CONFIG:-/config/rclone.conf}
+    networks:
+      - external_network
+    volumes:
+      - data:/config
+#:media |      - media:/media
+#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nastools}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-nastools}.${DEPLOY_HOSTNAME}\`)}"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nastools}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nastools}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-nastools}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-nastools}.loadbalancer.server.port=3000"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-nastools}/data"
+#:media |  media:
+#:media |    driver_opts:
+#:media |      type: "nfs"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      device: ":$DEPLOY_MEDIA_ROOT"
+#:rclone|  rclone:
+#:rclone|    driver: "rclone"
+#:rclone|    driver_opts:
+#:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"
