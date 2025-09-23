@@ -1,0 +1,72 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-searxng/searxng:latest}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
+    environment:
+      - SEARXNG_BASE_URL=https://${DEPLOY_SUBDOMAIN:-searxng}.${DEPLOY_HOSTNAME}/
+      - UWSGI_WORKERS=${SEARXNG_UWSGI_WORKERS:-4}
+      - UWSGI_THREADS=${SEARXNG_UWSGI_THREADS:-4}
+    networks:
+#:redis|      - internal_network
+      - external_network
+    configs:
+      - source: searxng-settings-config
+        target: /etc/searxng/settings.yml
+#:redis|      - source: searxng-limiter-config
+#:redis|        target: /etc/searxng/limiter.toml
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-searxng}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-searxng}.${DEPLOY_HOSTNAME}\`)}"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-searxng}.entrypoints=webhttps"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-searxng}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-searxng}.loadbalancer.server.port=8080"
+
+#:redis|  redis:
+#:redis|    image: ${DEPLOY_IMAGE_REDIS:-redis:7-alpine}
+#:redis|#:log |    logging: *loki-logging
+#:redis|#:env |    env_file: ${DEPLOY_ENV_REDIS}
+#:redis|    networks:
+#:redis|      - internal_network
+#:redis|    volumes:
+#:redis|      - redis:/redis
+#:redis|    deploy:
+#:redis|      replicas: 1
+#:redis|      placement:
+#:redis|        constraints: 
+#:redis|          - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
+
+configs:
+  searxng-settings-config:
+    file: ${DEPLOY_CONFIG_SEARXNG_SETTINGS:-config/settings.yml}
+#:redis|  searxng-limiter-config:
+#:redis|    file: ${DEPLOY_CONFIG_SEARXNG_LIMITER:-config/limiter.toml}
+
+networks:
+#:redis|  internal_network:
+#:redis|    internal: true
+  external_network:
+    external: true
+
+#:redis|volumes:
+#:redis|  redis:
+#:redis|    driver_opts:
+#:redis|      type: "nfs"
+#:redis|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:redis|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-firefish}/redis"
