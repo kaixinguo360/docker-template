@@ -69,4 +69,4 @@ networks:
 #:redis|    driver_opts:
 #:redis|      type: "nfs"
 #:redis|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
-#:redis|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-firefish}/redis"
+#:redis|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-searxng}/redis"

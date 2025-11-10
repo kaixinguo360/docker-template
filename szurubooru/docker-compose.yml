@@ -20,7 +20,7 @@ services:
       POSTGRES_USER: szurubooru
       POSTGRES_PASSWORD: szurubooru
       ## Commented Values are Default:
-      #POSTGRES_DB: defaults to same as POSTGRES_USER
+      POSTGRES_DB: szurubooru
       #POSTGRES_PORT: 5432
       #LOG_SQL: 0 (1 for verbose SQL logs)
     networks:
