@@ -1,0 +1,85 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  transmission:
+    image: ${DEPLOY_IMAGE_TRANSMISSION:-linuxserver/transmission:4.0.6}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_TRANSMISSION}
+    ports:
+      - ${DEPLOY_PORT_TRANSMISSION_BT:-51413}:${DEPLOY_PORT_TRANSMISSION_BT:-51413}/tcp #!host
+      - ${DEPLOY_PORT_TRANSMISSION_BT:-51413}:${DEPLOY_PORT_TRANSMISSION_BT:-51413}/udp #!host
+#:host|      - target: ${DEPLOY_PORT_TRANSMISSION_BT:-51413}
+#:host|        published: ${DEPLOY_PORT_TRANSMISSION_BT:-51413}
+#:host|        protocol: udp
+#:host|        mode: host
+#:host|      - target: ${DEPLOY_PORT_TRANSMISSION_BT:-51413}
+#:host|        published: ${DEPLOY_PORT_TRANSMISSION_BT:-51413}
+#:host|        protocol: tcp
+#:host|        mode: host
+#:port|      - ${DEPLOY_PORT_ARIA2_RPC:-6800}:6800
+#:port|      - ${DEPLOY_PORT_TRANSMISSION:-9091}:9091
+    environment:
+#:webui|      - TRANSMISSION_WEB_HOME=/webui
+      - PEERPORT=${DEPLOY_PORT_TRANSMISSION_BT:-51413}
+      - PUID
+      - PGID
+      - USER
+      - PASS
+      - TZ
+    networks:
+      - external_network
+    volumes:
+      - config:/config
+      - downloads:/downloads
+#:webui |      - webui:/webui
+#:media |      - media:$DEPLOY_MEDIA_MOUNT
+#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - ${DEPLOY_NODE_TRANSMISSION:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-transmission}.rule=${DEPLOY_ROUTER_TRANSMISSION:-Host(\`${DEPLOY_SUBDOMAIN:-transmission}.${DEPLOY_HOSTNAME}\`)}"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-transmission}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-transmission}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-transmission}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-transmission}.loadbalancer.server.port=9091"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-transmission}/config"
+  downloads:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-transmission}/downloads"
+#:webui |  webui:
+#:webui |    driver_opts:
+#:webui |      type: "nfs"
+#:webui |      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:webui |      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-transmission}/webui"
+#:media |  media:
+#:media |    driver_opts:
+#:media |      type: "nfs"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      device: ":$DEPLOY_MEDIA_ROOT"
+#:rclone|  rclone:
+#:rclone|    driver: "rclone"
+#:rclone|    driver_opts:
+#:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"
