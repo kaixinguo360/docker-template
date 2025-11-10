@@ -1,0 +1,63 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-binwiederhier/ntfy:v2.11.0}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-80}:80
+    command: serve
+    healthcheck: # optional: remember to adapt the host:port to your environment
+      test: ["CMD-SHELL", "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\\\s*:\\\\s*true' || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      NTFY_BASE_URL: "https://${DEPLOY_SUBDOMAIN:-ntfy}.${DEPLOY_HOSTNAME}"
+      NTFY_CACHE_FILE: /var/lib/ntfy/cache.db
+      NTFY_AUTH_FILE: /var/lib/ntfy/auth.db
+      NTFY_ATTACHMENT_CACHE_DIR: /var/lib/ntfy/attachments
+      NTFY_WEB_PUSH_FILE: /var/lib/ntfy/webpush.db
+      NTFY_BEHIND_PROXY: 'true'
+      NTFY_ENABLE_LOGIN: "${NTFY_ENABLE_LOGIN:-true}"
+      NTFY_ENABLE_SIGNUP: "${NTFY_ENABLE_SIGNUP:-false}"
+      NTFY_AUTH_DEFAULT_ACCESS: ${NTFY_AUTH_DEFAULT_ACCESS:-deny-all}
+      NTFY_WEB_PUSH_PUBLIC_KEY: ${NTFY_WEB_PUSH_PUBLIC_KEY}
+      NTFY_WEB_PUSH_PRIVATE_KEY: ${NTFY_WEB_PUSH_PRIVATE_KEY}
+      NTFY_WEB_PUSH_EMAIL_ADDRESS: ${NTFY_WEB_PUSH_EMAIL_ADDRESS}
+    networks:
+      - external_network
+    volumes:
+      - data:/var/lib/ntfy
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-ntfy}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-ntfy}.${DEPLOY_HOSTNAME}\`)}"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-ntfy}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-ntfy}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-ntfy}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-ntfy}.loadbalancer.server.port=80"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-ntfy}/data"
