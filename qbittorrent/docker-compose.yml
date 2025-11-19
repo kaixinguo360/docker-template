@@ -1,0 +1,76 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  qbittorrent:
+    image: ${DEPLOY_IMAGE_QBITTORRENT:-linuxserver/qbittorrent:5.1.2}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_QBITTORRENT}
+    ports:
+      - ${DEPLOY_PORT_QBITTORRENT_BT:-6881}:${DEPLOY_PORT_QBITTORRENT_BT:-6881}/tcp #!host
+      - ${DEPLOY_PORT_QBITTORRENT_BT:-6881}:${DEPLOY_PORT_QBITTORRENT_BT:-6881}/udp #!host
+#:host|      - target: ${DEPLOY_PORT_QBITTORRENT_BT:-6881}
+#:host|        published: ${DEPLOY_PORT_QBITTORRENT_BT:-6881}
+#:host|        protocol: udp
+#:host|        mode: host
+#:host|      - target: ${DEPLOY_PORT_QBITTORRENT_BT:-6881}
+#:host|        published: ${DEPLOY_PORT_QBITTORRENT_BT:-6881}
+#:host|        protocol: tcp
+#:host|        mode: host
+#:port|      - ${DEPLOY_PORT_QBITTORRENT:-8080}:8080
+    environment:
+      - PUID
+      - PGID
+      - TZ
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    networks:
+      - external_network
+    volumes:
+      - data:/config
+      - downloads:/downloads
+#:media |      - media:$DEPLOY_MEDIA_MOUNT
+#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - ${DEPLOY_NODE_QBITTORRENT:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-qbittorrent}.rule=${DEPLOY_ROUTER_QBITTORRENT:-Host(\`${DEPLOY_SUBDOMAIN:-qbittorrent}.${DEPLOY_HOSTNAME}\`)}"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-qbittorrent}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-qbittorrent}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-qbittorrent}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-qbittorrent}.loadbalancer.server.port=8080"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-qbittorrent}/data"
+  downloads:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-qbittorrent}/downloads"
+#:media |  media:
+#:media |    driver_opts:
+#:media |      type: "nfs"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      device: ":$DEPLOY_MEDIA_ROOT"
+#:rclone|  rclone:
+#:rclone|    driver: "rclone"
+#:rclone|    driver_opts:
+#:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"

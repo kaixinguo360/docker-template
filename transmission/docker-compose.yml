@@ -23,7 +23,6 @@ services:
 #:host|        published: ${DEPLOY_PORT_TRANSMISSION_BT:-51413}
 #:host|        protocol: tcp
 #:host|        mode: host
-#:port|      - ${DEPLOY_PORT_ARIA2_RPC:-6800}:6800
 #:port|      - ${DEPLOY_PORT_TRANSMISSION:-9091}:9091
     environment:
 #:webui|      - TRANSMISSION_WEB_HOME=/webui
