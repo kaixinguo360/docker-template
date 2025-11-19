@@ -9,20 +9,19 @@ x-logging: &loki-logging
 
 services:
   web:
-    image: ${DEPLOY_IMAGE_WEB:-gotson/komga:0.116.0}
+    image: ${DEPLOY_IMAGE_WEB:-gotson/komga:1.23.5}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_WEB}
 #:port|    ports:
-#:port|      - ${DEPLOY_PORT_WEB:-8080}:8080
+#:port|      - ${DEPLOY_PORT_WEB:-25600}:25600
+    environment:
+      - KOMGA_DATABASE_CHECKLOCALFILESYSTEM=FALSE
+      - KOMGA_TASKSDB_CHECKLOCALFILESYSTEM=FALSE
     networks:
       - external_network
     volumes:
       - data:/config
-      - books:/books
-      - type: bind
-        source: /etc/timezone
-        target: /etc/timezone
-        read_only: true
+#:media |      - media:$DEPLOY_MEDIA_MOUNT
 #:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
     deploy:
       replicas: 1
@@ -34,7 +33,7 @@ services:
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-komga}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-komga}.${DEPLOY_HOSTNAME}\`)}"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-komga}.entrypoints=webhttps"
         - "traefik.http.routers.${DEPLOY_STACK_NAME:-komga}.tls.certresolver=le"
-        - "traefik.http.services.${DEPLOY_STACK_NAME:-komga}.loadbalancer.server.port=8080"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-komga}.loadbalancer.server.port=25600"
 
 networks:
   external_network:
@@ -46,16 +45,11 @@ volumes:
       type: "nfs"
       o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-komga}/data"
-  books: #!media_manga
-    driver_opts: #!media_manga
-      type: "nfs" #!media_manga
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!media_manga
-      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-komga}/data" #!media_manga
-#:media_manga|  books:
-#:media_manga|    driver_opts:
-#:media_manga|      type: "nfs"
-#:media_manga|      o: "addr=$DEPLOY_MEDIA_MANGA_HOST,nolock,soft,rw"
-#:media_manga|      device: ":$DEPLOY_MEDIA_MANGA_ROOT"
+#:media |  media:
+#:media |    driver_opts:
+#:media |      type: "nfs"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      device: ":$DEPLOY_MEDIA_ROOT"
 #:rclone|  rclone:
 #:rclone|    driver: "rclone"
 #:rclone|    driver_opts:
