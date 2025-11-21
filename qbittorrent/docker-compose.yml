@@ -29,7 +29,7 @@ services:
       - PGID
       - TZ
       - WEBUI_PORT=8080
-      - TORRENTING_PORT=6881
+      - TORRENTING_PORT=${DEPLOY_PORT_QBITTORRENT_BT:-6881}
     networks:
       - external_network
     volumes:
