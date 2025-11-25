@@ -1,0 +1,92 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-ghcr.io/bitmagnet-io/bitmagnet:v0.10}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+    ports:
+      - ${DEPLOY_PORT_BITMAGNET_BT:-3334}:${DEPLOY_PORT_BITMAGNET_BT:-3334}/tcp #!host
+      - ${DEPLOY_PORT_BITMAGNET_BT:-3334}:${DEPLOY_PORT_BITMAGNET_BT:-3334}/udp #!host
+#:host|      - target: ${DEPLOY_PORT_BITMAGNET_BT:-3334}
+#:host|        published: ${DEPLOY_PORT_BITMAGNET_BT:-3334}
+#:host|        protocol: udp
+#:host|        mode: host
+#:host|      - target: ${DEPLOY_PORT_BITMAGNET_BT:-3334}
+#:host|        published: ${DEPLOY_PORT_BITMAGNET_BT:-3334}
+#:host|        protocol: tcp
+#:host|        mode: host
+#:port|      - ${DEPLOY_PORT_WEB:-3333}:3333
+    command:
+      - worker
+      - run
+      - --keys=http_server
+      - --keys=queue_server
+      # disable the next line to run without DHT crawler
+      - --keys=dht_crawler
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=bitmagnet
+      - POSTGRES_USER=bitmagnet
+      - POSTGRES_PASSWORD=bitmagnet
+      - DHT_SERVER_PORT=${DEPLOY_PORT_BITMAGNET_BT:-3334}
+      - TMDB_API_KEY
+      - LOG_LEVEL
+    networks:
+      - internal_network
+      - external_network
+    volumes:
+      - data:/root/.config/bitmagnet
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-bitmagnet}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-bitmagnet}.${DEPLOY_HOSTNAME}\`)}"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-bitmagnet}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-bitmagnet}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-bitmagnet}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-bitmagnet}.loadbalancer.server.port=3333"
+
+  db:
+    image: ${DEPLOY_IMAGE_DB:-postgres:16-alpine}
+    environment:
+      - POSTGRES_DB=bitmagnet
+      - POSTGRES_USER=bitmagnet
+      - POSTGRES_PASSWORD=bitmagnet
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-bitmagnet}/data"
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-bitmagnet}/db"
