@@ -1,0 +1,93 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-ghcr.io/linkwarden/linkwarden:v2.13.1}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-3000}:3000
+    environment:
+      - DATABASE_URL=postgresql://linkwarden:linkwarden@db:5432/linkwarden
+      - MEILI_HOST=http://meilisearch:7700
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-VERY_SENSITIVE_MEILI_MASTER_KEY}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-VERY_SENSITIVE_SECRET}
+      - NEXTAUTH_URL
+      - NEXT_PUBLIC_DISABLE_REGISTRATION # 禁止注册
+    networks:
+      - internal_network
+      - external_network
+    volumes:
+      - data:/data/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-linkwarden}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-linkwarden}.${DEPLOY_HOSTNAME}\`)}"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-linkwarden}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-linkwarden}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-linkwarden}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-linkwarden}.loadbalancer.server.port=3000"
+
+  db:
+    image: ${DEPLOY_IMAGE_DB:-postgres:16-alpine}
+    environment:
+      - POSTGRES_DB=linkwarden
+      - POSTGRES_USER=linkwarden
+      - POSTGRES_PASSWORD=linkwarden
+    networks:
+      - internal_network
+    volumes:
+      - db:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_DB:-node.labels.ignore != true}
+
+  meilisearch:
+    image: ${DEPLOY_IMAGE_MEILISEARCH:-getmeili/meilisearch:v1.12.8}
+    environment:
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-VERY_SENSITIVE_MEILI_MASTER_KEY}
+    networks:
+      - internal_network
+    volumes:
+      - meilisearch:/meili_data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - ${DEPLOY_NODE_MEILISEARCH:-node.labels.ignore != true}
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-linkwarden}/data"
+  db:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-linkwarden}/db"
+  meilisearch:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-linkwarden}/meilisearch"
