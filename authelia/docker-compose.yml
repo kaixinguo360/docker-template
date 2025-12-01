@@ -9,7 +9,7 @@ x-logging: &loki-logging
 
 services:
   authelia:
-    image: ${DEPLOY_IMAGE_AUTHELIA:-authelia/authelia:latest}
+    image: ${DEPLOY_IMAGE_AUTHELIA:-authelia/authelia:4}
 #:log |    logging: *loki-logging
 #:env |    env_file: ${DEPLOY_ENV_AUTHELIA}
 #:port|    ports:
