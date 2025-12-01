@@ -19,6 +19,7 @@ services:
       DEFAULT_REDIRECTION_URL: https://${DEPLOY_SUBDOMAIN:-authelia}.${DEPLOY_HOSTNAME}
       DOMAIN_TO_PROTECT: ${DEPLOY_HOSTNAME}
     networks:
+#:redis|      - internal_network
       - external_network
     configs:
       - source: authelia-configuration
@@ -47,6 +48,25 @@ services:
         - "traefik.http.middlewares.authelia-basic.forwardAuth.trustForwardHeader=true"
         - "traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 
+#:redis|  redis:
+#:redis|    image: ${DEPLOY_IMAGE_REDIS:-redis:7-alpine}
+#:redis|#:log |    logging: *loki-logging
+#:redis|#:env |    env_file: ${DEPLOY_ENV_REDIS}
+#:redis|    command: redis-server --save 60 1 --loglevel warning
+#:redis|    networks:
+#:redis|      - internal_network
+#:redis|    volumes:
+#:redis|      - type: volume
+#:redis|        source: data
+#:redis|        target: /data
+#:redis|        volume:
+#:redis|          subpath: redis
+#:redis|    deploy:
+#:redis|      replicas: 1
+#:redis|      placement:
+#:redis|        constraints: 
+#:redis|          - ${DEPLOY_NODE_REDIS:-node.labels.ignore != true}
+
 #:test|  test:
 #:test|    image: containous/whoami
 #:test|    networks:
@@ -62,6 +82,8 @@ services:
 #:test|        - "traefik.http.routers.test-authelia.middlewares=authelia@docker"
 
 networks:
+#:redis|  internal_network:
+#:redis|    internal: true
   external_network:
     external: true
 
