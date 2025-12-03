@@ -11,5 +11,9 @@ search:
   formats:
     - html
     - json
-redis:
-  url: redis://redis:6379/0
+#redis:
+#  url: redis://redis:6379/0
+outgoing:
+  request_timeout: 2.0
+  max_request_timeout: 2.0
+  enable_http2: true
