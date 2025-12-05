@@ -1,0 +1,63 @@
+version: "3.8"
+
+x-logging: &loki-logging
+    driver: loki
+    options:
+      loki-url: "${DEPLOY_LOKI_URL}"
+      loki-retries: 5
+      loki-batch-size: 400
+
+services:
+  web:
+    image: ${DEPLOY_IMAGE_WEB:-linuxserver/code-server:4.106.3}
+#:log |    logging: *loki-logging
+#:env |    env_file: ${DEPLOY_ENV_WEB}
+#:port|    ports:
+#:port|      - ${DEPLOY_PORT_WEB:-8443}:8443
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ
+      - PASSWORD
+      - SUDO_PASSWORD
+      - PROXY_DOMAIN
+      - DEFAULT_WORKSPACE
+      - PWA_APPNAME
+    networks:
+      - external_network
+    volumes:
+      - data:/config
+#:media |      - media:$DEPLOY_MEDIA_MOUNT
+#:rclone|      - rclone:$DEPLOY_RCLONE_MOUNT
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - ${DEPLOY_NODE_WEB:-node.labels.ignore != true}
+      labels:
+        - "traefik.enable=true" #!no-proxy
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-codeserver}.rule=${DEPLOY_ROUTER_WEB:-Host(\`${DEPLOY_SUBDOMAIN:-codeserver}.${DEPLOY_HOSTNAME}\`)}"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-codeserver}.entrypoints=webhttps"
+#:client-ssl|        - "traefik.http.routers.${DEPLOY_STACK_NAME:-codeserver}.tls.options=sslVerifyClient@file"
+        - "traefik.http.routers.${DEPLOY_STACK_NAME:-codeserver}.tls.certresolver=le"
+        - "traefik.http.services.${DEPLOY_STACK_NAME:-codeserver}.loadbalancer.server.port=8443"
+
+networks:
+  external_network:
+    external: true
+
+volumes:
+  data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-codeserver}/data"
+#:media |  media:
+#:media |    driver_opts:
+#:media |      type: "nfs"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      device: ":$DEPLOY_MEDIA_ROOT"
+#:rclone|  rclone:
+#:rclone|    driver: "rclone"
+#:rclone|    driver_opts:
+#:rclone|      remote: "$DEPLOY_RCLONE_REMOTE"
