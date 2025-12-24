@@ -68,5 +68,5 @@ networks:
 #:redis|  redis:
 #:redis|    driver_opts:
 #:redis|      type: "nfs"
-#:redis|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:redis|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:redis|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-searxng}/redis"

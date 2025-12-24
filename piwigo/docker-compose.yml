@@ -62,22 +62,22 @@ volumes:
   data:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-piwigo}/data"
   config:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-piwigo}/config"
 #:db|  db:
 #:db|    driver_opts:
 #:db|      type: "nfs"
-#:db|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:db|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:db|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-piwigo}/db"
 #:media |  media:
 #:media |    driver_opts:
 #:media |      type: "nfs"
-#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:media |      device: ":$DEPLOY_MEDIA_ROOT"
 #:rclone|  rclone:
 #:rclone|    driver: "rclone"

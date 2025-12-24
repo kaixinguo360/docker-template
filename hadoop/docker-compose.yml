@@ -380,15 +380,15 @@ volumes: #!local-volume
 #:hdfs|  namenode: #!local-volume
 #:hdfs|    driver_opts: #!local-volume
 #:hdfs|      type: "nfs" #!local-volume
-#:hdfs|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!local-volume
+#:hdfs|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}" #!local-volume
 #:hdfs|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-hadoop}/namenode" #!local-volume
 #:yarn|  historyserver: #!local-volume
 #:yarn|    driver_opts: #!local-volume
 #:yarn|      type: "nfs" #!local-volume
-#:yarn|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!local-volume
+#:yarn|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}" #!local-volume
 #:yarn|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-hadoop}/historyserver" #!local-volume
 #:hive|  hive: #!local-volume
 #:hive|    driver_opts: #!local-volume
 #:hive|      type: "nfs" #!local-volume
-#:hive|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!local-volume
+#:hive|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}" #!local-volume
 #:hive|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-hadoop}/hive" #!local-volume

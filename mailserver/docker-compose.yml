@@ -96,25 +96,25 @@ volumes:
   maildata:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mailserver}/maildata"
   mailstate:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mailserver}/mailstate"
   maillogs:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mailserver}/maillogs"
   config:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-mailserver}/config"
 #:traefik-ssl|  traefik:
 #:traefik-ssl|    driver_opts:
 #:traefik-ssl|      type: "nfs"
-#:traefik-ssl|      o: "addr=$DEPLOY_TRAEFIK_HOST,nolock,soft,rw"
+#:traefik-ssl|      o: "addr=$DEPLOY_TRAEFIK_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:traefik-ssl|      device: ":$DEPLOY_TRAEFIK_ROOT"

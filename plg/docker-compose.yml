@@ -146,16 +146,16 @@ volumes:
   grafana:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-plg}/grafana"
   loki:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-plg}/loki"
 #:influxdb|  influxdb:
 #:influxdb|    driver_opts:
 #:influxdb|      type: "nfs"
-#:influxdb|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:influxdb|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:influxdb|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-plg}/influxdb"
 #:promtail|  promtail:

@@ -70,10 +70,10 @@ volumes:
   feed-icons:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-ttrss}/feed-icons"
   db:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-ttrss}/db"

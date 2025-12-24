@@ -76,7 +76,7 @@ configs:
 #:media |  media:
 #:media |    driver_opts:
 #:media |      type: "nfs"
-#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:media |      device: ":$DEPLOY_MEDIA_ROOT"
 #:rclone|  rclone:
 #:rclone|    driver: "rclone"

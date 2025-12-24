@@ -41,15 +41,15 @@ volumes:
   storage:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-verdaccio}/storage"
   config:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-verdaccio}/config"
 #:plugins|  plugins:
 #:plugins|    driver_opts:
 #:plugins|      type: "nfs"
-#:plugins|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:plugins|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:plugins|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-verdaccio}/plugins"

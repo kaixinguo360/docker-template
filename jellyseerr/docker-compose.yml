@@ -239,42 +239,42 @@ volumes:
   jellyseerr:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/jellyseerr"
 #:radarr|  radarr:
 #:radarr|    driver_opts:
 #:radarr|      type: "nfs"
-#:radarr|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:radarr|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:radarr|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/radarr"
 #:sonarr|  sonarr:
 #:sonarr|    driver_opts:
 #:sonarr|      type: "nfs"
-#:sonarr|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:sonarr|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:sonarr|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/sonarr"
 #:jackett|  jackett:
 #:jackett|    driver_opts:
 #:jackett|      type: "nfs"
-#:jackett|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:jackett|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:jackett|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/jackett"
 #:jproxy|  jproxy:
 #:jproxy|    driver_opts:
 #:jproxy|      type: "nfs"
-#:jproxy|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:jproxy|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:jproxy|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/jproxy"
 #:prowlarr|  prowlarr:
 #:prowlarr|    driver_opts:
 #:prowlarr|      type: "nfs"
-#:prowlarr|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:prowlarr|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:prowlarr|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/prowlarr"
 #:medusa|  medusa:
 #:medusa|    driver_opts:
 #:medusa|      type: "nfs"
-#:medusa|      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+#:medusa|      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:medusa|      device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-jellyseerr}/medusa"
 #:media |  media:
 #:media |    driver_opts:
 #:media |      type: "nfs"
-#:media |      o: "addr=$DEPLOY_MEDIA_HOST,nolock,soft,rw"
+#:media |      o: "addr=$DEPLOY_MEDIA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:media |      device: ":$DEPLOY_MEDIA_ROOT"
 #:rclone|  rclone:
 #:rclone|    driver: "rclone"

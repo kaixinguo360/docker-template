@@ -44,15 +44,15 @@ volumes:
   data:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-calibre}/data"
   books: #!media_book
     driver_opts: #!media_book
       type: "nfs" #!media_book
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!media_book
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}" #!media_book
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-calibre}/books" #!media_book
 #:media_book|  books:
 #:media_book|    driver_opts:
 #:media_book|      type: "nfs"
-#:media_book|      o: "addr=$DEPLOY_MEDIA_BOOK_HOST,nolock,soft,rw"
+#:media_book|      o: "addr=$DEPLOY_MEDIA_BOOK_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:media_book|      device: ":$DEPLOY_MEDIA_BOOK_ROOT"

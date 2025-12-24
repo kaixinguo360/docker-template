@@ -72,22 +72,22 @@ volumes:
   db:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-photoview}/db"
   apicache:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-photoview}/apicache"
   images: #!media_image
     driver_opts: #!media_image
       type: "nfs" #!media_image
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw" #!media_image
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}" #!media_image
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-photoview}/images" #!media_image
 #:media_image|  images:
 #:media_image|    driver_opts:
 #:media_image|      type: "nfs"
-#:media_image|      o: "addr=$DEPLOY_MEDIA_IMAGE_HOST,nolock,soft,rw"
+#:media_image|      o: "addr=$DEPLOY_MEDIA_IMAGE_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
 #:media_image|      device: ":$DEPLOY_MEDIA_IMAGE_ROOTT"
 #:rclone|  rclone:
 #:rclone|    driver: "rclone"

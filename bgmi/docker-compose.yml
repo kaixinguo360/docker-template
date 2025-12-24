@@ -56,7 +56,7 @@ volumes:
   data:
     driver_opts:
       type: "nfs"
-      o: "addr=$DEPLOY_DATA_HOST,nolock,soft,rw"
+      o: "addr=$DEPLOY_DATA_HOST,${DEPLOY_NFS_OPTS:-nolock,soft,rw}"
       device: ":$DEPLOY_DATA_ROOT/${DEPLOY_STACK_NAME:-bgmi}/data"
 #:rclone|  rclone:
 #:rclone|    driver: "rclone"
