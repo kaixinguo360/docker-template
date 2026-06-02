@@ -15,6 +15,7 @@ services:
 #:port|    ports:
 #:port|      - ${DEPLOY_PORT_WEB:-7745}:7745
     environment:
+      - HBOX_AUTH_API_KEY_PEPPER=${HBOX_AUTH_API_KEY_PEPPER?}
       - HBOX_OPTIONS_ALLOW_ANALYTICS=false
     networks:
       - external_network
